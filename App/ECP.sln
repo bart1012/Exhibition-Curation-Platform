@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECP.Api", "ECP.API\ECP.Api.csproj", "{795BD9A4-6909-4441-9849-6BC7CF903AF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECP.API", "ECP.API\ECP.API.csproj", "{795BD9A4-6909-4441-9849-6BC7CF903AF5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECP.Ui.Client", "ECP.UI\ECP.UI.Client\ECP.Ui.Client.csproj", "{412D6919-96AE-4839-909E-EECBF65D9C03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECP.UI.Client", "ECP.UI\ECP.UI.Client\ECP.UI.Client.csproj", "{412D6919-96AE-4839-909E-EECBF65D9C03}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECP.Ui.Server", "ECP.UI\ECP.UI.Server\ECP.Ui.Server.csproj", "{19B23BCF-FBED-484F-9183-BE08337C0F98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECP.UI.Server", "ECP.UI\ECP.UI.Server\ECP.UI.Server.csproj", "{19B23BCF-FBED-484F-9183-BE08337C0F98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
