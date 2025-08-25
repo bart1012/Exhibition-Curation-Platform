@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECP.Api", "App\ECP.Api.csproj", "{B79CE4EF-1B6B-42A6-869B-79B6E2FA6856}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECP.Api", "App\ECP.Api.csproj", "{B79CE4EF-1B6B-42A6-869B-79B6E2FA6856}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECP.Ui.Server", "ECP.Ui.Server\ECP.Ui.Server\ECP.Ui.Server.csproj", "{AC8B1943-70A3-43DF-B5A2-72067B199D68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECP.Ui.Client", "ECP.Ui.Server\ECP.Ui.Server.Client\ECP.Ui.Client.csproj", "{05D7C39F-AC26-4D42-93CD-0D3CBB7CAB19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{B79CE4EF-1B6B-42A6-869B-79B6E2FA6856}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B79CE4EF-1B6B-42A6-869B-79B6E2FA6856}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B79CE4EF-1B6B-42A6-869B-79B6E2FA6856}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC8B1943-70A3-43DF-B5A2-72067B199D68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC8B1943-70A3-43DF-B5A2-72067B199D68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC8B1943-70A3-43DF-B5A2-72067B199D68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC8B1943-70A3-43DF-B5A2-72067B199D68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05D7C39F-AC26-4D42-93CD-0D3CBB7CAB19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05D7C39F-AC26-4D42-93CD-0D3CBB7CAB19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05D7C39F-AC26-4D42-93CD-0D3CBB7CAB19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05D7C39F-AC26-4D42-93CD-0D3CBB7CAB19}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
