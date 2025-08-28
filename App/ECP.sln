@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECP.UI.Client", "ECP.UI\ECP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECP.UI.Server", "ECP.UI\ECP.UI.Server\ECP.UI.Server.csproj", "{19B23BCF-FBED-484F-9183-BE08337C0F98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECP.Shared", "ECP.Shared\ECP.Shared.csproj", "{3A9152B3-49EA-4C22-93DB-EEFB22732AAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECP.Shared", "ECP.Shared\ECP.Shared.csproj", "{3A9152B3-49EA-4C22-93DB-EEFB22732AAC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECP.API.Tests", "ECP.API.Tests\ECP.API.Tests.csproj", "{C727F746-B67C-4E3E-8D35-17025C87144E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{3A9152B3-49EA-4C22-93DB-EEFB22732AAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A9152B3-49EA-4C22-93DB-EEFB22732AAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A9152B3-49EA-4C22-93DB-EEFB22732AAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C727F746-B67C-4E3E-8D35-17025C87144E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C727F746-B67C-4E3E-8D35-17025C87144E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C727F746-B67C-4E3E-8D35-17025C87144E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C727F746-B67C-4E3E-8D35-17025C87144E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
