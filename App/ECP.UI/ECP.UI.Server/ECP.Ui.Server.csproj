@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ECP.Ui.Server.Client\ECP.Ui.Client.csproj" />
+    <ProjectReference Include="..\ECP.UI.Client\ECP.UI.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.8" />
   </ItemGroup>
 

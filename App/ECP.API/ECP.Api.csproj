@@ -7,7 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Artworks\" />
+    <Folder Include="Features\Artists\" />
+    <Folder Include="Features\Collections\" />
+    <Folder Include="Features\Users\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ECP.Shared\ECP.Shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,30 @@
+﻿using ECP.API.Features.Artworks.Models;
+using Microsoft.AspNetCore.Mvc;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace ECP.API.Features.Artworks
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ArtworksController(IArtworksService artworksService) : ControllerBase
+    {
+        private readonly IArtworksService _artworksService = artworksService;
+
+        // GET: api/<ArtworksController>
+        [HttpGet("Previews")]
+        public async Task<IActionResult> GetArtworkPreviewAsync()
+        {
+            Shared.Result<List<ArtworkPreview>> response = await _artworksService.GetArtworkPreviewAsync(10);
+
+            return response.IsSuccess switch
+            {
+                true => (response.Value == null || !response.Value.Any()) ? NoContent() : Ok(response.Value),
+                false => StatusCode(500, new { error = response.ErrorMessage })
+            };
+        }
+
+
+
+    }
+}
