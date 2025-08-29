@@ -13,9 +13,9 @@ namespace ECP.API.Features.Artworks
 
         // GET: api/<ArtworksController>
         [HttpGet("Previews")]
-        public async Task<IActionResult> GetArtworkPreviewAsync()
+        public async Task<IActionResult> GetArtworkPreviewAsync([FromBody] int count)
         {
-            Shared.Result<List<ArtworkPreview>> response = await _artworksService.GetArtworkPreviewAsync(10);
+            Shared.Result<List<ArtworkPreview>> response = await _artworksService.GetArtworkPreviewAsync(count);
 
             return response.IsSuccess switch
             {

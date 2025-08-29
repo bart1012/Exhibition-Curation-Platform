@@ -1,7 +1,6 @@
-using ECP.Ui.Server.Client.Pages;
-using ECP.Ui.Server.Components;
+using ECP.UI.Server.Components;
 
-namespace ECP.Ui.Server
+namespace ECP.UI.Server
 {
     public class Program
     {
