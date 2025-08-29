@@ -9,12 +9,20 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
 {
     public class ArtworksControllerTests
     {
+        private Mock<IArtworksService> _mockArtworksService;
+        private ArtworksController _artworksController;
+
+        [SetUp]
+        public void Setup()
+        {
+            _mockArtworksService = new Mock<IArtworksService>();
+            _artworksController = new ArtworksController(_mockArtworksService.Object);
+        }
+
         [Test]
         public async Task GetArtworkPreviewAsync_WhenServiceReturnsSuccessWithData_ReturnsOkResultWithArtworks()
         {
             // Arrange
-            Mock<IArtworksService> mockArtworkService = new Mock<IArtworksService>();
-            ArtworksController artworksController = new(mockArtworkService.Object);
             var artworkList = new List<ArtworkPreview>()
             {
                 new ArtworkPreview()
@@ -44,13 +52,13 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             };
             var successResult = Shared.Result<List<ArtworkPreview>>.Success(artworkList);
             var completedTask = Task.FromResult(successResult);
-            mockArtworkService.Setup(service => service.GetArtworkPreviewAsync(2)).Returns(completedTask);
+            _mockArtworksService.Setup(service => service.GetArtworkPreviewAsync(2)).Returns(completedTask);
 
             // Act
-            var result = await artworksController.GetArtworkPreviewAsync(2);
+            var result = await _artworksController.GetArtworkPreviewAsync(2);
 
             // Assert
-            mockArtworkService.Verify(service => service.GetArtworkPreviewAsync(2), Times.Once);
+            _mockArtworksService.Verify(service => service.GetArtworkPreviewAsync(2), Times.Once);
             result.Should().BeOfType<OkObjectResult>();
             var okResult = result as OkObjectResult;
             okResult.StatusCode.Should().Be(StatusCodes.Status200OK);
@@ -91,18 +99,16 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
         {
 
             // Arrange
-            Mock<IArtworksService> mockArtworkService = new Mock<IArtworksService>();
-            ArtworksController artworksController = new(mockArtworkService.Object);
             List<ArtworkPreview> artworkList = new();
             var successResult = Shared.Result<List<ArtworkPreview>>.Success(artworkList);
             var completedTask = Task.FromResult(successResult);
-            mockArtworkService.Setup(service => service.GetArtworkPreviewAsync(2)).Returns(completedTask);
+            _mockArtworksService.Setup(service => service.GetArtworkPreviewAsync(2)).Returns(completedTask);
 
             // Act
-            var result = await artworksController.GetArtworkPreviewAsync(2);
+            var result = await _artworksController.GetArtworkPreviewAsync(2);
 
             // Assert
-            mockArtworkService.Verify(service => service.GetArtworkPreviewAsync(2), Times.Once);
+            _mockArtworksService.Verify(service => service.GetArtworkPreviewAsync(2), Times.Once);
             result.Should().BeOfType<NoContentResult>();
             var okResult = result as NoContentResult;
             okResult.StatusCode.Should().Be(StatusCodes.Status204NoContent);
@@ -112,18 +118,16 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
         public async Task GetArtworkPreviewAsync_WhenServiceReturnsSuccessWithNullValue_ReturnsNoContentResult()
         {
             // Arrange
-            Mock<IArtworksService> mockArtworkService = new Mock<IArtworksService>();
-            ArtworksController artworksController = new(mockArtworkService.Object);
             List<ArtworkPreview> artworkList = null;
             var successResult = Shared.Result<List<ArtworkPreview>>.Success(null);
             var completedTask = Task.FromResult(successResult);
-            mockArtworkService.Setup(service => service.GetArtworkPreviewAsync(2)).Returns(completedTask);
+            _mockArtworksService.Setup(service => service.GetArtworkPreviewAsync(2)).Returns(completedTask);
 
             // Act
-            var result = await artworksController.GetArtworkPreviewAsync(2);
+            var result = await _artworksController.GetArtworkPreviewAsync(2);
 
             // Assert
-            mockArtworkService.Verify(service => service.GetArtworkPreviewAsync(2), Times.Once);
+            _mockArtworksService.Verify(service => service.GetArtworkPreviewAsync(2), Times.Once);
             result.Should().BeOfType<NoContentResult>();
             var okResult = result as NoContentResult;
             okResult.StatusCode.Should().Be(StatusCodes.Status204NoContent);
@@ -133,17 +137,15 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
         public async Task GetArtworkPreviewAsync_WhenServiceReturnsFailure_ReturnsInternalServerError()
         {
             // Arrange
-            Mock<IArtworksService> mockArtworkService = new Mock<IArtworksService>();
-            ArtworksController artworksController = new(mockArtworkService.Object);
             var failureResult = Shared.Result<List<ArtworkPreview>>.Failure("Error connecting to external APIs", System.Net.HttpStatusCode.Unauthorized);
             var completedTask = Task.FromResult(failureResult);
-            mockArtworkService.Setup(service => service.GetArtworkPreviewAsync(2)).Returns(completedTask);
+            _mockArtworksService.Setup(service => service.GetArtworkPreviewAsync(2)).Returns(completedTask);
 
             // Act
-            var result = await artworksController.GetArtworkPreviewAsync(2);
+            var result = await _artworksController.GetArtworkPreviewAsync(2);
 
             // Assert
-            mockArtworkService.Verify(service => service.GetArtworkPreviewAsync(2), Times.Once);
+            _mockArtworksService.Verify(service => service.GetArtworkPreviewAsync(2), Times.Once);
             var serverErrorResult = result as ObjectResult;
             serverErrorResult.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
             serverErrorResult.Value.Should().BeEquivalentTo(new { error = "Error connecting to external APIs" });

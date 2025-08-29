@@ -6,7 +6,7 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
     public interface IClevelandMuseumClient
     {
         Task<List<ClevelandMuseumArtworkPreview>> GetArtworkPreview(int count);
-        Task<List<ClevelandMuseumArtwork>> GetArtworksByQuery(string q);
+        Task<List<ClevelandMuseumArtworkPreview>> GetArtworksByQuery(string q, int count);
     }
 
     public class ClevelandMuseumClient : IClevelandMuseumClient
@@ -40,9 +40,20 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
             return artworks;
         }
 
-        public Task<List<ClevelandMuseumArtwork>> GetArtworksByQuery(string q)
+        public async Task<List<ClevelandMuseumArtworkPreview>> GetArtworksByQuery(string q, int count)
         {
-            throw new NotImplementedException();
+            string target_url = BASE_URL + "artworks" + $"/?limit={count}&fields=id,title,creators,images&q={q}";
+            //including a description in the fields list throws a 500 error
+            List<ClevelandMuseumArtworkPreview> artworks = null;
+            HttpResponseMessage response = await _client.GetAsync(target_url);
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var data = JsonSerializer.Deserialize<ClevelandMuseumResponsePreview>(responseContent, _jsonOptions);
+                artworks = data.Data;
+            }
+
+            return artworks;
         }
     }
 }

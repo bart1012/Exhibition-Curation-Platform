@@ -109,10 +109,11 @@ namespace ECP.API.Features.Artworks
             string artworkId = string.Concat("cleveland_", clevelandArtworkPreview.Id);
             int artworkSourceId = clevelandArtworkPreview.Id;
             string artworkTitle = clevelandArtworkPreview.Title;
-            List<Artist> artworkArtists = clevelandArtworkPreview.Creators?.Any() == true ? clevelandArtworkPreview.Creators.Select(a => new Artist()
+            List<Artist?>? artworkArtists = clevelandArtworkPreview.Creators?.Any() == true ? clevelandArtworkPreview.Creators.Select(a => (a != null && a.Description.Contains('(')) ? new Artist()
             {
-                Name = a.Description
-            }).ToList() : null;
+                Name = a.Description.Substring(0, a.Description.IndexOf('(')).Trim()
+            } : null).ToList() : null;
+
             Image artworkWebImage = null;
             if (clevelandArtworkPreview.Images.Web != null)
             {
@@ -165,7 +166,7 @@ namespace ECP.API.Features.Artworks
             return new ArtworkPreview()
             {
                 Id = artworkId,
-                Source = ArtworkSource.CLEVELAND_MUSEUM,
+                Source = ArtworkSource.CHICAGO_ART_INSTITUTE,
                 SourceId = artworkSourceId,
                 Title = artworkTitle,
                 Artists = artworkArtists,

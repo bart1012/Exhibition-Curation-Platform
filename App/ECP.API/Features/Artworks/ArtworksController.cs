@@ -13,9 +13,22 @@ namespace ECP.API.Features.Artworks
 
         // GET: api/<ArtworksController>
         [HttpGet("Previews")]
-        public async Task<IActionResult> GetArtworkPreviewAsync([FromBody] int count)
+        public async Task<IActionResult> GetArtworkPreviewAsync([FromQuery] int count)
         {
             Shared.Result<List<ArtworkPreview>> response = await _artworksService.GetArtworkPreviewAsync(count);
+
+            return response.IsSuccess switch
+            {
+                true => (response.Value == null || !response.Value.Any()) ? NoContent() : Ok(response.Value),
+                false => StatusCode(500, new { error = response.ErrorMessage })
+            };
+        }
+
+        // GET: api/<ArtworksController>
+        [HttpGet("Previews/Search")]
+        public async Task<IActionResult> GetArtworkPreviewByQueryAsync([FromQuery] string q, [FromQuery] int count)
+        {
+            Shared.Result<List<ArtworkPreview>> response = await _artworksService.GetArtworkPreviewByQueryAsync(q, count);
 
             return response.IsSuccess switch
             {
