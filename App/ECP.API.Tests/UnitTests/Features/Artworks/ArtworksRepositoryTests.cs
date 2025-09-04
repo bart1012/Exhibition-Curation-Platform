@@ -3,7 +3,7 @@ using ECP.API.Features.Artworks.Clients.ChicagoArtInstitute;
 using ECP.API.Features.Artworks.Clients.ChicagoArtInstitute.Models;
 using ECP.API.Features.Artworks.Clients.ClevelandMuseum;
 using ECP.API.Features.Artworks.Clients.ClevelandMuseum.Models;
-using ECP.API.Features.Artworks.Models;
+using ECP.Shared;
 using FluentAssertions;
 using Moq;
 

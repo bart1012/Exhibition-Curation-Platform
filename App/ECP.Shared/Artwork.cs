@@ -1,4 +1,4 @@
-﻿namespace ECP.API.Features.Artworks.Models
+﻿namespace ECP.Shared
 {
     public class Artwork
     {
@@ -28,13 +28,6 @@
         public double Height { get; set; }
         public double Width { get; set; }
         public double? Depth { get; set; }
-    }
-
-    public class Image
-    {
-        public string Url { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
     }
 
     public class Images

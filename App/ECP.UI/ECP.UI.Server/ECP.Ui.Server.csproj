@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MudBlazor" Version="8.11.0" />
+    <ProjectReference Include="..\..\ECP.Shared\ECP.Shared.csproj" />
     <ProjectReference Include="..\ECP.UI.Client\ECP.UI.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.8" />
   </ItemGroup>

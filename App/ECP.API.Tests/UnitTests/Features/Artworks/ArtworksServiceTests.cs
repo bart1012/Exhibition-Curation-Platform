@@ -1,5 +1,5 @@
 ﻿using ECP.API.Features.Artworks;
-using ECP.API.Features.Artworks.Models;
+using ECP.Shared;
 using FluentAssertions;
 using Moq;
 

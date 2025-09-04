@@ -1,6 +1,5 @@
 ﻿// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-using ECP.API.Features.Artworks.Models;
 using ECP.Shared;
 
 

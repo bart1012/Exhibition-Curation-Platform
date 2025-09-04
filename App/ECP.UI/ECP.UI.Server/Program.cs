@@ -1,4 +1,5 @@
-using ECP.UI.Server.Components;
+using ECP.UI.Server.Services;
+using MudBlazor.Services;
 
 namespace ECP.UI.Server
 {
@@ -12,6 +13,13 @@ namespace ECP.UI.Server
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents()
                 .AddInteractiveWebAssemblyComponents();
+
+            builder.Services.AddMudServices();
+            builder.Services.AddScoped<IArtworkService, ArtworkService>();
+            builder.Services.AddHttpClient<ArtworkService>(client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7102/api/");
+            });
 
             var app = builder.Build();
 

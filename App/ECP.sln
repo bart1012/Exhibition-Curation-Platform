@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECP.UI.Server", "ECP.UI\ECP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECP.Shared", "ECP.Shared\ECP.Shared.csproj", "{3A9152B3-49EA-4C22-93DB-EEFB22732AAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECP.API.Tests", "ECP.API.Tests\ECP.API.Tests.csproj", "{C727F746-B67C-4E3E-8D35-17025C87144E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ECP.API.Tests", "ECP.API.Tests\ECP.API.Tests.csproj", "{C727F746-B67C-4E3E-8D35-17025C87144E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

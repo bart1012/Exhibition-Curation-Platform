@@ -1,0 +1,23 @@
+﻿@if (List != null)
+{
+    <div class="masonry-grid">
+        @foreach (var item in List)
+        {
+            <MasonryGridItem Artwork="item" />
+        }
+    </div>
+}
+else
+{
+    <div>No Content Error</div>
+}
+
+
+
+
+
+
+@code {
+    [Parameter]
+    public List<ArtworkPreview> List { get; set; }
+}

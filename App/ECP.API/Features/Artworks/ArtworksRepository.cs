@@ -1,6 +1,5 @@
 ﻿using ECP.API.Features.Artworks.Clients.ChicagoArtInstitute;
 using ECP.API.Features.Artworks.Clients.ClevelandMuseum;
-using ECP.API.Features.Artworks.Models;
 using ECP.Shared;
 namespace ECP.API.Features.Artworks
 {

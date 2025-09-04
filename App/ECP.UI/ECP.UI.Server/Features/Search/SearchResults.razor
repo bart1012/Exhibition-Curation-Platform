@@ -1,0 +1,26 @@
+﻿@page "/search"
+@using ECP.UI.Server.Components
+@inject ArtworkService ArtworkService
+
+
+<MudText Align="Align.Center" Typo="Typo.h1" style="font-size: 3rem" Class="pb-5"><b>Results for: @SearchQuery</b></MudText>
+<MasonryGrid List="@artworkList"></MasonryGrid>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "q")]
+    public string SearchQuery { get; set; }
+
+    private List<ArtworkPreview> artworkList;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Console.WriteLine(SearchQuery);
+        var response = await ArtworkService.GetArtworksByQueryAsync(5, SearchQuery);
+
+        if (response.Success)
+        {
+            artworkList = response.Data;
+        }
+    }
+}

@@ -1,4 +1,4 @@
-﻿namespace ECP.API.Features.Artworks.Models
+﻿namespace ECP.Shared
 {
     public class Artist
     {
