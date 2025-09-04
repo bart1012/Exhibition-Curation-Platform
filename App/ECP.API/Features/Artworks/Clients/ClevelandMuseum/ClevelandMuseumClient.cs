@@ -1,12 +1,15 @@
 ﻿using ECP.API.Features.Artworks.Clients.ClevelandMuseum.Models;
+using ECP.API.Features.Artworks.Models;
+using System.Text;
 using System.Text.Json;
 
 namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
 {
     public interface IClevelandMuseumClient
     {
-        Task<List<ClevelandMuseumArtworkPreview>> GetArtworkPreview(int count);
-        Task<List<ClevelandMuseumArtworkPreview>> GetArtworksByQuery(string q, int count);
+        Task<List<ClevelandMuseumArtworkPreview>> GetArtworkPreviews(int count);
+        Task<List<ClevelandMuseumArtworkPreview>> GetArtworkPreviewsByQuery(string q, int count, int offset);
+        string UrlBuilder(ApiArtworkParameters parameters);
     }
 
     public class ClevelandMuseumClient : IClevelandMuseumClient
@@ -24,16 +27,62 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
             };
         }
 
-        public async Task<List<ClevelandMuseumArtworkPreview>?> GetArtworkPreview(int count = 25)
+        public async Task<List<ClevelandMuseumArtworkPreview>?> GetArtworkPreviews(int count = 25)
         {
-            string target_url = BASE_URL + "artworks" + $"/?limit={count}&fields=id,title,creators,images";
-            return await FetchArtworksAsync(target_url);
+            var parameters = new ApiArtworkParameters()
+            {
+                Count = count,
+                PreviewsOnly = true
+            };
+            return await GetArtworksWithParameters(parameters);
         }
 
-        public async Task<List<ClevelandMuseumArtworkPreview>> GetArtworksByQuery(string q, int count)
+        public async Task<List<ClevelandMuseumArtworkPreview>> GetArtworkPreviewsByQuery(string q, int count, int offset)
         {
-            string target_url = BASE_URL + "artworks" + $"/?limit={count}&fields=id,title,creators,images&q={q}";
-            return await FetchArtworksAsync(target_url);
+            var parameters = new ApiArtworkParameters()
+            {
+                Count = count,
+                PreviewsOnly = true,
+                Query = q,
+                Offset = offset
+            };
+            return await GetArtworksWithParameters(parameters);
+
+        }
+
+        public string UrlBuilder(ApiArtworkParameters parameters)
+        {
+            StringBuilder url = new();
+            url.Append(BASE_URL + "artworks");
+
+            if (!string.IsNullOrEmpty(parameters.Query))
+            {
+                url.Append($"?q={parameters.Query}");
+            }
+            else
+            {
+                url.Append("?");
+            }
+
+            if (parameters.Count != 0)
+            {
+                url.Append($"&limit={parameters.Count}");
+            }
+
+            if (parameters.PreviewsOnly)
+            {
+                url.Append("&fields=id,title,creators,images");
+            }
+
+            url.Append($"&skip={parameters.Offset}");
+
+            return url.ToString();
+        }
+
+        protected async Task<List<ClevelandMuseumArtworkPreview>> GetArtworksWithParameters(ApiArtworkParameters parameters)
+        {
+            string url = UrlBuilder(parameters);
+            return await FetchArtworksAsync(url);
         }
 
         private async Task<List<ClevelandMuseumArtworkPreview>?> FetchArtworksAsync(string url)

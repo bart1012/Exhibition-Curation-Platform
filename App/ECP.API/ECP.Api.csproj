@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Features\Artists\" />
-    <Folder Include="Features\Artworks\Models\" />
     <Folder Include="Features\Collections\" />
   </ItemGroup>
 

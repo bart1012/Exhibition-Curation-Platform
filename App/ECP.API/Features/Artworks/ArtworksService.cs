@@ -8,7 +8,7 @@ namespace ECP.API.Features.Artworks
     public interface IArtworksService
     {
         Task<Shared.Result<List<ArtworkPreview>>> GetArtworkPreviewAsync(int count);
-        Task<Shared.Result<List<ArtworkPreview>>> GetArtworkPreviewByQueryAsync(string q, int count);
+        Task<Shared.Result<List<ArtworkPreview>>> GetArtworkPreviewByQueryAsync(string q, int count, int offset);
     }
     public class ArtworksService(IArtworksRepository artworksRepository) : IArtworksService
     {
@@ -18,9 +18,9 @@ namespace ECP.API.Features.Artworks
             return await _artworksRepository.GetArtworkPreviewAsync(count);
         }
 
-        public async Task<Result<List<ArtworkPreview>>> GetArtworkPreviewByQueryAsync(string q, int count)
+        public async Task<Result<List<ArtworkPreview>>> GetArtworkPreviewByQueryAsync(string q, int count, int offset)
         {
-            return await _artworksRepository.GetArtworkPreviewByQueryAsync(q, count);
+            return await _artworksRepository.GetArtworkPreviewByQueryAsync(q, count, offset);
 
         }
     }

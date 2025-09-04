@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
-namespace ECP.Ui.Server.Client
+namespace ECP.UI.Client
 {
     internal class Program
     {

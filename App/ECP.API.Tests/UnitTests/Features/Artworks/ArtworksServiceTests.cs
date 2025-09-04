@@ -110,6 +110,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             // Arrange
             var expectedQuery = "monet";
             var expectedCount = 10;
+            var expectedOffset = 0;
             var artworkList = new List<ArtworkPreview>
        {
                 new ArtworkPreview()
@@ -139,16 +140,16 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             };
             var repositoryResult = Shared.Result<List<ArtworkPreview>>.Success(artworkList);
 
-            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount))
+            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset))
                 .ReturnsAsync(repositoryResult);
 
             // Act
-            var serviceResult = await _artworksService.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount);
+            var serviceResult = await _artworksService.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset);
 
             // Assert
             serviceResult.IsSuccess.Should().BeTrue();
             serviceResult.Value.Should().BeEquivalentTo(artworkList);
-            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount), Times.Once);
+            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset), Times.Once);
         }
 
         [Test]
@@ -157,19 +158,20 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             // Arrange
             var expectedQuery = "unknown artist";
             var expectedCount = 10;
+            var expectedOffset = 1;
             var emptyList = new List<ArtworkPreview>();
             var repositoryResult = Shared.Result<List<ArtworkPreview>>.Success(emptyList);
 
-            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount))
+            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset))
                 .ReturnsAsync(repositoryResult);
 
             // Act
-            var serviceResult = await _artworksService.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount);
+            var serviceResult = await _artworksService.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset);
 
             // Assert
             serviceResult.IsSuccess.Should().BeTrue();
             serviceResult.Value.Should().BeEmpty();
-            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount), Times.Once);
+            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset), Times.Once);
         }
 
         [Test]
@@ -178,20 +180,21 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             // Arrange
             var expectedQuery = "monet";
             var expectedCount = 10;
+            var expectedOffset = 1;
             var expectedError = "Search service is unavailable.";
             var repositoryResult = Shared.Result<List<ArtworkPreview>>.Failure(expectedError, System.Net.HttpStatusCode.ServiceUnavailable);
 
-            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount))
+            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset))
                 .ReturnsAsync(repositoryResult);
 
             // Act
-            var serviceResult = await _artworksService.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount);
+            var serviceResult = await _artworksService.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset);
 
-            // Assert
+            // s
             serviceResult.IsSuccess.Should().BeFalse();
             serviceResult.ErrorMessage.Should().Be(expectedError);
             serviceResult.Value.Should().BeNull();
-            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount), Times.Once);
+            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset), Times.Once);
         }
     }
 }

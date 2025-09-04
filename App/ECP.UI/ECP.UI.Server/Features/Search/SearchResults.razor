@@ -1,26 +1,50 @@
 ﻿@page "/search"
+
 @using ECP.UI.Server.Components
+
 @inject ArtworkService ArtworkService
+@inject NavigationManager NavManager
+
+
 
 
 <MudText Align="Align.Center" Typo="Typo.h1" style="font-size: 3rem" Class="pb-5"><b>Results for: @SearchQuery</b></MudText>
-<MasonryGrid List="@artworkList"></MasonryGrid>
+@if(artworkList != null && artworkList.Count > 0)
+{
+    <MasonryGrid List="@artworkList"></MasonryGrid>
+}
+else
+{
+    <div>No content error</div>
+}
+
+<div class="pagination-container">
+    <MudPagination SelectedChanged="PageChanged" Color="Color.Primary" class="flex-none px-0" Count="4" Size="Size.Large"/>
+</div>
 
 @code {
     [Parameter]
     [SupplyParameterFromQuery(Name = "q")]
     public string SearchQuery { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "p")]
+    public int PageNumber { get; set; }
+
     private List<ArtworkPreview> artworkList;
 
     protected override async Task OnParametersSetAsync()
     {
-        Console.WriteLine(SearchQuery);
-        var response = await ArtworkService.GetArtworksByQueryAsync(5, SearchQuery);
+        var response = await ArtworkService.GetArtworksByQueryAsync(10, SearchQuery, 5*(PageNumber - 1));
 
         if (response.Success)
         {
             artworkList = response.Data;
         }
+    }
+
+    private void PageChanged(int i)
+    {
+        NavManager.NavigateTo($"/search?q={SearchQuery}&p={i}");
     }
 }

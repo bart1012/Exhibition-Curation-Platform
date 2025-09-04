@@ -65,7 +65,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             var clevelandArtworks = CreateClevelandArtPreviews(2);
             var chicagoArtworks = CreateChicagoArtPreviews(2);
 
-            _mockClevelandClient.Setup(c => c.GetArtworkPreview(2)).ReturnsAsync(clevelandArtworks);
+            _mockClevelandClient.Setup(c => c.GetArtworkPreviews(2)).ReturnsAsync(clevelandArtworks);
             _mockChicagoClient.Setup(c => c.GetArtworkPreviews(2)).ReturnsAsync(chicagoArtworks);
             SetupMapper(clevelandArtworks, chicagoArtworks);
 
@@ -75,7 +75,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             // Assert
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().HaveCount(4);
-            _mockClevelandClient.Verify(c => c.GetArtworkPreview(2), Times.Once);
+            _mockClevelandClient.Verify(c => c.GetArtworkPreviews(2), Times.Once);
             _mockChicagoClient.Verify(c => c.GetArtworkPreviews(2), Times.Once);
         }
 
@@ -86,7 +86,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             var clevelandArtworks = CreateClevelandArtPreviews(2);
             var chicagoArtworks = CreateChicagoArtPreviews(0);
 
-            _mockClevelandClient.Setup(c => c.GetArtworkPreview(2)).ReturnsAsync(clevelandArtworks);
+            _mockClevelandClient.Setup(c => c.GetArtworkPreviews(2)).ReturnsAsync(clevelandArtworks);
             _mockChicagoClient.Setup(c => c.GetArtworkPreviews(2)).ReturnsAsync(chicagoArtworks);
             SetupMapper(clevelandArtworks, chicagoArtworks);
 
@@ -96,7 +96,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             // Assert
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().HaveCount(2);
-            _mockClevelandClient.Verify(c => c.GetArtworkPreview(2), Times.Once);
+            _mockClevelandClient.Verify(c => c.GetArtworkPreviews(2), Times.Once);
             _mockChicagoClient.Verify(c => c.GetArtworkPreviews(2), Times.Once);
         }
 
@@ -110,7 +110,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             var chicagoArtworksWithImage = new ChicagoInstArtPreview { Id = 3, ImageId = "chicago_img_1" };
             var chicagoArtworks = new List<ChicagoInstArtPreview> { chicagoArtworksWithImage };
 
-            _mockClevelandClient.Setup(c => c.GetArtworkPreview(1)).ReturnsAsync(clevelandArtworks);
+            _mockClevelandClient.Setup(c => c.GetArtworkPreviews(1)).ReturnsAsync(clevelandArtworks);
             _mockChicagoClient.Setup(c => c.GetArtworkPreviews(1)).ReturnsAsync(chicagoArtworks);
 
             _mockMapper.Setup(m => m.FromClevelandPreview(clevelandArtworkWithoutImage)).Returns(new ArtworkPreview { SourceId = 2, WebImage = null });
