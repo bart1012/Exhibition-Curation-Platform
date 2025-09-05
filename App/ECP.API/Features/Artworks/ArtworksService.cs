@@ -19,7 +19,7 @@ namespace ECP.API.Features.Artworks
             Result<List<ArtworkPreview>> repositoryResponse = await _artworksRepository.GetArtworkPreviewsAsync(count);
             if (!repositoryResponse.IsSuccess)
             {
-                return Shared.Result<PaginatedResponse<ArtworkPreview>>.Failure(repositoryResponse.ErrorMessage, repositoryResponse.StatusCode);
+                return Shared.Result<PaginatedResponse<ArtworkPreview>>.Failure(repositoryResponse.Message, repositoryResponse.StatusCode);
             }
             var allArtworks = repositoryResponse.Value ?? new List<ArtworkPreview>();
 
@@ -34,7 +34,7 @@ namespace ECP.API.Features.Artworks
             Result<List<ArtworkPreview>> repositoryResponse = await _artworksRepository.SearchAllArtworkPreviewsAsync(q);
             if (!repositoryResponse.IsSuccess)
             {
-                return Shared.Result<PaginatedResponse<ArtworkPreview>>.Failure(repositoryResponse.ErrorMessage, repositoryResponse.StatusCode);
+                return Shared.Result<PaginatedResponse<ArtworkPreview>>.Failure(repositoryResponse.Message, repositoryResponse.StatusCode);
             }
             var allArtworks = repositoryResponse.Value ?? new List<ArtworkPreview>();
 

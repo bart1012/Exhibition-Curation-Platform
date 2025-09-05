@@ -20,7 +20,7 @@ namespace ECP.API.Features.Artworks
             return response.IsSuccess switch
             {
                 true => (response.Value.Data == null || !response.Value.Data.Any()) ? NoContent() : Ok(response.Value),
-                false => StatusCode(500, new { error = response.ErrorMessage })
+                false => StatusCode(500, new { error = response.Message })
             };
         }
 
@@ -33,7 +33,7 @@ namespace ECP.API.Features.Artworks
             return response.IsSuccess switch
             {
                 true => (response.Value.Data == null || !response.Value.Data.Any()) ? NoContent() : Ok(response.Value),
-                false => StatusCode(500, new { error = response.ErrorMessage })
+                false => StatusCode(500, new { error = response.Message })
             };
         }
 

@@ -6,14 +6,14 @@ namespace ECP.Shared
     public class Result
     {
         public bool IsSuccess { get; }
-        public string? ErrorMessage { get; }
+        public string? Message { get; }
         public HttpStatusCode? StatusCode { get; }
 
 
         protected Result(bool isSuccess, string? errorMessage, HttpStatusCode? httpStatus = null)
         {
             IsSuccess = isSuccess;
-            ErrorMessage = errorMessage;
+            Message = errorMessage;
         }
 
         public static Result Success() => new Result(true, null);

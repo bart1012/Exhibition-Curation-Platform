@@ -1,5 +1,4 @@
 ﻿using ECP.Shared;
-using ECP.UI.Server.Components;
 using System.Net;
 using System.Text.Json;
 
@@ -7,61 +6,53 @@ namespace ECP.UI.Server.Services
 {
     public interface IArtworkService
     {
-        Task<ServiceResponse<List<ArtworkPreview>>> GetArtworksAsync(int count);
-        Task<ServiceResponse<List<ArtworkPreview>>> GetArtworksByQueryAsync(string q);
+        Task<Result<PaginatedResponse<ArtworkPreview>>> GetArtworksAsync(int count, int resultsPerPage, int pageNum);
+        Task<Result<PaginatedResponse<ArtworkPreview>>> SearchArtworksByQueryAsync(string q, int resultsPerPage, int pageNum);
     }
     public class ArtworkService(HttpClient client) : IArtworkService
     {
         private readonly HttpClient _httpClient = client;
-        public async Task<ServiceResponse<List<ArtworkPreview>>> GetArtworksAsync(int count)
+        public async Task<Result<PaginatedResponse<ArtworkPreview>>> GetArtworksAsync(int count, int resultsPerPage, int pageNum)
         {
-            return await ExecuteApiCallAsync<List<ArtworkPreview>>($"artworks/previews?count={count}");
+            return await ExecuteApiCallAsync<PaginatedResponse<ArtworkPreview>>($"artworks/previews?count={count}&results_per_page={resultsPerPage}&page_num={pageNum}");
         }
 
-        public async Task<ServiceResponse<List<ArtworkPreview>>> GetArtworksByQueryAsync(string q)
+        public async Task<Result<PaginatedResponse<ArtworkPreview>>> SearchArtworksByQueryAsync(string q, int resultsPerPage, int pageNum)
         {
-            return await ExecuteApiCallAsync<List<ArtworkPreview>>($"artworks/previews/search?&q={q}");
+            return await ExecuteApiCallAsync<PaginatedResponse<ArtworkPreview>>($"artworks/previews/search?&q={q}&results_per_page={resultsPerPage}&page_num={pageNum}");
         }
 
-        protected async Task<ServiceResponse<T>> ExecuteApiCallAsync<T>(string url)
+        protected async Task<Result<T>> ExecuteApiCallAsync<T>(string url)
         {
-            var result = new ServiceResponse<T>();
             try
             {
                 HttpResponseMessage response = await _httpClient.GetAsync(url);
-                result.StatusCode = response.StatusCode;
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    result.Success = false;
-                    result.Message = $"Http Error: {response.StatusCode}";
-                    return result;
+                    return Result<T>.Failure($"Http Error: {response.StatusCode}", HttpStatusCode.ServiceUnavailable);
                 }
-                result.Success = true;
+
                 string httpContent = await response.Content.ReadAsStringAsync();
                 var list = JsonSerializer.Deserialize<T>(httpContent, new JsonSerializerOptions()
                 {
                     PropertyNameCaseInsensitive = true
                 });
 
-                result.Data = list;
+                return Result<T>.Success(list);
             }
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"Http Request Failed: {ex.Message}");
+                return Result<T>.Failure(ex.Message, HttpStatusCode.ServiceUnavailable);
 
-                result.Success = false;
-                result.Message = ex.Message;
-                result.StatusCode = HttpStatusCode.ServiceUnavailable;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Unknown Exception: {ex.Message}");
-                result.Success = false;
-                result.Message = ex.Message;
-                result.StatusCode = HttpStatusCode.InternalServerError;
+                return Result<T>.Failure(ex.Message, HttpStatusCode.InternalServerError);
             }
-            return result;
+
         }
 
     }
