@@ -1,5 +1,5 @@
-﻿using ECP.API.Features.Artworks.Clients.ClevelandMuseum.Models;
-using ECP.API.Features.Artworks.Models;
+﻿using ECP.API.Features.Artworks.Clients.ChicagoArtInstitute.Models;
+using ECP.API.Features.Artworks.Clients.ClevelandMuseum.Models;
 using System.Text;
 using System.Text.Json;
 
@@ -8,8 +8,8 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
     public interface IClevelandMuseumClient
     {
         Task<List<ClevelandMuseumArtworkPreview>> GetArtworkPreviews(int count);
-        Task<List<ClevelandMuseumArtworkPreview>> GetArtworkPreviewsByQuery(string q, int count, int offset);
-        string UrlBuilder(ApiArtworkParameters parameters);
+        Task<List<ClevelandMuseumArtworkPreview>> GetArtworkPreviewsByQuery(string q);
+        string UrlBuilder(ChicagoApiParameters parameters);
     }
 
     public class ClevelandMuseumClient : IClevelandMuseumClient
@@ -29,7 +29,7 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
 
         public async Task<List<ClevelandMuseumArtworkPreview>?> GetArtworkPreviews(int count = 25)
         {
-            var parameters = new ApiArtworkParameters()
+            var parameters = new ChicagoApiParameters()
             {
                 Count = count,
                 PreviewsOnly = true
@@ -37,20 +37,20 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
             return await GetArtworksWithParameters(parameters);
         }
 
-        public async Task<List<ClevelandMuseumArtworkPreview>> GetArtworkPreviewsByQuery(string q, int count, int offset)
+        public async Task<List<ClevelandMuseumArtworkPreview>> GetArtworkPreviewsByQuery(string q)
         {
-            var parameters = new ApiArtworkParameters()
+            var parameters = new ChicagoApiParameters()
             {
-                Count = count,
+                Count = 0,
                 PreviewsOnly = true,
                 Query = q,
-                Offset = offset
+                Offset = 0
             };
             return await GetArtworksWithParameters(parameters);
 
         }
 
-        public string UrlBuilder(ApiArtworkParameters parameters)
+        public string UrlBuilder(ChicagoApiParameters parameters)
         {
             StringBuilder url = new();
             url.Append(BASE_URL + "artworks");
@@ -79,7 +79,7 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
             return url.ToString();
         }
 
-        protected async Task<List<ClevelandMuseumArtworkPreview>> GetArtworksWithParameters(ApiArtworkParameters parameters)
+        protected async Task<List<ClevelandMuseumArtworkPreview>> GetArtworksWithParameters(ChicagoApiParameters parameters)
         {
             string url = UrlBuilder(parameters);
             return await FetchArtworksAsync(url);

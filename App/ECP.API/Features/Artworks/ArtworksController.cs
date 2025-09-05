@@ -13,26 +13,26 @@ namespace ECP.API.Features.Artworks
 
         // GET: api/<ArtworksController>
         [HttpGet("previews")]
-        public async Task<IActionResult> GetArtworkPreviewAsync([FromQuery] int count)
+        public async Task<IActionResult> GetArtworkPreviewAsync([FromQuery] int count, int results_per_page, int page_num)
         {
-            Shared.Result<List<ArtworkPreview>> response = await _artworksService.GetArtworkPreviewAsync(count);
+            Shared.Result<PaginatedResponse<ArtworkPreview>> response = await _artworksService.GetArtworkPreviewsAsync(count, results_per_page, page_num);
 
             return response.IsSuccess switch
             {
-                true => (response.Value == null || !response.Value.Any()) ? NoContent() : Ok(response.Value),
+                true => (response.Value.Data == null || !response.Value.Data.Any()) ? NoContent() : Ok(response.Value),
                 false => StatusCode(500, new { error = response.ErrorMessage })
             };
         }
 
         // GET: api/<ArtworksController>
         [HttpGet("previews/search")]
-        public async Task<IActionResult> GetArtworkPreviewByQueryAsync([FromQuery] string q, [FromQuery] int count, [FromQuery] int offset)
+        public async Task<IActionResult> GetArtworkPreviewByQueryAsync([FromQuery] string q, int results_per_page, int page_num)
         {
-            Shared.Result<List<ArtworkPreview>> response = await _artworksService.GetArtworkPreviewByQueryAsync(q, count, offset);
+            Shared.Result<PaginatedResponse<ArtworkPreview>> response = await _artworksService.SearchAllArtworkPreviewsAsync(q, results_per_page, page_num);
 
             return response.IsSuccess switch
             {
-                true => (response.Value == null || !response.Value.Any()) ? NoContent() : Ok(response.Value),
+                true => (response.Value.Data == null || !response.Value.Data.Any()) ? NoContent() : Ok(response.Value),
                 false => StatusCode(500, new { error = response.ErrorMessage })
             };
         }

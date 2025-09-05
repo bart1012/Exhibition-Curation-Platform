@@ -1,5 +1,4 @@
 ﻿using ECP.API.Features.Artworks.Clients.ChicagoArtInstitute.Models;
-using ECP.API.Features.Artworks.Models;
 using System.Text;
 using System.Text.Json;
 
@@ -7,9 +6,9 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
 {
     public interface IChicagoArtInstituteClient
     {
-        Task<List<ChicagoInstArtPreview>>? GetArtworkPreviews(int count);
-        Task<List<ChicagoInstArtPreview>> GetArtworksPreviewsByQuery(string q, int count, int offset);
-        string UrlBuilder(ApiArtworkParameters parameters);
+        Task<List<ChicagoArtPreview>>? GetArtworkPreviews(int count);
+        Task<List<ChicagoArtPreview>> GetArtworkPreviewsByQuery(string q);
+        string UrlBuilder(ChicagoApiParameters parameters);
     }
     public class ChicagoArtClient : IChicagoArtInstituteClient
     {
@@ -27,38 +26,55 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
             };
         }
 
-        public async Task<List<ChicagoInstArtPreview>>? GetArtworkPreviews(int count = 25)
+        public async Task<List<ChicagoArtPreview>>? GetArtworkPreviews(int count = 25)
         {
-            var parameters = new ApiArtworkParameters()
+            var parameters = new ChicagoApiParameters()
             {
                 Count = count,
                 PreviewsOnly = true
             };
 
-            return await GetArtworksWithParameters(parameters);
+            var apiResponse = await GetResponseWithParameters<ChicagoArtPreview>(parameters);
+            return apiResponse.Data;
 
         }
 
-        public async Task<List<ChicagoInstArtPreview>> GetArtworksPreviewsByQuery(string q, int count, int offset)
+        public async Task<List<ChicagoArtPreview>> GetArtworkPreviewsByQuery(string q)
         {
-            var parameters = new ApiArtworkParameters()
+            var artworks = new List<ChicagoArtPreview>();
+
+            var parameters = new ChicagoApiParameters()
             {
-                Count = count,
+                Count = 100,
                 PreviewsOnly = true,
                 Query = q,
-                Offset = offset
+                Page = 1
             };
 
-            return await GetArtworksWithParameters(parameters);
+            ChicagoApiResponse<ChicagoArtPreview> firstResponse = await GetResponseWithParameters<ChicagoArtPreview>(parameters);
+            artworks.AddRange(firstResponse.Data);
+
+            if (firstResponse.Info.Pages > 1)
+            {
+                while (parameters.Page <= firstResponse.Info.Pages)
+                {
+                    parameters.Page++;
+                    ChicagoApiResponse<ChicagoArtPreview> response = await GetResponseWithParameters<ChicagoArtPreview>(parameters);
+                    artworks.AddRange(firstResponse.Data);
+                }
+
+            }
+
+            return artworks;
         }
 
-        protected async Task<List<ChicagoInstArtPreview>> GetArtworksWithParameters(ApiArtworkParameters parameters)
+        protected async Task<ChicagoApiResponse<T>> GetResponseWithParameters<T>(ChicagoApiParameters parameters)
         {
             string url = UrlBuilder(parameters);
-            return await FetchArtworksAsync(url);
+            return await FetchChicagoApiResponseAsync<T>(url);
         }
 
-        private async Task<List<ChicagoInstArtPreview>?> FetchArtworksAsync(string url)
+        private async Task<ChicagoApiResponse<T>> FetchChicagoApiResponseAsync<T>(string url)
         {
             try
             {
@@ -67,9 +83,9 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
                 response.EnsureSuccessStatusCode();
 
                 var responseContent = await response.Content.ReadAsStringAsync();
-                var data = JsonSerializer.Deserialize<ChicagoArtInstituteResponsePreview>(responseContent, _jsonOptions);
+                var apiResponseModel = JsonSerializer.Deserialize<ChicagoApiResponse<T>>(responseContent, _jsonOptions);
 
-                return data?.Data;
+                return apiResponseModel;
             }
             catch (HttpRequestException e)
             {
@@ -83,7 +99,7 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
             }
         }
 
-        public string UrlBuilder(ApiArtworkParameters parameters)
+        public string UrlBuilder(ChicagoApiParameters parameters)
         {
             StringBuilder url = new();
             url.Append(BASE_URL);
@@ -99,7 +115,7 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
 
             if (parameters.Count != 0)
             {
-                url.Append($"&limit={parameters.Count}");
+                url.Append($"&size={parameters.Count}");
             }
 
             if (parameters.PreviewsOnly)
@@ -111,5 +127,6 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
 
             return url.ToString();
         }
+
     }
 }

@@ -10,7 +10,7 @@ namespace ECP.API.Features.Artworks
 
         ArtworkPreview FromClevelandPreview(ClevelandMuseumArtworkPreview clevelandArtworkPreview);
 
-        ArtworkPreview FromChicagoPreview(ChicagoInstArtPreview chicagoArtworkPreview);
+        ArtworkPreview FromChicagoPreview(ChicagoArtPreview chicagoArtworkPreview);
 
     }
     public class ArtworkMapper : IArtworkMapper
@@ -136,7 +136,7 @@ namespace ECP.API.Features.Artworks
             };
 
         }
-        public ArtworkPreview FromChicagoPreview(ChicagoInstArtPreview chicagoArtworkPreview)
+        public ArtworkPreview FromChicagoPreview(ChicagoArtPreview chicagoArtworkPreview)
         {
             string artworkId = string.Concat("chicago_", chicagoArtworkPreview.Id);
             int artworkSourceId = chicagoArtworkPreview.Id;

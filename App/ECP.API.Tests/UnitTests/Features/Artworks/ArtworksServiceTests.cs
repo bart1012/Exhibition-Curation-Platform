@@ -51,7 +51,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             };
             var repositoryResult = Shared.Result<List<ArtworkPreview>>.Success(artworkList);
 
-            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewAsync(expectedCount))
+            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewsAsync(expectedCount))
                 .ReturnsAsync(repositoryResult);
 
             // Act
@@ -60,7 +60,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             // Assert
             serviceResult.IsSuccess.Should().BeTrue();
             serviceResult.Value.Should().BeEquivalentTo(artworkList);
-            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewAsync(expectedCount), Times.Once);
+            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewsAsync(expectedCount), Times.Once);
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             var emptyList = new List<ArtworkPreview>();
             var repositoryResult = Shared.Result<List<ArtworkPreview>>.Success(emptyList);
 
-            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewAsync(expectedCount))
+            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewsAsync(expectedCount))
                 .ReturnsAsync(repositoryResult);
 
             // Act
@@ -80,7 +80,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             // Assert
             serviceResult.IsSuccess.Should().BeTrue();
             serviceResult.Value.Should().BeEmpty();
-            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewAsync(expectedCount), Times.Once);
+            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewsAsync(expectedCount), Times.Once);
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             var expectedError = "Repository connection failed.";
             var repositoryResult = Shared.Result<List<ArtworkPreview>>.Failure(expectedError, System.Net.HttpStatusCode.InternalServerError);
 
-            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewAsync(expectedCount))
+            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewsAsync(expectedCount))
                 .ReturnsAsync(repositoryResult);
 
             // Act
@@ -101,7 +101,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             serviceResult.IsSuccess.Should().BeFalse();
             serviceResult.ErrorMessage.Should().Be(expectedError);
             serviceResult.Value.Should().BeNull();
-            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewAsync(expectedCount), Times.Once);
+            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewsAsync(expectedCount), Times.Once);
         }
 
         [Test]

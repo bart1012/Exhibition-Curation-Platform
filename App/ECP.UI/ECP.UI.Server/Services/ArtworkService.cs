@@ -8,7 +8,7 @@ namespace ECP.UI.Server.Services
     public interface IArtworkService
     {
         Task<ServiceResponse<List<ArtworkPreview>>> GetArtworksAsync(int count);
-        Task<ServiceResponse<List<ArtworkPreview>>> GetArtworksByQueryAsync(int count, string q, int offset);
+        Task<ServiceResponse<List<ArtworkPreview>>> GetArtworksByQueryAsync(string q);
     }
     public class ArtworkService(HttpClient client) : IArtworkService
     {
@@ -18,9 +18,9 @@ namespace ECP.UI.Server.Services
             return await ExecuteApiCallAsync<List<ArtworkPreview>>($"artworks/previews?count={count}");
         }
 
-        public async Task<ServiceResponse<List<ArtworkPreview>>> GetArtworksByQueryAsync(int count, string q, int offset)
+        public async Task<ServiceResponse<List<ArtworkPreview>>> GetArtworksByQueryAsync(string q)
         {
-            return await ExecuteApiCallAsync<List<ArtworkPreview>>($"artworks/previews/search?count={count}&q={q}&offset={offset}");
+            return await ExecuteApiCallAsync<List<ArtworkPreview>>($"artworks/previews/search?&q={q}");
         }
 
         protected async Task<ServiceResponse<T>> ExecuteApiCallAsync<T>(string url)

@@ -34,17 +34,17 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
                     Title = $"ClevelandImage_{i}"
                 }).ToList();
         }
-        private List<ChicagoInstArtPreview> CreateChicagoArtPreviews(int count)
+        private List<ChicagoArtPreview> CreateChicagoArtPreviews(int count)
         {
             return Enumerable.Range(0, count)
-                .Select(i => new ChicagoInstArtPreview
+                .Select(i => new ChicagoArtPreview
                 {
                     Id = 2000 + i,
                     Title = $"ChicagoImage_{i}"
                 }).ToList();
         }
 
-        private void SetupMapper(List<ClevelandMuseumArtworkPreview> clevelandArtwork, List<ChicagoInstArtPreview> chicagoArtwork)
+        private void SetupMapper(List<ClevelandMuseumArtworkPreview> clevelandArtwork, List<ChicagoArtPreview> chicagoArtwork)
         {
             foreach (var artwork in clevelandArtwork)
             {
@@ -70,7 +70,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             SetupMapper(clevelandArtworks, chicagoArtworks);
 
             // Act
-            var result = await _artworksRepository.GetArtworkPreviewAsync(2);
+            var result = await _artworksRepository.GetArtworkPreviewsAsync(2);
 
             // Assert
             result.IsSuccess.Should().BeTrue();
@@ -91,7 +91,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             SetupMapper(clevelandArtworks, chicagoArtworks);
 
             // Act
-            var result = await _artworksRepository.GetArtworkPreviewAsync(2);
+            var result = await _artworksRepository.GetArtworkPreviewsAsync(2);
 
             // Assert
             result.IsSuccess.Should().BeTrue();
@@ -107,8 +107,8 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             var clevelandArtworkWithoutImage = new ClevelandMuseumArtworkPreview { Id = 2, Images = new() { Web = null } };
             var clevelandArtworks = new List<ClevelandMuseumArtworkPreview> { clevelandArtworkWithoutImage };
 
-            var chicagoArtworksWithImage = new ChicagoInstArtPreview { Id = 3, ImageId = "chicago_img_1" };
-            var chicagoArtworks = new List<ChicagoInstArtPreview> { chicagoArtworksWithImage };
+            var chicagoArtworksWithImage = new ChicagoArtPreview { Id = 3, ImageId = "chicago_img_1" };
+            var chicagoArtworks = new List<ChicagoArtPreview> { chicagoArtworksWithImage };
 
             _mockClevelandClient.Setup(c => c.GetArtworkPreviews(1)).ReturnsAsync(clevelandArtworks);
             _mockChicagoClient.Setup(c => c.GetArtworkPreviews(1)).ReturnsAsync(chicagoArtworks);
@@ -117,7 +117,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             _mockMapper.Setup(m => m.FromChicagoPreview(chicagoArtworksWithImage)).Returns(new ArtworkPreview { SourceId = 3, WebImage = new Image() });
 
             // Act
-            var result = await _artworksRepository.GetArtworkPreviewAsync(1);
+            var result = await _artworksRepository.GetArtworkPreviewsAsync(1);
 
             // Assert
             result.IsSuccess.Should().BeTrue();

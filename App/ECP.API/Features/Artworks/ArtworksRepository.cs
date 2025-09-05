@@ -6,15 +6,15 @@ namespace ECP.API.Features.Artworks
 
     public interface IArtworksRepository
     {
-        Task<Shared.Result<List<ArtworkPreview>>> GetArtworkPreviewAsync(int count);
-        Task<Shared.Result<List<ArtworkPreview>>> GetArtworkPreviewByQueryAsync(string q, int count, int offset);
+        Task<Shared.Result<List<ArtworkPreview>>> GetArtworkPreviewsAsync(int count);
+        Task<Shared.Result<List<ArtworkPreview>>> SearchAllArtworkPreviewsAsync(string q);
     }
     public class ArtworksRepository(IClevelandMuseumClient clevelandClient, IChicagoArtInstituteClient chicagoClient, IArtworkMapper mapper) : IArtworksRepository
     {
         private readonly IClevelandMuseumClient _clevelandClient = clevelandClient;
         private readonly IChicagoArtInstituteClient _chicagoClient = chicagoClient;
         private readonly IArtworkMapper _mapper = mapper;
-        public async Task<Shared.Result<List<ArtworkPreview>>> GetArtworkPreviewAsync(int count)
+        public async Task<Shared.Result<List<ArtworkPreview>>> GetArtworkPreviewsAsync(int count)
         {
             try
             {
@@ -39,12 +39,12 @@ namespace ECP.API.Features.Artworks
 
         }
 
-        public async Task<Result<List<ArtworkPreview>>> GetArtworkPreviewByQueryAsync(string q, int count, int offset)
+        public async Task<Result<List<ArtworkPreview>>> SearchAllArtworkPreviewsAsync(string q)
         {
             try
             {
-                var clevelandTask = _clevelandClient.GetArtworkPreviewsByQuery(q, count, offset);
-                var chicagoTask = _chicagoClient.GetArtworksPreviewsByQuery(q, count, offset);
+                var clevelandTask = _clevelandClient.GetArtworkPreviewsByQuery(q);
+                var chicagoTask = _chicagoClient.GetArtworkPreviewsByQuery(q);
 
                 await Task.WhenAll(clevelandTask, chicagoTask);
 
