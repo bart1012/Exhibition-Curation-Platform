@@ -6,7 +6,17 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute.Models
     {
         public List<T> Data { get; set; }
 
+        [JsonPropertyName("pagination")]
         public ChicagoResponseMetadata Info { get; set; }
+
+        public override string? ToString()
+        {
+            return $"""
+                Total results: {Info.Total}
+                Total pages: {Info.Pages}
+                Current results count: {Data.Count()}
+                """;
+        }
     }
 
     public class ChicagoResponseMetadata

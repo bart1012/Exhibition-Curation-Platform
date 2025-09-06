@@ -7,7 +7,7 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
     public interface IChicagoArtInstituteClient
     {
         Task<List<ChicagoArtPreview>>? GetArtworkPreviews(int count);
-        Task<List<ChicagoArtPreview>> GetArtworkPreviewsByQuery(string q);
+        Task<List<ChicagoArtPreview>> SearchArtworkPreviewsByQuery(string q);
         string UrlBuilder(ChicagoApiParameters parameters);
     }
     public class ChicagoArtClient : IChicagoArtInstituteClient
@@ -39,7 +39,7 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
 
         }
 
-        public async Task<List<ChicagoArtPreview>> GetArtworkPreviewsByQuery(string q)
+        public async Task<List<ChicagoArtPreview>> SearchArtworkPreviewsByQuery(string q)
         {
             var artworks = new List<ChicagoArtPreview>();
 
@@ -52,19 +52,20 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
             };
 
             ChicagoApiResponse<ChicagoArtPreview> firstResponse = await GetResponseWithParameters<ChicagoArtPreview>(parameters);
+            Console.WriteLine(firstResponse.ToString());
             artworks.AddRange(firstResponse.Data);
 
             if (firstResponse.Info.Pages > 1)
             {
-                while (parameters.Page <= firstResponse.Info.Pages)
+                while (parameters.Page < firstResponse.Info.Pages)
                 {
                     parameters.Page++;
                     ChicagoApiResponse<ChicagoArtPreview> response = await GetResponseWithParameters<ChicagoArtPreview>(parameters);
-                    artworks.AddRange(firstResponse.Data);
+                    artworks.AddRange(response.Data);
                 }
 
             }
-
+            Console.WriteLine($"Total Chicago count on q={q}: {artworks.Count}");
             return artworks;
         }
 

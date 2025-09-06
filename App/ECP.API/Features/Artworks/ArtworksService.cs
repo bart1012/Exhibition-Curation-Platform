@@ -2,6 +2,7 @@
 
 using ECP.API.Utils;
 using ECP.Shared;
+using Microsoft.Extensions.Caching.Memory;
 
 
 namespace ECP.API.Features.Artworks
@@ -11,9 +12,10 @@ namespace ECP.API.Features.Artworks
         Task<Shared.Result<PaginatedResponse<ArtworkPreview>>> GetArtworkPreviewsAsync(int count, int resultsPerPage, int pageNum);
         Task<Shared.Result<PaginatedResponse<ArtworkPreview>>> SearchAllArtworkPreviewsAsync(string q, int resultsPerPage, int pageNum);
     }
-    public class ArtworksService(IArtworksRepository artworksRepository) : IArtworksService
+    public class ArtworksService(IArtworksRepository artworksRepository, IMemoryCache memoryCache) : IArtworksService
     {
         private readonly IArtworksRepository _artworksRepository = artworksRepository;
+        private readonly IMemoryCache _cache = memoryCache;
         public async Task<Shared.Result<PaginatedResponse<ArtworkPreview>>> GetArtworkPreviewsAsync(int count, int resultsPerPage, int pageNum)
         {
             Result<List<ArtworkPreview>> repositoryResponse = await _artworksRepository.GetArtworkPreviewsAsync(count);
@@ -31,19 +33,36 @@ namespace ECP.API.Features.Artworks
 
         public async Task<Shared.Result<PaginatedResponse<ArtworkPreview>>> SearchAllArtworkPreviewsAsync(string q, int resultsPerPage, int pageNum)
         {
-            Result<List<ArtworkPreview>> repositoryResponse = await _artworksRepository.SearchAllArtworkPreviewsAsync(q);
-            if (!repositoryResponse.IsSuccess)
+            List<ArtworkPreview> artworks = null;
+
+            if (!_cache.TryGetValue(q, out artworks))
             {
-                return Shared.Result<PaginatedResponse<ArtworkPreview>>.Failure(repositoryResponse.Message, repositoryResponse.StatusCode);
+                Result<List<ArtworkPreview>> repositoryResponse = await _artworksRepository.SearchAllArtworkPreviewsAsync(q);
+                if (!repositoryResponse.IsSuccess)
+                {
+                    return Shared.Result<PaginatedResponse<ArtworkPreview>>.Failure(repositoryResponse.Message, repositoryResponse.StatusCode);
+                }
+
+                if (repositoryResponse.Value != null && repositoryResponse.Value.Count > 0)
+                {
+                    MemoryCacheEntryOptions options = new()
+                    {
+                        Size = repositoryResponse.Value.Count,
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24)
+                    };
+                    _cache.Set(q, repositoryResponse.Value, options);
+                }
+
             }
-            var allArtworks = repositoryResponse.Value ?? new List<ArtworkPreview>();
+
+
+            var allArtworks = artworks ?? new List<ArtworkPreview>();
 
             var paginatedResponse = PaginatedResponseBuilder<ArtworkPreview>.Build(allArtworks, resultsPerPage, pageNum);
 
             return Shared.Result<PaginatedResponse<ArtworkPreview>>.Success(paginatedResponse);
 
         }
-
 
     }
 }
