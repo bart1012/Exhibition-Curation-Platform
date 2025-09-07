@@ -103,12 +103,12 @@ namespace ECP.API.Features.Artworks
 
             return artwork;
         }
-
         public ArtworkPreview FromClevelandPreview(ClevelandMuseumArtworkPreview clevelandArtworkPreview)
         {
             string artworkId = string.Concat("cleveland_", clevelandArtworkPreview.Id);
             int artworkSourceId = clevelandArtworkPreview.Id;
             string artworkTitle = clevelandArtworkPreview.Title;
+            int creationDate = 0;
             List<Artist?>? artworkArtists = clevelandArtworkPreview.Creators?.Any() == true ? clevelandArtworkPreview.Creators.Select(a => (a != null && a.Description.Contains('(')) ? new Artist()
             {
                 Name = a.Description.Substring(0, a.Description.IndexOf('(')).Trim()
@@ -132,7 +132,8 @@ namespace ECP.API.Features.Artworks
                 SourceId = artworkSourceId,
                 Title = artworkTitle,
                 Artists = artworkArtists,
-                WebImage = artworkWebImage
+                WebImage = artworkWebImage,
+                CreationYear = int.TryParse(clevelandArtworkPreview.CreationDate, out creationDate) ? creationDate : -1
             };
 
         }
@@ -141,6 +142,24 @@ namespace ECP.API.Features.Artworks
             string artworkId = string.Concat("chicago_", chicagoArtworkPreview.Id);
             int artworkSourceId = chicagoArtworkPreview.Id;
             string artworkTitle = chicagoArtworkPreview.Title;
+            int? creationYear = 0;
+            if (chicagoArtworkPreview.EarliestCreationDate != 0 && chicagoArtworkPreview.LatestCreationDate != 0)
+            {
+                creationYear = (chicagoArtworkPreview.EarliestCreationDate + chicagoArtworkPreview.LatestCreationDate) / 2;
+            }
+            else
+            {
+                if (chicagoArtworkPreview.EarliestCreationDate == 0 && chicagoArtworkPreview.LatestCreationDate == 0)
+                {
+                    creationYear = -1;
+                }
+                else
+                {
+                    creationYear = chicagoArtworkPreview.EarliestCreationDate == 0 ? chicagoArtworkPreview.LatestCreationDate : chicagoArtworkPreview.EarliestCreationDate;
+
+                }
+            }
+
             List<Artist> artworkArtists = null;
 
             if (chicagoArtworkPreview.Artists != null && chicagoArtworkPreview.Artists.Count > 0)
@@ -169,6 +188,7 @@ namespace ECP.API.Features.Artworks
                 Source = ArtworkSource.CHICAGO_ART_INSTITUTE,
                 SourceId = artworkSourceId,
                 Title = artworkTitle,
+                CreationYear = creationYear,
                 Artists = artworkArtists,
                 WebImage = artworkWebImage
             };

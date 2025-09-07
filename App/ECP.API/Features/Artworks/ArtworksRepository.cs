@@ -57,18 +57,15 @@ namespace ECP.API.Features.Artworks
                 var filteredClevelandList = clevelandResults.Select(a => _mapper.FromClevelandPreview(a)).Where(a => a.WebImage != null).ToList();
                 var filteredChicagoList = chicagoResults.Select(a => _mapper.FromChicagoPreview(a)).Where(a => a.WebImage != null).ToList();
 
+                Console.WriteLine($"Cleveland total: {filteredClevelandList.Count()}");
+                Console.WriteLine($"Chicago total: {filteredChicagoList.Count()}");
+
 
 
                 artworkPreviews.AddRange(filteredClevelandList);
                 artworkPreviews.AddRange(filteredChicagoList);
 
-                Console.WriteLine($"""
-                    Cleveland results unfiltered: {clevelandResults.Count}
-                    Cleveland results filtered: {filteredClevelandList.Count}
-                    Chicago results unfiltered: {chicagoResults.Count}
-                    Chicago results filtered: {filteredChicagoList.Count}
-                    Total: {artworkPreviews.Count}
-                    """);
+
 
                 return Shared.Result<List<ArtworkPreview>>.Success(artworkPreviews);
             }

@@ -26,14 +26,14 @@ namespace ECP.API.Features.Artworks
 
         // GET: api/<ArtworksController>
         [HttpGet("previews/search")]
-        public async Task<IActionResult> GetArtworkPreviewByQueryAsync([FromQuery] string q, int results_per_page, int page_num)
+        public async Task<IActionResult> GetArtworkPreviewByQueryAsync([FromQuery] string q, string? sort = null, int limit = 25, int page = 1)
         {
-            Shared.Result<PaginatedResponse<ArtworkPreview>> response = await _artworksService.SearchAllArtworkPreviewsAsync(q, results_per_page, page_num);
+            Shared.Result<PaginatedResponse<ArtworkPreview>> response = await _artworksService.SearchAllArtworkPreviewsAsync(q, sort, limit, page);
 
             return response.IsSuccess switch
             {
                 true => (response.Value.Data == null || !response.Value.Data.Any()) ? NoContent() : Ok(response.Value),
-                false => StatusCode(500, new { error = response.Message })
+                false => response.StatusCode == System.Net.HttpStatusCode.BadRequest ? BadRequest(response.Message) : StatusCode(500, new { error = response.Message })
             };
         }
 

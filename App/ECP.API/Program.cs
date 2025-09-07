@@ -22,7 +22,7 @@ namespace App
             builder.Services.AddControllers();
             builder.Services.AddMemoryCache(options =>
             {
-                options.SizeLimit = 1024;
+                options.SizeLimit = 3000;
                 options.CompactionPercentage = 0.25;
                 options.ExpirationScanFrequency = TimeSpan.FromHours(1);
 

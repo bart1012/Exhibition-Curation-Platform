@@ -1,6 +1,7 @@
 ﻿using ECP.API.Features.Artworks;
 using ECP.Shared;
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 
 namespace ECP.API.Tests.UnitTests.Features.Artworks
@@ -8,17 +9,21 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
     internal class ArtworksServiceTests
     {
         private Mock<IArtworksRepository> _mockArtworksRepository;
+        private Mock<IMemoryCache> _mockMemoryCache;
         private ArtworksService _artworksService;
+        private Mock<ICacheEntry> _mockCacheEntry;
 
         [SetUp]
         public void Setup()
         {
             _mockArtworksRepository = new Mock<IArtworksRepository>();
-            _artworksService = new ArtworksService(_mockArtworksRepository.Object);
+            _mockMemoryCache = new Mock<IMemoryCache>();
+            _mockCacheEntry = new Mock<ICacheEntry>();
+            _artworksService = new ArtworksService(_mockArtworksRepository.Object, _mockMemoryCache.Object);
         }
 
         [Test]
-        public async Task GetArtworkPreviewAsync_WhenRepositoryReturnsSuccessWithData_ReturnsSuccessWithData()
+        public async Task GetArtworkPreviewAsync_WhenRepositoryReturnsSuccessWithData_ReturnsPaginatedResponseWithData()
         {
             // Arrange
             var expectedCount = 5;
@@ -55,16 +60,26 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
                 .ReturnsAsync(repositoryResult);
 
             // Act
-            var serviceResult = await _artworksService.GetArtworkPreviewAsync(expectedCount);
+            var serviceResult = await _artworksService.GetArtworkPreviewsAsync(expectedCount);
 
             // Assert
             serviceResult.IsSuccess.Should().BeTrue();
-            serviceResult.Value.Should().BeEquivalentTo(artworkList);
+            serviceResult.Value.Should().BeEquivalentTo(new PaginatedResponse<ArtworkPreview>()
+            {
+                Data = artworkList,
+                Info = new PaginationInfo()
+                {
+                    ItemsPerPage = 25,
+                    TotalItems = 2,
+                    CurrentPage = 1,
+                    TotalPages = 1
+                }
+            });
             _mockArtworksRepository.Verify(r => r.GetArtworkPreviewsAsync(expectedCount), Times.Once);
         }
 
         [Test]
-        public async Task GetArtworkPreviewAsync_WhenRepositoryReturnsEmptyList_ReturnsEmptyList()
+        public async Task GetArtworkPreviewAsync_WhenRepositoryReturnsEmptyList_ReturnsEmptyPaginatedResponse()
         {
             // Arrange
             var expectedCount = 5;
@@ -75,11 +90,21 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
                 .ReturnsAsync(repositoryResult);
 
             // Act
-            var serviceResult = await _artworksService.GetArtworkPreviewAsync(expectedCount);
+            var serviceResult = await _artworksService.GetArtworkPreviewsAsync(expectedCount);
 
             // Assert
             serviceResult.IsSuccess.Should().BeTrue();
-            serviceResult.Value.Should().BeEmpty();
+            serviceResult.Value.Should().BeEquivalentTo(new PaginatedResponse<ArtworkPreview>()
+            {
+                Data = new List<ArtworkPreview>(),
+                Info = new PaginationInfo()
+                {
+                    ItemsPerPage = 25,
+                    TotalItems = 0,
+                    CurrentPage = 1,
+                    TotalPages = 0
+                }
+            });
             _mockArtworksRepository.Verify(r => r.GetArtworkPreviewsAsync(expectedCount), Times.Once);
         }
 
@@ -95,22 +120,20 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
                 .ReturnsAsync(repositoryResult);
 
             // Act
-            var serviceResult = await _artworksService.GetArtworkPreviewAsync(expectedCount);
+            var serviceResult = await _artworksService.GetArtworkPreviewsAsync(expectedCount);
 
             // Assert
             serviceResult.IsSuccess.Should().BeFalse();
-            serviceResult.ErrorMessage.Should().Be(expectedError);
+            serviceResult.Message.Should().Be(expectedError);
             serviceResult.Value.Should().BeNull();
             _mockArtworksRepository.Verify(r => r.GetArtworkPreviewsAsync(expectedCount), Times.Once);
         }
 
         [Test]
-        public async Task GetArtworkPreviewByQueryAsync_WhenRepositoryReturnsSuccess_ReturnsSuccessWithData()
+        public async Task SearchAllArtworkPreviewsAsync_WhenRepositoryReturnsSuccess_ReturnsPaginatedResponseWithData()
         {
             // Arrange
             var expectedQuery = "monet";
-            var expectedCount = 10;
-            var expectedOffset = 0;
             var artworkList = new List<ArtworkPreview>
        {
                 new ArtworkPreview()
@@ -140,20 +163,39 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             };
             var repositoryResult = Shared.Result<List<ArtworkPreview>>.Success(artworkList);
 
-            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset))
+            _mockArtworksRepository.Setup(r => r.SearchAllArtworkPreviewsAsync(expectedQuery))
                 .ReturnsAsync(repositoryResult);
 
+            object cacheValue = null;
+
+            _mockMemoryCache.Setup(c => c.TryGetValue(It.IsAny<object>(), out cacheValue))
+            .Returns(false);
+
+            _mockMemoryCache.Setup(m => m.CreateEntry(It.IsAny<object>()))
+             .Returns(_mockCacheEntry.Object);
+
             // Act
-            var serviceResult = await _artworksService.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset);
+            var serviceResult = await _artworksService.SearchAllArtworkPreviewsAsync(expectedQuery, null, 25, 1);
 
             // Assert
             serviceResult.IsSuccess.Should().BeTrue();
-            serviceResult.Value.Should().BeEquivalentTo(artworkList);
-            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset), Times.Once);
+            var expectation = new PaginatedResponse<ArtworkPreview>()
+            {
+                Data = artworkList,
+                Info = new PaginationInfo()
+                {
+                    ItemsPerPage = 25,
+                    TotalItems = 2,
+                    CurrentPage = 1,
+                    TotalPages = 1
+                }
+            };
+            serviceResult.Value.Should().BeEquivalentTo(expectation);
+            _mockArtworksRepository.Verify(r => r.SearchAllArtworkPreviewsAsync(expectedQuery), Times.Once);
         }
 
         [Test]
-        public async Task GetArtworkPreviewByQueryAsync_WhenRepositoryReturnsEmptyList_ReturnsEmptyList()
+        public async Task SearchAllArtworkPreviewsAsync_WhenRepositoryReturnsEmptyList_ReturnsEmptyPaginatedResponse()
         {
             // Arrange
             var expectedQuery = "unknown artist";
@@ -162,20 +204,30 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             var emptyList = new List<ArtworkPreview>();
             var repositoryResult = Shared.Result<List<ArtworkPreview>>.Success(emptyList);
 
-            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset))
+            _mockArtworksRepository.Setup(r => r.SearchAllArtworkPreviewsAsync(expectedQuery))
                 .ReturnsAsync(repositoryResult);
 
             // Act
-            var serviceResult = await _artworksService.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset);
+            var serviceResult = await _artworksService.SearchAllArtworkPreviewsAsync(expectedQuery);
 
             // Assert
             serviceResult.IsSuccess.Should().BeTrue();
-            serviceResult.Value.Should().BeEmpty();
-            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset), Times.Once);
+            serviceResult.Value.Should().BeEquivalentTo(new PaginatedResponse<ArtworkPreview>()
+            {
+                Data = new List<ArtworkPreview>(),
+                Info = new PaginationInfo()
+                {
+                    ItemsPerPage = 25,
+                    TotalItems = 0,
+                    CurrentPage = 1,
+                    TotalPages = 0
+                }
+            });
+            _mockArtworksRepository.Verify(r => r.SearchAllArtworkPreviewsAsync(expectedQuery), Times.Once);
         }
 
         [Test]
-        public async Task GetArtworkPreviewByQueryAsync_WhenRepositoryReturnsFailure_ReturnsFailure()
+        public async Task SearchAllArtworkPreviewsAsync_WhenRepositoryReturnsFailure_ReturnsFailure()
         {
             // Arrange
             var expectedQuery = "monet";
@@ -184,17 +236,97 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             var expectedError = "Search service is unavailable.";
             var repositoryResult = Shared.Result<List<ArtworkPreview>>.Failure(expectedError, System.Net.HttpStatusCode.ServiceUnavailable);
 
-            _mockArtworksRepository.Setup(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset))
+            _mockArtworksRepository.Setup(r => r.SearchAllArtworkPreviewsAsync(expectedQuery))
                 .ReturnsAsync(repositoryResult);
 
             // Act
-            var serviceResult = await _artworksService.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset);
+            var serviceResult = await _artworksService.SearchAllArtworkPreviewsAsync(expectedQuery);
 
             // s
             serviceResult.IsSuccess.Should().BeFalse();
-            serviceResult.ErrorMessage.Should().Be(expectedError);
+            serviceResult.Message.Should().Be(expectedError);
             serviceResult.Value.Should().BeNull();
-            _mockArtworksRepository.Verify(r => r.GetArtworkPreviewByQueryAsync(expectedQuery, expectedCount, expectedOffset), Times.Once);
+            _mockArtworksRepository.Verify(r => r.SearchAllArtworkPreviewsAsync(expectedQuery), Times.Once);
+        }
+
+        [Test]
+        public async Task SearchAllArtworkPreviewsAsync_WhenRepositoryReturnsSuccessWithDuplicates_ReturnsPaginatedResponseWithoutDuplicates()
+        {
+            // Arrange
+            var expectedQuery = "monet";
+            var artworkList = new List<ArtworkPreview>
+       {
+                new ArtworkPreview()
+                {
+                    Id = "artwork_0",
+                    Source = ArtworkSource.CLEVELAND_MUSEUM,
+                    SourceId = 1012,
+                    Title = "Impression, Sunrise",
+                    Artists = new List<Artist>()
+                    {
+                        new Artist(){Name="Claude Monet"}
+                    },
+                    WebImage = new Image(){Url="url_0",Width=1080, Height=920}
+                },
+                new ArtworkPreview()
+                {
+                    Id = "artwork_1",
+                    Source = ArtworkSource.CHICAGO_ART_INSTITUTE,
+                    SourceId = 2032,
+                    Title = "Impression, Sunrise",
+                    Artists = new List<Artist>()
+                    {
+                        new Artist(){Name="Claude Monet"}
+                    },
+                    WebImage = new Image(){Url="url_1",Width=1080, Height=920}
+                }
+            };
+            var repositoryResult = Shared.Result<List<ArtworkPreview>>.Success(artworkList);
+
+            _mockArtworksRepository.Setup(r => r.SearchAllArtworkPreviewsAsync(expectedQuery))
+                .ReturnsAsync(repositoryResult);
+
+            object cacheValue = null;
+
+            _mockMemoryCache.Setup(c => c.TryGetValue(It.IsAny<object>(), out cacheValue))
+            .Returns(false);
+
+            _mockMemoryCache.Setup(m => m.CreateEntry(It.IsAny<object>()))
+             .Returns(_mockCacheEntry.Object);
+
+            // Act
+            var serviceResult = await _artworksService.SearchAllArtworkPreviewsAsync(expectedQuery, null, 25, 1);
+
+            // Assert
+            serviceResult.IsSuccess.Should().BeTrue();
+            var expectation = new PaginatedResponse<ArtworkPreview>()
+            {
+                Data = new List<ArtworkPreview>
+                {
+                    new ArtworkPreview()
+                    {
+                        Id = "artwork_0",
+                        Source = ArtworkSource.CLEVELAND_MUSEUM,
+                        SourceId = 1012,
+                        Title = "Impression, Sunrise",
+                        Artists = new List<Artist>()
+                        {
+                            new Artist(){Name="Claude Monet"}
+                        },
+                        WebImage = new Image(){Url="url_0",Width=1080, Height=920}
+                    }
+                },
+                Info = new PaginationInfo()
+                {
+                    ItemsPerPage = 25,
+                    TotalItems = 1,
+                    CurrentPage = 1,
+                    TotalPages = 1
+                }
+            };
+            serviceResult.Value.Data.Count().Should().Be(1);
+            serviceResult.Value.Should().BeEquivalentTo(expectation);
+            _mockArtworksRepository.Verify(r => r.SearchAllArtworkPreviewsAsync(expectedQuery), Times.Once);
         }
     }
 }

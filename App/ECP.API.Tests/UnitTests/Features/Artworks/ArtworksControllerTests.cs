@@ -20,7 +20,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
         }
 
         [Test]
-        public async Task GetArtworkPreviewAsync_WhenServiceReturnsSuccessWithData_ReturnsOkResultWithArtworks()
+        public async Task GetArtworkPreviewAsync_WhenServiceReturnsSuccessWithData_ReturnsOkResultWithPaginatedDataModel()
         {
             // Arrange
             var artworkList = new List<ArtworkPreview>()
@@ -50,47 +50,40 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
                     WebImage = new Image(){Url="url_1",Width=1080, Height=920}
                 }
             };
-            var successResult = Shared.Result<List<ArtworkPreview>>.Success(artworkList);
+            var successResult = Shared.Result<PaginatedResponse<ArtworkPreview>>.Success(new PaginatedResponse<ArtworkPreview>()
+            {
+                Data = artworkList,
+                Info = new PaginationInfo()
+                {
+                    ItemsPerPage = 25,
+                    TotalItems = 2,
+                    CurrentPage = 1,
+                    TotalPages = 1
+                }
+            });
             var completedTask = Task.FromResult(successResult);
-            _mockArtworksService.Setup(service => service.GetArtworkPreviewAsync(2)).Returns(completedTask);
+            _mockArtworksService.Setup(service => service.GetArtworkPreviewsAsync(2, 25, 1)).Returns(completedTask);
 
             // Act
-            var result = await _artworksController.GetArtworkPreviewAsync(2);
+            var result = await _artworksController.GetArtworkPreviewAsync(2, 25, 1);
 
             // Assert
-            _mockArtworksService.Verify(service => service.GetArtworkPreviewAsync(2), Times.Once);
+            _mockArtworksService.Verify(service => service.GetArtworkPreviewsAsync(2, 25, 1), Times.Once);
             result.Should().BeOfType<OkObjectResult>();
             var okResult = result as OkObjectResult;
             okResult.StatusCode.Should().Be(StatusCodes.Status200OK);
             okResult.Value.Should().NotBeNull();
-            var resultValue = okResult.Value as List<ArtworkPreview>;
-            resultValue.Should().BeEquivalentTo(new List<ArtworkPreview>()
+            var resultValue = okResult.Value as PaginatedResponse<ArtworkPreview>;
+            resultValue.Should().BeEquivalentTo(new PaginatedResponse<ArtworkPreview>()
             {
-                 new ArtworkPreview()
+                Data = artworkList,
+                Info = new PaginationInfo()
                 {
-                    Id = "artwork_0",
-                    Source = ArtworkSource.CLEVELAND_MUSEUM,
-                    SourceId = 1012,
-                    Title = "Artwork_0",
-                    Artists = new List<Artist>()
-                    {
-                        new Artist(){Name="Sample_Artist_0"}
-                    },
-                    WebImage = new Image(){Url="url_0",Width=1080, Height=920}
-                },
-                new ArtworkPreview()
-                {
-                    Id = "artwork_1",
-                    Source = ArtworkSource.CHICAGO_ART_INSTITUTE,
-                    SourceId = 2032,
-                    Title = "Artwork_1",
-                    Artists = new List<Artist>()
-                    {
-                        new Artist(){Name="Sample_Artist_1"}
-                    },
-                    WebImage = new Image(){Url="url_1",Width=1080, Height=920}
+                    ItemsPerPage = 25,
+                    TotalItems = 2,
+                    CurrentPage = 1,
+                    TotalPages = 1
                 }
-
             });
         }
 
@@ -99,16 +92,26 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
         {
 
             // Arrange
-            List<ArtworkPreview> artworkList = new();
-            var successResult = Shared.Result<List<ArtworkPreview>>.Success(artworkList);
+            var paginatedResponse = new PaginatedResponse<ArtworkPreview>()
+            {
+                Data = new List<ArtworkPreview>(),
+                Info = new PaginationInfo()
+                {
+                    ItemsPerPage = 25,
+                    TotalItems = 0,
+                    CurrentPage = 1,
+                    TotalPages = 0
+                }
+            };
+            var successResult = Shared.Result<PaginatedResponse<ArtworkPreview>>.Success(paginatedResponse);
             var completedTask = Task.FromResult(successResult);
-            _mockArtworksService.Setup(service => service.GetArtworkPreviewAsync(2)).Returns(completedTask);
+            _mockArtworksService.Setup(service => service.GetArtworkPreviewsAsync(2, 25, 1)).Returns(completedTask);
 
             // Act
-            var result = await _artworksController.GetArtworkPreviewAsync(2);
+            var result = await _artworksController.GetArtworkPreviewAsync(2, 25, 1);
 
             // Assert
-            _mockArtworksService.Verify(service => service.GetArtworkPreviewAsync(2), Times.Once);
+            _mockArtworksService.Verify(service => service.GetArtworkPreviewsAsync(2, 25, 1), Times.Once);
             result.Should().BeOfType<NoContentResult>();
             var okResult = result as NoContentResult;
             okResult.StatusCode.Should().Be(StatusCodes.Status204NoContent);
@@ -118,16 +121,26 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
         public async Task GetArtworkPreviewAsync_WhenServiceReturnsSuccessWithNullValue_ReturnsNoContentResult()
         {
             // Arrange
-            List<ArtworkPreview> artworkList = null;
-            var successResult = Shared.Result<List<ArtworkPreview>>.Success(null);
+            var paginatedResponse = new PaginatedResponse<ArtworkPreview>()
+            {
+                Data = null,
+                Info = new PaginationInfo()
+                {
+                    ItemsPerPage = 25,
+                    TotalItems = 0,
+                    CurrentPage = 1,
+                    TotalPages = 0
+                }
+            };
+            var successResult = Shared.Result<PaginatedResponse<ArtworkPreview>>.Success(paginatedResponse);
             var completedTask = Task.FromResult(successResult);
-            _mockArtworksService.Setup(service => service.GetArtworkPreviewAsync(2)).Returns(completedTask);
+            _mockArtworksService.Setup(service => service.GetArtworkPreviewsAsync(2, 25, 1)).Returns(completedTask);
 
             // Act
-            var result = await _artworksController.GetArtworkPreviewAsync(2);
+            var result = await _artworksController.GetArtworkPreviewAsync(2, 25, 1);
 
             // Assert
-            _mockArtworksService.Verify(service => service.GetArtworkPreviewAsync(2), Times.Once);
+            _mockArtworksService.Verify(service => service.GetArtworkPreviewsAsync(2, 25, 1), Times.Once);
             result.Should().BeOfType<NoContentResult>();
             var okResult = result as NoContentResult;
             okResult.StatusCode.Should().Be(StatusCodes.Status204NoContent);
@@ -137,15 +150,15 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
         public async Task GetArtworkPreviewAsync_WhenServiceReturnsFailure_ReturnsInternalServerError()
         {
             // Arrange
-            var failureResult = Shared.Result<List<ArtworkPreview>>.Failure("Error connecting to external APIs", System.Net.HttpStatusCode.Unauthorized);
+            var failureResult = Shared.Result<PaginatedResponse<ArtworkPreview>>.Failure("Error connecting to external APIs", System.Net.HttpStatusCode.Unauthorized);
             var completedTask = Task.FromResult(failureResult);
-            _mockArtworksService.Setup(service => service.GetArtworkPreviewAsync(2)).Returns(completedTask);
+            _mockArtworksService.Setup(service => service.GetArtworkPreviewsAsync(2, 25, 1)).Returns(completedTask);
 
             // Act
-            var result = await _artworksController.GetArtworkPreviewAsync(2);
+            var result = await _artworksController.GetArtworkPreviewAsync(2, 25, 1);
 
             // Assert
-            _mockArtworksService.Verify(service => service.GetArtworkPreviewAsync(2), Times.Once);
+            _mockArtworksService.Verify(service => service.GetArtworkPreviewsAsync(2, 25, 1), Times.Once);
             var serverErrorResult = result as ObjectResult;
             serverErrorResult.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
             serverErrorResult.Value.Should().BeEquivalentTo(new { error = "Error connecting to external APIs" });

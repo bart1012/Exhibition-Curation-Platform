@@ -52,7 +52,7 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
             };
 
             ChicagoApiResponse<ChicagoArtPreview> firstResponse = await GetResponseWithParameters<ChicagoArtPreview>(parameters);
-            Console.WriteLine(firstResponse.ToString());
+
             artworks.AddRange(firstResponse.Data);
 
             if (firstResponse.Info.Pages > 1)
@@ -61,11 +61,16 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
                 {
                     parameters.Page++;
                     ChicagoApiResponse<ChicagoArtPreview> response = await GetResponseWithParameters<ChicagoArtPreview>(parameters);
-                    artworks.AddRange(response.Data);
+
+                    if (response != null)
+                    {
+                        artworks.AddRange(response.Data);
+                    }
+
                 }
 
             }
-            Console.WriteLine($"Total Chicago count on q={q}: {artworks.Count}");
+
             return artworks;
         }
 
@@ -121,10 +126,14 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
 
             if (parameters.PreviewsOnly)
             {
-                url.Append("&fields=id,title,artist_titles,thumbnail,image_id");
+                url.Append("&fields=id,title,artist_titles,thumbnail,image_id,date_start,date_end");
             }
 
-            url.Append($"&from={parameters.Offset}");
+            if (parameters.Page != 0)
+            {
+                url.Append($"&page={parameters.Page}");
+            }
+
 
             return url.ToString();
         }
