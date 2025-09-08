@@ -10,10 +10,10 @@ namespace ECP.Shared
         public HttpStatusCode? StatusCode { get; }
 
 
-        protected Result(bool isSuccess, string? errorMessage, HttpStatusCode? httpStatus = null)
+        protected Result(bool isSuccess, string? message, HttpStatusCode? httpStatus = null)
         {
             IsSuccess = isSuccess;
-            Message = errorMessage;
+            Message = message;
             StatusCode = httpStatus;
         }
 
@@ -26,13 +26,13 @@ namespace ECP.Shared
     {
         public T? Value { get; }
 
-        protected Result(T? value, bool isSuccess, string? errorMessage, HttpStatusCode? httpStatus)
-            : base(isSuccess, errorMessage, httpStatus)
+        protected Result(T? value, bool isSuccess, string? message, HttpStatusCode? httpStatus)
+            : base(isSuccess, message, httpStatus)
         {
             Value = value;
         }
 
-        public static Result<T> Success(T value) => new Result<T>(value, true, null, null);
+        public static Result<T> Success(T value, string? message = null) => new Result<T>(value, true, message, null);
         public static Result<T> Failure(string errorMessage, HttpStatusCode? httpStatus = null) => new Result<T>(default, false, errorMessage, httpStatus);
     }
 }

@@ -6,12 +6,17 @@
         public string Id { get; set; }
         public ArtworkSource Source { get; set; }
         public int SourceId { get; set; }
+        public ArtworkType ArtworkType { get; set; }
 
         //Display properties
         public string Title { get; set; }
         public List<Artist>? Artists { get; set; }
         public int? CreationYear { get; set; }
+        public string ArtworkTypeDisplay { get; set; }
+
+        public List<string> Materials { get; set; }
         public Image? WebImage { get; set; }
+        public List<string> Subjects { get; set; }
 
         public override bool Equals(object? obj)
         {

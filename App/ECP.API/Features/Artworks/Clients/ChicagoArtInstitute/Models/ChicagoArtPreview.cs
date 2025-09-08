@@ -13,6 +13,9 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute.Models
         [JsonPropertyName("artist_titles")]
         public List<string> Artists { get; set; }
 
+        [JsonPropertyName("artwork_type_title")]
+        public string Type { get; set; }
+
         [JsonPropertyName("date_start")]
         public int? EarliestCreationDate { get; set; }
 

@@ -26,9 +26,9 @@ namespace ECP.API.Features.Artworks
 
         // GET: api/<ArtworksController>
         [HttpGet("previews/search")]
-        public async Task<IActionResult> GetArtworkPreviewByQueryAsync([FromQuery] string q, string? sort = null, int limit = 25, int page = 1)
+        public async Task<IActionResult> GetArtworkPreviewByQueryAsync([FromQuery] string q, string? sort = null, [FromQuery] List<string>? filters = null, int limit = 25, int page = 1)
         {
-            Shared.Result<PaginatedResponse<ArtworkPreview>> response = await _artworksService.SearchAllArtworkPreviewsAsync(q, sort, limit, page);
+            Shared.Result<PaginatedResponse<ArtworkPreview>> response = await _artworksService.SearchAllArtworkPreviewsAsync(q, sort, filters, limit, page);
 
             return response.IsSuccess switch
             {

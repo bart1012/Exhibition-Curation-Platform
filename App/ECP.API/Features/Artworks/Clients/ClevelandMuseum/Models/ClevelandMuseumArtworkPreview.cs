@@ -13,6 +13,9 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum.Models
         [JsonPropertyName("creation_date")]
         public string CreationDate { get; set; }
 
+        [JsonPropertyName("type")]
+        public string Type { get; set; }
+
         [JsonPropertyName("creators")]
         public List<ClevelandMuseumArtist> Creators { get; set; }
 

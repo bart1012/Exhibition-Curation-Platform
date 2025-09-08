@@ -109,6 +109,9 @@ namespace ECP.API.Features.Artworks
             int artworkSourceId = clevelandArtworkPreview.Id;
             string artworkTitle = clevelandArtworkPreview.Title;
             int creationDate = 0;
+            ArtworkType artworkType = ArtworkType.Undefined;
+            Enum.TryParse(clevelandArtworkPreview.Type, true, out artworkType);
+
             List<Artist?>? artworkArtists = clevelandArtworkPreview.Creators?.Any() == true ? clevelandArtworkPreview.Creators.Select(a => (a != null && a.Description.Contains('(')) ? new Artist()
             {
                 Name = a.Description.Substring(0, a.Description.IndexOf('(')).Trim()
@@ -131,6 +134,8 @@ namespace ECP.API.Features.Artworks
                 Source = ArtworkSource.CLEVELAND_MUSEUM,
                 SourceId = artworkSourceId,
                 Title = artworkTitle,
+                ArtworkType = artworkType,
+                ArtworkTypeDisplay = clevelandArtworkPreview.Type,
                 Artists = artworkArtists,
                 WebImage = artworkWebImage,
                 CreationYear = int.TryParse(clevelandArtworkPreview.CreationDate, out creationDate) ? creationDate : -1
@@ -143,6 +148,9 @@ namespace ECP.API.Features.Artworks
             int artworkSourceId = chicagoArtworkPreview.Id;
             string artworkTitle = chicagoArtworkPreview.Title;
             int? creationYear = 0;
+            ArtworkType artworkType = ArtworkType.Undefined;
+            Enum.TryParse(chicagoArtworkPreview.Type, true, out artworkType);
+
             if (chicagoArtworkPreview.EarliestCreationDate != 0 && chicagoArtworkPreview.LatestCreationDate != 0)
             {
                 creationYear = (chicagoArtworkPreview.EarliestCreationDate + chicagoArtworkPreview.LatestCreationDate) / 2;
@@ -187,6 +195,8 @@ namespace ECP.API.Features.Artworks
                 Id = artworkId,
                 Source = ArtworkSource.CHICAGO_ART_INSTITUTE,
                 SourceId = artworkSourceId,
+                ArtworkType = artworkType,
+                ArtworkTypeDisplay = chicagoArtworkPreview.Type,
                 Title = artworkTitle,
                 CreationYear = creationYear,
                 Artists = artworkArtists,

@@ -71,7 +71,7 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
 
             if (parameters.PreviewsOnly)
             {
-                url.Append("&fields=id,title,creators,images,creation_date&has_image=1");
+                url.Append("&fields=id,title,creators,images,creation_date,type&has_image=1");
             }
 
             url.Append($"&skip={parameters.Offset}");
