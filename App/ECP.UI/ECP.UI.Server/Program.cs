@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using ECP.UI.Server.Services;
 using MudBlazor.Services;
 
@@ -20,8 +21,12 @@ namespace ECP.UI.Server
             {
                 client.BaseAddress = new Uri("https://localhost:7102/api/");
             });
+            builder.Services.AddBlazoredLocalStorage();
 
             var app = builder.Build();
+
+            app.UseStatusCodePagesWithRedirects("/not-found");
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

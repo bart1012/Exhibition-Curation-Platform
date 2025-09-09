@@ -6,13 +6,22 @@ namespace ECP.UI.Server.Services
 {
     public interface IArtworkService
     {
-        Task<Result<PaginatedResponse<ArtworkPreview>>> GetArtworksAsync(int count, int resultsPerPage, int pageNum);
+        Task<Result<PaginatedResponse<ArtworkPreview>>> GetArtworkPreviewsAsync(int count, int resultsPerPage, int pageNum);
+
+        Task<Result<Artwork>> GetArtworkByIdAsync(int id, int source);
+
         Task<Result<PaginatedResponse<ArtworkPreview>>> SearchArtworksByQueryAsync(string q, int resultsPerPage, int pageNum);
     }
     public class ArtworkService(HttpClient client) : IArtworkService
     {
         private readonly HttpClient _httpClient = client;
-        public async Task<Result<PaginatedResponse<ArtworkPreview>>> GetArtworksAsync(int count, int resultsPerPage, int pageNum)
+
+        public async Task<Result<Artwork>> GetArtworkByIdAsync(int id, int source)
+        {
+            return await ExecuteApiCallAsync<Artwork>($"https://localhost:7102/api/artworks?id={id}&source={source}");
+        }
+
+        public async Task<Result<PaginatedResponse<ArtworkPreview>>> GetArtworkPreviewsAsync(int count, int resultsPerPage, int pageNum)
         {
             return await ExecuteApiCallAsync<PaginatedResponse<ArtworkPreview>>($"artworks/previews?count={count}&results_per_page={resultsPerPage}&page_num={pageNum}");
         }
