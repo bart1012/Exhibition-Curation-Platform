@@ -2,7 +2,7 @@
 
 namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute.Models
 {
-    public class ChicagoApiResponse<T>
+    public class ChicagoCollectionApiResponse<T>
     {
         public List<T> Data { get; set; }
 

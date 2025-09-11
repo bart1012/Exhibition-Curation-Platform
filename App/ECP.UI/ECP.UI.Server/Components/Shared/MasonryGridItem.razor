@@ -1,21 +1,20 @@
-﻿<div class="masonry-item">
+﻿<a href="@($"/artwork/{Artwork.SourceId}/{(int)Artwork.Source}")" class="masonry-item">
     <div class="masonry-content">
-        @if (!string.IsNullOrWhiteSpace(Artwork.WebImage.Url))
-        {
-            <img src="@Artwork.WebImage.Url" alt="@Artwork.Title" class="item-image" />
-        }
-        else
-        {
-            <div class="placeholder-image">
-                <p>No Image</p>
+            @if (!string.IsNullOrWhiteSpace(Artwork.WebImage.Url))
+            {
+                <img src="@Artwork.WebImage.Url" alt="@Artwork.Title" class="item-image" />
+            }
+            else
+            {
+                <div class="placeholder-image">
+                    <p>No Image</p>
+                </div>
+            }
+            <div class="item-info">
+                <h5 class="title">@Artwork.Title</h5>
             </div>
-        }
-        <div class="item-info">
-            <h5 class="title">@Artwork.Title</h5>
         </div>
-    </div>
-</div>
-
+</a>
 @code {
     [Parameter]
     public ArtworkPreview Artwork { get; set; }

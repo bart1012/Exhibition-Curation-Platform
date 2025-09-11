@@ -6,11 +6,11 @@ namespace ECP.API.Features.Artworks
 {
     public interface IArtworkMapper
     {
-        Artwork FromCleveland(ClevelandMuseumArtwork clevelandArtwork);
+        Artwork FromCleveland(ClevelandArtwork clevelandArtwork);
+        Artwork FromChicago(ChicagoArtwork chicagoArtwork);
+        ArtworkPreview FromClevelandPreview(ClevelandArtworkPreview clevelandArtworkPreview);
 
-        ArtworkPreview FromClevelandPreview(ClevelandMuseumArtworkPreview clevelandArtworkPreview);
-
-        ArtworkPreview FromChicagoPreview(ChicagoArtPreview chicagoArtworkPreview);
+        ArtworkPreview FromChicagoPreview(ChicagoArtworkPreview chicagoArtworkPreview);
 
     }
     public class ArtworkMapper : IArtworkMapper
@@ -23,9 +23,8 @@ namespace ECP.API.Features.Artworks
             }
             return defaultValue;
         }
-        public Artwork FromCleveland(ClevelandMuseumArtwork clevelandArtwork)
+        public Artwork FromCleveland(ClevelandArtwork clevelandArtwork)
         {
-
             string artworkId = string.Concat("cleveland_", clevelandArtwork.Id);
             var artworkSource = ArtworkSource.CLEVELAND_MUSEUM;
             int artworkSourceId = clevelandArtwork.Id;
@@ -38,6 +37,8 @@ namespace ECP.API.Features.Artworks
             string description = clevelandArtwork.Description;
             List<string> culture = clevelandArtwork.Culture;
             string sourceUrl = clevelandArtwork.Url;
+            ArtworkType artworkType = ArtworkType.Undefined;
+            Enum.TryParse(clevelandArtwork.Type, true, out artworkType);
 
             var artists = clevelandArtwork.Creators?.Any() == true
                 ? clevelandArtwork.Creators.Select(a => new Artist() { Name = a.Description }).ToList()
@@ -93,7 +94,7 @@ namespace ECP.API.Features.Artworks
                 MinCreationYear = minCreationYear,
                 MaxCreationYear = maxCreationYear,
                 Medium = medium,
-                Type = type,
+                Type = artworkType,
                 Dimensions = dimensions,
                 Description = description,
                 Culture = culture,
@@ -103,7 +104,51 @@ namespace ECP.API.Features.Artworks
 
             return artwork;
         }
-        public ArtworkPreview FromClevelandPreview(ClevelandMuseumArtworkPreview clevelandArtworkPreview)
+        public Artwork FromChicago(ChicagoArtwork chicagoArtwork)
+        {
+
+            string artworkId = string.Concat("chicago_", chicagoArtwork.Id);
+            var artworkSource = ArtworkSource.CHICAGO_ART_INSTITUTE;
+            int artworkSourceId = chicagoArtwork.Id;
+            string title = chicagoArtwork.Title;
+            string creationDate = chicagoArtwork.DateDisplay;
+            int? minCreationYear = chicagoArtwork.EarliestCreationDate;
+            int? maxCreationYear = chicagoArtwork.LatestCreationDate;
+            string medium = chicagoArtwork.MediumDisplay;
+            string type_display = chicagoArtwork.Type;
+            string description = chicagoArtwork.Description;
+            string placeOfOrigin = chicagoArtwork.PlaceOfOrigin;
+            ArtworkType artworkType = ArtworkType.Undefined;
+            Enum.TryParse(chicagoArtwork.Type, true, out artworkType);
+
+            var artists = chicagoArtwork.Artists?.Any() == true
+                ? chicagoArtwork.Artists.Select(a => new Artist() { Name = a }).ToList()
+                : null;
+
+            string dimensions = chicagoArtwork.Dimensions;
+
+
+
+
+            Artwork artwork = new Artwork()
+            {
+                Id = artworkId,
+                Source = artworkSource,
+                SourceId = artworkSourceId,
+
+                Title = title,
+                Artists = artists,
+                CreationDate = creationDate,
+                MinCreationYear = minCreationYear,
+                MaxCreationYear = maxCreationYear,
+                Medium = medium,
+                TypeDisplay = chicagoArtwork.Type,
+                Type = artworkType
+            };
+
+            return artwork;
+        }
+        public ArtworkPreview FromClevelandPreview(ClevelandArtworkPreview clevelandArtworkPreview)
         {
             string artworkId = string.Concat("cleveland_", clevelandArtworkPreview.Id);
             int artworkSourceId = clevelandArtworkPreview.Id;
@@ -142,7 +187,7 @@ namespace ECP.API.Features.Artworks
             };
 
         }
-        public ArtworkPreview FromChicagoPreview(ChicagoArtPreview chicagoArtworkPreview)
+        public ArtworkPreview FromChicagoPreview(ChicagoArtworkPreview chicagoArtworkPreview)
         {
             string artworkId = string.Concat("chicago_", chicagoArtworkPreview.Id);
             int artworkSourceId = chicagoArtworkPreview.Id;

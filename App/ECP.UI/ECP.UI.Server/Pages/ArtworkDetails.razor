@@ -1,35 +1,35 @@
 ﻿@page "/artwork/{ArtworkId:int}/{SourceId:int}"
 @inject ArtworkService ArtworkService
+@rendermode InteractiveWebAssembly
 @using ECP.UI.Server.Components.Error
 @using ECP.UI.Server.Components.Shared
+@using ECP.UI.Client.Components
 
 @if (isLoading)
 {
-    <div class="d-flex justify-center align-center" style="height: 100vh;">
-        <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
-    </div>
+    <Loading></Loading>
 }
 else if (_artwork != null)
 {
     <MudGrid Class="pa-4">
-        <!-- Main artwork image and details layout -->
+        <!-- artwork image -->
         <MudItem xs="12" sm="6" Class="d-flex justify-center">
             @if (!string.IsNullOrEmpty(_artwork.Images?.Thumbnail?.Url))
             {
                 <MudImage Src="@_artwork.Images.Thumbnail.Url" Alt="@_artwork.Title"
                           Class="rounded-lg shadow-lg"
-                          Style="max-width: 100%; height: auto;"/>
+                          Style="max-width: 100%; height: auto;" />
             }
             else
             {
                 <MudImage Src="https://placehold.co/600x400/2c3e50/ecf0f1?text=Image+Not+Found"
                           Alt="Image Not Found"
                           Class="rounded-lg shadow-lg"
-                          Style="max-width: 100%; height: auto;"/>
+                          Style="max-width: 100%; height: auto;" />
             }
         </MudItem>
 
-        <!-- Artwork information section -->
+        <!-- Artwork information -->
         <MudItem xs="12" sm="6">
             <MudCard Outlined="true" Elevation="4">
                 <MudCardHeader>
@@ -41,9 +41,12 @@ else if (_artwork != null)
                                 @string.Join(", ", _artwork.Artists.Select(a => a.Name))
                             </MudText>
                         }
+                        <!-- save artwork button-->
+
+                        <SaveToCollection></SaveToCollection>
                     </CardHeaderContent>
                 </MudCardHeader>
-                <MudDivider/>
+                <MudDivider />
                 <MudCardContent>
                     <MudText Typo="Typo.body1" Class="mb-4">
                         <strong>Creation Date:</strong> @_artwork.CreationDate
@@ -65,7 +68,7 @@ else if (_artwork != null)
                     @if (!string.IsNullOrWhiteSpace(_artwork.Description))
                     {
                         <MudText Typo="Typo.body2" Class="mb-4">
-                            <div class="mt-4" style="text-align: justify;" >
+                            <div class="mt-4" style="text-align: justify;">
                                 @_artwork.Description
                             </div>
                         </MudText>
@@ -107,6 +110,10 @@ else if (_artwork != null)
         </MudItem>
     </MudGrid>
 }
+else if (_isServerError)
+{
+    <ServerErrorMessage></ServerErrorMessage>
+}
 else
 {
     <NotFoundMessage></NotFoundMessage>
@@ -121,6 +128,15 @@ else
 
     private Artwork _artwork = null;
     private bool isLoading = true;
+    private bool _isServerError = false;
+
+    private bool _expanded = true;
+    private bool _saved { get; set; } = false;
+
+    private void OnExpandCollapseClick()
+    {
+        _expanded = !_expanded;
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -129,11 +145,32 @@ else
 
         try
         {
-            var response = await ArtworkService.GetArtworkByIdAsync(ArtworkId, SourceId);
+            // Mock data retrieval for testing purposes
+            await Task.Delay(1000);// Simulate network delay
 
-            if (response.IsSuccess)
+            if (ArtworkId == 122130)
             {
-                _artwork = response.Value;
+                _artwork = new Artwork
+                    {
+                        Id = "122130",
+                        Title = "Les Andelys, Côte d'Aval (Test Instance)",
+                        Artists = new List<Artist> { new Artist { Name = "Paul Signac" } },
+                        CreationDate = "1886",
+                        Medium = "Oil on canvas",
+                        Dimensions = new Dimensions { Width = 92, Height = 60, Depth = 6.4 },
+                        Description = "This is a mock description for testing purposes. It simulates a full artwork object without needing to call the API.",
+                        Images = new Images
+                        {
+                            Thumbnail = new Image { Url = "https://www.artic.edu/iiif/2/43fcfad0-8256-4923-9f9c-03ca90417907/full/843,/0/default.jpg" }
+                        },
+                        Subjects = new List<string> { "Landscapes", "Boats", "Towns", "Water" },
+                        Styles = new List<string> { "Post-Impressionism", "19th Century" },
+                        SourceUrl = "https://www.artic.edu/artworks/122130/les-andelys-cote-d-aval"
+                    };
+            }
+            else
+            {
+                _artwork = null;
             }
         }
         catch (Exception ex)

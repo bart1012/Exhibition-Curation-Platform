@@ -2,13 +2,10 @@
 
 namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum.Models
 {
-    public class ClevelandMuseumArtwork
+    public class ClevelandArtwork
     {
         [JsonPropertyName("id")]
         public int Id { get; set; }
-
-        [JsonPropertyName("description")]
-        public string Description { get; set; }
 
         [JsonPropertyName("title")]
         public string Title { get; set; }
@@ -28,6 +25,9 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum.Models
         [JsonPropertyName("type")]
         public string Type { get; set; }
 
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
         [JsonPropertyName("measurements")]
         public string Measurements { get; set; }
 
@@ -46,5 +46,12 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum.Models
         [JsonPropertyName("url")]
         public string Url { get; set; }
 
+        public override string? ToString()
+        {
+            return $"""
+                Id: {Id}
+                Title: {Title}
+                """;
+        }
     }
 }

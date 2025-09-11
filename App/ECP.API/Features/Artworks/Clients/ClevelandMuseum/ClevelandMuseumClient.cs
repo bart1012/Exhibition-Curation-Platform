@@ -7,9 +7,9 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
 {
     public interface IClevelandMuseumClient
     {
-        Task<List<ClevelandMuseumArtworkPreview>> GetArtworkPreviews(int count);
-        Task<List<ClevelandMuseumArtworkPreview>> GetArtworkPreviewsByQuery(string q);
-        string UrlBuilder(ChicagoApiParameters parameters);
+        Task<ClevelandArtwork?> GetArtworkById(int id);
+        Task<List<ClevelandArtworkPreview>> GetArtworkPreviews(int count);
+        Task<List<ClevelandArtworkPreview>> GetArtworkPreviewsByQuery(string q);
     }
 
     public class ClevelandMuseumClient : IClevelandMuseumClient
@@ -27,17 +27,25 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
             };
         }
 
-        public async Task<List<ClevelandMuseumArtworkPreview>?> GetArtworkPreviews(int count = 25)
+        public async Task<ClevelandArtwork?> GetArtworkById(int id)
+        {
+            string url = $"https://openaccess-api.clevelandart.org/api/artworks/{id}";
+            var apiResponse = await FetchObjectAsync(url);
+            return apiResponse;
+        }
+
+        public async Task<List<ClevelandArtworkPreview>?> GetArtworkPreviews(int count = 25)
         {
             var parameters = new ChicagoApiParameters()
             {
                 Count = count,
                 PreviewsOnly = true
             };
-            return await GetArtworksWithParameters(parameters);
+            string url = UrlBuilder(parameters);
+            return await FetchCollectionAsync(url);
         }
 
-        public async Task<List<ClevelandMuseumArtworkPreview>> GetArtworkPreviewsByQuery(string q)
+        public async Task<List<ClevelandArtworkPreview>> GetArtworkPreviewsByQuery(string q)
         {
             var parameters = new ChicagoApiParameters()
             {
@@ -46,11 +54,12 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
                 Query = q,
                 Offset = 0
             };
-            return await GetArtworksWithParameters(parameters);
+            string url = UrlBuilder(parameters);
+            return await FetchCollectionAsync(url);
 
         }
 
-        public string UrlBuilder(ChicagoApiParameters parameters)
+        private string UrlBuilder(ChicagoApiParameters parameters)
         {
             StringBuilder url = new();
             url.Append(BASE_URL + "artworks");
@@ -79,13 +88,7 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
             return url.ToString();
         }
 
-        protected async Task<List<ClevelandMuseumArtworkPreview>> GetArtworksWithParameters(ChicagoApiParameters parameters)
-        {
-            string url = UrlBuilder(parameters);
-            return await FetchArtworksAsync(url);
-        }
-
-        private async Task<List<ClevelandMuseumArtworkPreview>?> FetchArtworksAsync(string url)
+        private async Task<List<ClevelandArtworkPreview>?> FetchCollectionAsync(string url)
         {
             try
             {
@@ -100,7 +103,31 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine($"An error occurred while fetching artworks: {e.Message}");
+                Console.WriteLine($"An error occurred while fetching artworks from Cleveland API: {e.Message}");
+                return null;
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine($"An error occurred during JSON deserialization: {e.Message}");
+                return null;
+            }
+        }
+
+        private async Task<ClevelandArtwork?> FetchObjectAsync(string url)
+        {
+            try
+            {
+                var response = await _client.GetAsync(url);
+
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var parsedResponse = JsonSerializer.Deserialize<ClevelandObjectResponse<ClevelandArtwork>>(responseContent, _jsonOptions);
+                return parsedResponse.Data;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"An error occurred while fetching artwork from Cleveland API: {e.Message}");
                 return null;
             }
             catch (JsonException e)

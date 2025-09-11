@@ -25,26 +25,26 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             _artworksRepository = new ArtworksRepository(_mockClevelandClient.Object, _mockChicagoClient.Object, _mockMapper.Object);
         }
 
-        private List<ClevelandMuseumArtworkPreview> CreateClevelandArtPreviews(int count)
+        private List<ClevelandArtworkPreview> CreateClevelandArtPreviews(int count)
         {
             return Enumerable.Range(0, count)
-                .Select(i => new ClevelandMuseumArtworkPreview
+                .Select(i => new ClevelandArtworkPreview
                 {
                     Id = 1000 + i,
                     Title = $"ClevelandImage_{i}"
                 }).ToList();
         }
-        private List<ChicagoArtPreview> CreateChicagoArtPreviews(int count)
+        private List<ChicagoArtworkPreview> CreateChicagoArtPreviews(int count)
         {
             return Enumerable.Range(0, count)
-                .Select(i => new ChicagoArtPreview
+                .Select(i => new ChicagoArtworkPreview
                 {
                     Id = 2000 + i,
                     Title = $"ChicagoImage_{i}"
                 }).ToList();
         }
 
-        private void SetupMapper(List<ClevelandMuseumArtworkPreview> clevelandArtwork, List<ChicagoArtPreview> chicagoArtwork)
+        private void SetupMapper(List<ClevelandArtworkPreview> clevelandArtwork, List<ChicagoArtworkPreview> chicagoArtwork)
         {
             foreach (var artwork in clevelandArtwork)
             {
@@ -104,11 +104,11 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
         public async Task GetArtworkPreviewAsync_WhenClientsReturnItemsWithNullImage_FiltersThemOut()
         {
             // Arrange
-            var clevelandArtworkWithoutImage = new ClevelandMuseumArtworkPreview { Id = 2, Images = new() { Web = null } };
-            var clevelandArtworks = new List<ClevelandMuseumArtworkPreview> { clevelandArtworkWithoutImage };
+            var clevelandArtworkWithoutImage = new ClevelandArtworkPreview { Id = 2, Images = new() { Web = null } };
+            var clevelandArtworks = new List<ClevelandArtworkPreview> { clevelandArtworkWithoutImage };
 
-            var chicagoArtworksWithImage = new ChicagoArtPreview { Id = 3, ImageId = "chicago_img_1" };
-            var chicagoArtworks = new List<ChicagoArtPreview> { chicagoArtworksWithImage };
+            var chicagoArtworksWithImage = new ChicagoArtworkPreview { Id = 3, ImageId = "chicago_img_1" };
+            var chicagoArtworks = new List<ChicagoArtworkPreview> { chicagoArtworksWithImage };
 
             _mockClevelandClient.Setup(c => c.GetArtworkPreviews(1)).ReturnsAsync(clevelandArtworks);
             _mockChicagoClient.Setup(c => c.GetArtworkPreviews(1)).ReturnsAsync(chicagoArtworks);

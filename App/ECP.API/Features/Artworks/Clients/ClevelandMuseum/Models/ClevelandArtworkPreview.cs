@@ -2,7 +2,7 @@
 
 namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum.Models
 {
-    public class ClevelandMuseumArtworkPreview
+    public class ClevelandArtworkPreview
     {
         [JsonPropertyName("id")]
         public int Id { get; set; }

@@ -1,0 +1,151 @@
+﻿@using ECP.Shared
+@using ECP.UI.Client.Services
+@using MudBlazor
+@inject IUserCollectionsService CollectionsService
+
+<div class="d-flex justify-start">
+    @if (!_isExpanded)
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.BookmarkBorder"
+                   Class="rounded-lg mud-elevation-4" OnClick="ToggleExpansion">
+                    @(_isSaved ? "Saved" : "Save")
+        </MudButton>
+    }
+    else
+    {
+        @if (_isSaving)
+        {
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Small" Class="my-2" />
+        }
+        else
+        {
+            <MudStack Spacing="1">
+                <MudText Typo="Typo.subtitle1" Class="text-muted">Save to a collection</MudText>
+                <MudList T="string" Dense="true" Class="rounded-lg mud-elevation-4">
+                    @foreach (var collection in _userCollections)
+                    {
+                        <MudListItem OnClick="async () => await SaveToExistingCollection(collection, Artwork)">
+                            <MudText>@collection.Name</MudText>
+                        </MudListItem>
+                    }
+                    @if (!_isAddingNewCollection)
+                    {
+                        <MudListItem OnClick="StartNewCollectionFlow">
+                            <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-2" />
+                            <MudText>Create New Collection</MudText>
+                        </MudListItem>
+                    }
+                </MudList>
+
+                @if (_isAddingNewCollection)
+                {
+                    <MudStack Row="true" Spacing="1" Class="mt-2">
+                        <MudTextField @bind-Value="_newCollectionName"
+                                      Label="New Collection Name"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Immediate="true"
+                                      Class="flex-grow-1" />
+                        <MudButton OnClick="@(async () => await CreateNewCollectionAndSaveArtwork(Artwork))"
+                                   Disabled="@(string.IsNullOrWhiteSpace(_newCollectionName))"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Class="align-self-center">
+                            Add
+                        </MudButton>
+                    </MudStack>
+                }
+            </MudStack>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Artwork Artwork { get; set; } = null;
+
+    private bool _isExpanded = false;
+    private bool _errorOccured = false;
+    private bool _isAddingNewCollection = false;
+    private bool _isSaving = false;
+    private bool _isSaved { get; set; } = false;
+    private string _newCollectionName = string.Empty;
+
+    private List<Collection> _userCollections = null;
+
+    private void ToggleExpansion()
+    {
+        _isExpanded = !_isExpanded;
+        if (!_isExpanded)
+        {
+            _isAddingNewCollection = false;
+            _newCollectionName = string.Empty;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var collectionsResult = await CollectionsService.GetCollectionsAsync();
+            if (collectionsResult.IsSuccess)
+            {
+                _userCollections = collectionsResult.Value.Collections.ToList();
+                StateHasChanged();
+            }
+            else
+            {
+                Console.WriteLine($"Error fetching collections: {collectionsResult.Message}");
+            }
+        }
+    }
+
+    private async Task SaveToExistingCollection(Collection collection, Artwork artwork)
+    {
+        _isSaving = true;
+        Console.WriteLine($"Saving artwork {Artwork.Id} to existing collection: {collection.Name}");
+
+        var operationResult = await CollectionsService.AddArtworkToCollectionAsync(collection.Id, artwork);
+        _isSaving = false;
+
+        if (!operationResult.IsSuccess){
+            _errorOccured = true;
+            _isSaved = false;
+        }
+        else
+        {
+            _isSaved = true;
+
+        }
+        ToggleExpansion();
+        Console.WriteLine("Save successful!");
+    }
+
+    private void StartNewCollectionFlow()
+    {
+        _isAddingNewCollection = true;
+    }
+
+    private async Task CreateNewCollectionAndSaveArtwork(Artwork artwork)
+    {
+        _isSaving = true;
+        Console.WriteLine($"Creating new collection: {_newCollectionName}");
+
+        Collection newUserCollection = new()
+        {
+                Name = _newCollectionName
+        };
+
+        var createCollectionOperationResult = await CollectionsService.CreateCollectionAsync(newUserCollection);
+        if (!createCollectionOperationResult.IsSuccess) { _errorOccured = true; _isAddingNewCollection = false; _isSaving = false; return; }
+        var addToCollectionOperationResult = await CollectionsService.AddArtworkToCollectionAsync(newUserCollection.Id, artwork);
+        if (!addToCollectionOperationResult.IsSuccess) { _errorOccured = true; _isAddingNewCollection = false; _isSaving = false; return; }
+
+
+        _newCollectionName = string.Empty;
+        _isAddingNewCollection = false;
+        _isSaving = false;
+        ToggleExpansion();
+        Console.WriteLine("New collection created and artwork saved!");
+    }
+}

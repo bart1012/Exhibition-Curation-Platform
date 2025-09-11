@@ -1,26 +1,41 @@
 ﻿@page "/search"
 
-@using ECP.UI.Server.Components
+@using ECP.UI.Server.Components.Error
+@using ECP.UI.Server.Components.Shared
+@rendermode InteractiveAuto
 
 @inject ArtworkService ArtworkService
 @inject NavigationManager NavManager
 
-
-
-
-<MudText Align="Align.Center" Typo="Typo.h1" style="font-size: 3rem" Class="pb-5"><b>Results for: @SearchQuery</b></MudText>
-@if(artworkList != null && artworkList.Count > 0)
+@if (_isLoading)
 {
-    <MasonryGrid List="@artworkList"></MasonryGrid>
+    <Loading></Loading>
 }
-else
+else if (_artworkList != null)
 {
-    <div>No content error</div>
+    <MudText Align="Align.Center" Typo="Typo.h1" style="font-size: 3rem" Class="pb-5"><b>Results for: @SearchQuery</b></MudText>
+    <SearchBar SearchQuery="@SearchQuery"></SearchBar>
+
+
+    if (!_artworkList.Any())
+    {
+        <NoResultsMessage></NoResultsMessage>
+    }
+    else
+    {
+        <MasonryGrid List="@_artworkList"></MasonryGrid>
+
+        <div class="pagination-container">
+            <MudPagination SelectedChanged="PageChanged" Color="Color.Primary" class="flex-none px-0" Count="@_totalPages" Size="Size.Large" />
+        </div>
+    }
+
+}
+else if (_isServerError)
+{
+    <ServerErrorMessage></ServerErrorMessage>
 }
 
-<div class="pagination-container">
-    <MudPagination SelectedChanged="PageChanged" Color="Color.Primary" class="flex-none px-0" Count="@TotalPages" Size="Size.Large"/>
-</div>
 
 @code {
     [Parameter]
@@ -31,18 +46,41 @@ else
     [SupplyParameterFromQuery(Name = "p")]
     public int PageNumber { get; set; }
 
-    public int TotalPages { get; set; }
+    private bool _isServerError = false;
 
-    private List<ArtworkPreview> artworkList;
+    private int _totalPages { get; set; }
+
+    private List<ArtworkPreview>? _artworkList = null;
+
+    private bool _isLoading = true;
 
     protected override async Task OnParametersSetAsync()
     {
-        var response = await ArtworkService.SearchArtworksByQueryAsync(SearchQuery, 20, PageNumber);
-
-        if (response.IsSuccess)
+        _isLoading = true;
+        _artworkList = null;
+        try
         {
-            artworkList = response.Value.Data.ToList();
-            TotalPages = response.Value.Info.TotalPages;
+            _artworkList = new();
+            // var response = await ArtworkService.SearchArtworksByQueryAsync(SearchQuery, 20, PageNumber);
+
+            // if (response.IsSuccess)
+            // {
+            //     _artworkList = response.Value.Data.ToList();
+            //     _totalPages = response.Value.Info.TotalPages;
+            // }
+            // else
+            // {
+            //     _isServerError = true;
+            // }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching search results from SearchResults.razor: {ex.Message}");
+            _artworkList = null;
+        }
+        finally
+        {
+            _isLoading = false;
         }
 
 

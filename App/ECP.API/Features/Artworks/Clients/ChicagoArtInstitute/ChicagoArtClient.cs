@@ -6,9 +6,9 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
 {
     public interface IChicagoArtInstituteClient
     {
-        Task<List<ChicagoArtPreview>>? GetArtworkPreviews(int count);
-        Task<List<ChicagoArtPreview>> SearchArtworkPreviewsByQuery(string q);
-        string UrlBuilder(ChicagoApiParameters parameters);
+        Task<ChicagoArtwork?> GetArtworkById(int id);
+        Task<List<ChicagoArtworkPreview>>? GetArtworkPreviews(int count);
+        Task<List<ChicagoArtworkPreview>> SearchArtworkPreviewsByQuery(string q);
     }
     public class ChicagoArtClient : IChicagoArtInstituteClient
     {
@@ -26,7 +26,7 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
             };
         }
 
-        public async Task<List<ChicagoArtPreview>>? GetArtworkPreviews(int count = 25)
+        public async Task<List<ChicagoArtworkPreview>>? GetArtworkPreviews(int count = 25)
         {
             var parameters = new ChicagoApiParameters()
             {
@@ -34,14 +34,15 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
                 PreviewsOnly = true
             };
 
-            var apiResponse = await GetResponseWithParameters<ChicagoArtPreview>(parameters);
-            return apiResponse.Data;
+            string url = UrlBuilder(parameters);
+            var result = await FetchChicagoCollectionApiResponseAsync<ChicagoArtworkPreview>(url);
+            return result.Data;
 
         }
 
-        public async Task<List<ChicagoArtPreview>> SearchArtworkPreviewsByQuery(string q)
+        public async Task<List<ChicagoArtworkPreview>> SearchArtworkPreviewsByQuery(string q)
         {
-            var artworks = new List<ChicagoArtPreview>();
+            var artworks = new List<ChicagoArtworkPreview>();
 
             var parameters = new ChicagoApiParameters()
             {
@@ -50,8 +51,9 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
                 Query = q,
                 Page = 1
             };
+            string url = UrlBuilder(parameters);
 
-            ChicagoApiResponse<ChicagoArtPreview> firstResponse = await GetResponseWithParameters<ChicagoArtPreview>(parameters);
+            ChicagoCollectionApiResponse<ChicagoArtworkPreview> firstResponse = await FetchChicagoCollectionApiResponseAsync<ChicagoArtworkPreview>(url);
 
             artworks.AddRange(firstResponse.Data);
 
@@ -60,7 +62,8 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
                 while (parameters.Page < firstResponse.Info.Pages)
                 {
                     parameters.Page++;
-                    ChicagoApiResponse<ChicagoArtPreview> response = await GetResponseWithParameters<ChicagoArtPreview>(parameters);
+                    url = UrlBuilder(parameters);
+                    ChicagoCollectionApiResponse<ChicagoArtworkPreview> response = await FetchChicagoCollectionApiResponseAsync<ChicagoArtworkPreview>(url);
 
                     if (response != null)
                     {
@@ -74,13 +77,16 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
             return artworks;
         }
 
-        protected async Task<ChicagoApiResponse<T>> GetResponseWithParameters<T>(ChicagoApiParameters parameters)
+        public async Task<ChicagoArtwork?> GetArtworkById(int id)
         {
-            string url = UrlBuilder(parameters);
-            return await FetchChicagoApiResponseAsync<T>(url);
+            string url = $"https://api.artic.edu/api/v1/artworks/{id}";
+            var apiResponse = await FetchChicagoObjectApiResponseAsync<ChicagoArtwork>(url);
+            return apiResponse?.Data;
         }
 
-        private async Task<ChicagoApiResponse<T>> FetchChicagoApiResponseAsync<T>(string url)
+
+
+        private async Task<ChicagoObjectApiResponse<T>> FetchChicagoObjectApiResponseAsync<T>(string url)
         {
             try
             {
@@ -89,7 +95,32 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
                 response.EnsureSuccessStatusCode();
 
                 var responseContent = await response.Content.ReadAsStringAsync();
-                var apiResponseModel = JsonSerializer.Deserialize<ChicagoApiResponse<T>>(responseContent, _jsonOptions);
+                var apiResponseModel = JsonSerializer.Deserialize<ChicagoObjectApiResponse<T>>(responseContent, _jsonOptions);
+
+                return apiResponseModel;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"An error occurred while fetching artwork: {e.Message}");
+                return null;
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine($"An error occurred during JSON deserialization: {e.Message}");
+                return null;
+            }
+        }
+
+        private async Task<ChicagoCollectionApiResponse<T>> FetchChicagoCollectionApiResponseAsync<T>(string url)
+        {
+            try
+            {
+                var response = await _client.GetAsync(url);
+
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var apiResponseModel = JsonSerializer.Deserialize<ChicagoCollectionApiResponse<T>>(responseContent, _jsonOptions);
 
                 return apiResponseModel;
             }
@@ -105,7 +136,7 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
             }
         }
 
-        public string UrlBuilder(ChicagoApiParameters parameters)
+        private string UrlBuilder(ChicagoApiParameters parameters)
         {
             StringBuilder url = new();
             url.Append(BASE_URL);
@@ -137,6 +168,7 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
 
             return url.ToString();
         }
+
 
     }
 }

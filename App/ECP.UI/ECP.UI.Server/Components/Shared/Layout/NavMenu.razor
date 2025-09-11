@@ -1,9 +1,45 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
-    <MudNavLink Href="/servers" Match="NavLinkMatch.Prefix">Servers</MudNavLink>
-    <MudNavGroup Title="Settings" Expanded="true">
-        <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
-        <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
-    </MudNavGroup>
-    <MudNavLink Href="/about" Match="NavLinkMatch.Prefix">About</MudNavLink>
-</MudNavMenu>
+﻿@using MudBlazor;
+
+
+<MudLayout @rendermode="InteractiveServer">
+    <MudAppBar Elevation="0" Color="Color.Transparent">
+    @if (!_drawerOpen)
+    {
+    <MudIconButton Icon="@Icons.Material.Filled.Menu"
+    Color="Color.Inherit"
+    Size="Size.Large"
+    Edge="Edge.Start"
+    OnClick="@DrawerToggle" />
+    }
+    <MudSpacer />
+    <MudIconButton Icon="@Icons.Material.Filled.MoreVert"
+    Color="Color.Inherit"
+    Edge="Edge.End" />
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="2" Class="mud-drawer-fixed">
+    <MudDrawerHeader>
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                       Color="Color.Dark"
+                       Size="Size.Small"
+                       OnClick="@DrawerToggle" />
+    </MudDrawerHeader>
+    <MudNavMenu Color="Color.Dark">
+        <MudNavLink Color="Color.Dark" Href="/" Match="NavLinkMatch.All">Explore</MudNavLink>
+        <MudNavLink Href="/collections">My Collections</MudNavLink>
+        <MudNavLink Href="/search">Search</MudNavLink>
+    </MudNavMenu>
+</MudDrawer>
+</MudLayout>
+
+
+ 
+
+
+@code{
+    private bool _drawerOpen = false;
+
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}

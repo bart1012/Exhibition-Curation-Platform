@@ -175,7 +175,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
              .Returns(_mockCacheEntry.Object);
 
             // Act
-            var serviceResult = await _artworksService.SearchAllArtworkPreviewsAsync(expectedQuery, null, 25, 1);
+            var serviceResult = await _artworksService.SearchAllArtworkPreviewsAsync(expectedQuery, null, null, 25, 1);
 
             // Assert
             serviceResult.IsSuccess.Should().BeTrue();
@@ -249,84 +249,5 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             _mockArtworksRepository.Verify(r => r.SearchAllArtworkPreviewsAsync(expectedQuery), Times.Once);
         }
 
-        [Test]
-        public async Task SearchAllArtworkPreviewsAsync_WhenRepositoryReturnsSuccessWithDuplicates_ReturnsPaginatedResponseWithoutDuplicates()
-        {
-            // Arrange
-            var expectedQuery = "monet";
-            var artworkList = new List<ArtworkPreview>
-       {
-                new ArtworkPreview()
-                {
-                    Id = "artwork_0",
-                    Source = ArtworkSource.CLEVELAND_MUSEUM,
-                    SourceId = 1012,
-                    Title = "Impression, Sunrise",
-                    Artists = new List<Artist>()
-                    {
-                        new Artist(){Name="Claude Monet"}
-                    },
-                    WebImage = new Image(){Url="url_0",Width=1080, Height=920}
-                },
-                new ArtworkPreview()
-                {
-                    Id = "artwork_1",
-                    Source = ArtworkSource.CHICAGO_ART_INSTITUTE,
-                    SourceId = 2032,
-                    Title = "Impression, Sunrise",
-                    Artists = new List<Artist>()
-                    {
-                        new Artist(){Name="Claude Monet"}
-                    },
-                    WebImage = new Image(){Url="url_1",Width=1080, Height=920}
-                }
-            };
-            var repositoryResult = Shared.Result<List<ArtworkPreview>>.Success(artworkList);
-
-            _mockArtworksRepository.Setup(r => r.SearchAllArtworkPreviewsAsync(expectedQuery))
-                .ReturnsAsync(repositoryResult);
-
-            object cacheValue = null;
-
-            _mockMemoryCache.Setup(c => c.TryGetValue(It.IsAny<object>(), out cacheValue))
-            .Returns(false);
-
-            _mockMemoryCache.Setup(m => m.CreateEntry(It.IsAny<object>()))
-             .Returns(_mockCacheEntry.Object);
-
-            // Act
-            var serviceResult = await _artworksService.SearchAllArtworkPreviewsAsync(expectedQuery, null, 25, 1);
-
-            // Assert
-            serviceResult.IsSuccess.Should().BeTrue();
-            var expectation = new PaginatedResponse<ArtworkPreview>()
-            {
-                Data = new List<ArtworkPreview>
-                {
-                    new ArtworkPreview()
-                    {
-                        Id = "artwork_0",
-                        Source = ArtworkSource.CLEVELAND_MUSEUM,
-                        SourceId = 1012,
-                        Title = "Impression, Sunrise",
-                        Artists = new List<Artist>()
-                        {
-                            new Artist(){Name="Claude Monet"}
-                        },
-                        WebImage = new Image(){Url="url_0",Width=1080, Height=920}
-                    }
-                },
-                Info = new PaginationInfo()
-                {
-                    ItemsPerPage = 25,
-                    TotalItems = 1,
-                    CurrentPage = 1,
-                    TotalPages = 1
-                }
-            };
-            serviceResult.Value.Data.Count().Should().Be(1);
-            serviceResult.Value.Should().BeEquivalentTo(expectation);
-            _mockArtworksRepository.Verify(r => r.SearchAllArtworkPreviewsAsync(expectedQuery), Times.Once);
-        }
     }
 }

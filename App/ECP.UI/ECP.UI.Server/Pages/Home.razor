@@ -4,12 +4,26 @@
 
 <PageTitle>Home</PageTitle>
 
-<main>
-   <div id="home-content-container">
-        <SearchBar></SearchBar>
+<div id="outer-content-container" style="@($"background-image: url('{staticImgPaths[_random.Next(0,staticImgPaths.Count-1)]}')")">
+    <div id="container-overlay">
+       <div id="inner-content-container">
+            <SearchBar></SearchBar>
+            <PopularSearchQueries></PopularSearchQueries>
+        </div>
     </div>
-</main>
-
+</div>
+<style>
+    .mud-icon-size-large, .mud-icon-size-medium {
+        fill: white !important;
+    }
+</style>
 @code{
     public string TextValue { get; set; }
+    private Random _random = new();
+    private List<string> staticImgPaths = new()
+    {
+        "/home/1962.293_web.jpg",
+        "/home/1977.43_web.jpg",
+        "/home/1991.110_web.jpg"
+    };
 }

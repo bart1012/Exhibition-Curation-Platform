@@ -2,20 +2,21 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    
 }
 
 .search-wrapper {
     position: relative;
     width: 100%;
-    max-width: 32rem;
+    max-width: 35rem;
 }
 
 .search-input {
     width: 100%;
     padding: 0.75rem 1rem 0.75rem 3rem;
     border-radius: 9999px;
-    background-color: rgba(0,0,0,0.30);
+    background-color: rgba(0,0,0,0.35);
     color: white;
     border: 2px solid white;
     outline: none;
@@ -24,7 +25,7 @@
 }
 
     .search-input:focus {
-        box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.5);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
     }
 
 .search-icon {
@@ -38,12 +39,49 @@
     pointer-events: none;
 }
 
-    .search-icon svg {
-        width: 1.25rem;
-        height: 1.25rem;
-        color: white;
-    }
+.clear-icon {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 1rem;
+    cursor: pointer;
+    display: flex;
+    z-index: 100;
+    align-items: center;
+    padding-left: 0.75rem;
+    border-left: 1px white solid;
+}
+
+.clear-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: white;
+    cursor: pointer;
+}
+
+.search-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: white;
+}
 
 ::placeholder {
     color: white;
+}
+
+@media (max-width: 768px) {
+    #inner-content-container {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+
+    .search-wrapper {
+        max-width: 100%;
+    }
+
+    .search-input {
+        border-radius: 1rem;
+        height: 5rem;
+    }
 }

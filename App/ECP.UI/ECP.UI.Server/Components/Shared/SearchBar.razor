@@ -3,29 +3,49 @@
 <div class="search-container">
 <div class="search-wrapper">
     <input type="text"
-            placeholder="Search for something..."
+            placeholder="Search for an artwork, artist..."
             class="search-input"
             @onkeyup="HandleKeyUp"
-            @bind="searchTerm"
-    >
+            @bind="_searchQuery">
     <div class="search-icon">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
     </div>
+        <button class="clear-icon" @onclick="() => _searchQuery = string.Empty">
+            <svg fill="black" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
 </div>
 </div>
 
 @code{
-    private string searchTerm;
+    [Parameter]
+    public string SearchQuery { get; set; }
+
+    private string _searchQuery;
+
+    private bool _initialized;
+
+
+    protected override void OnParametersSet()
+    {
+        Console.WriteLine("params set");
+        if (!_initialized)
+        {
+            _searchQuery = SearchQuery;
+            _initialized = true;
+        }
+    }
 
     private void HandleKeyUp(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
-            if (!string.IsNullOrWhiteSpace(searchTerm))
+            if (!string.IsNullOrWhiteSpace(_searchQuery))
             {
-                NavManager.NavigateTo($"/search?q={searchTerm}&p=1");
+                NavManager.NavigateTo($"/search?q={_searchQuery}&p=1");
             }
         }
     }

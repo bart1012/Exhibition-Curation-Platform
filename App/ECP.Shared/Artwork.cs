@@ -8,18 +8,21 @@
         public int SourceId { get; set; }
 
         //Display properties
-        public string Title { get; set; }
+        public string? Title { get; set; }
         public List<Artist>? Artists { get; set; }
-        public string CreationDate { get; set; }
+        public string? CreationDate { get; set; }
         public int? MinCreationYear { get; set; }
         public int? MaxCreationYear { get; set; }
-        public string Medium { get; set; }
-        public string Type { get; set; }
+        public string? Medium { get; set; }
+        public string? TypeDisplay { get; set; }
+        public ArtworkType Type { get; set; }
         public List<string>? Culture { get; set; }
-        public Dimensions Dimensions { get; set; }
-        public string Description { get; set; }
-        public string SourceUrl { get; set; }
+        public Dimensions? Dimensions { get; set; }
+        public string? Description { get; set; }
+        public string? SourceUrl { get; set; }
         public Images? Images { get; set; }
+        public List<string>? Subjects { get; set; }
+        public List<string>? Styles { get; set; }
 
     }
 

@@ -9,7 +9,7 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum.Models
         public ResponseInfo Info { get; set; }
 
         [JsonPropertyName("data")]
-        public List<ClevelandMuseumArtwork> Data { get; set; }
+        public List<ClevelandArtwork> Data { get; set; }
     }
 
     public class ResponseInfo

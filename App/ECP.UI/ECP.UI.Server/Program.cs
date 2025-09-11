@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using ECP.UI.Client.Services;
 using ECP.UI.Server.Services;
 using MudBlazor.Services;
 
@@ -10,18 +11,23 @@ namespace ECP.UI.Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddMudServices();
+
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents()
                 .AddInteractiveWebAssemblyComponents();
 
-            builder.Services.AddMudServices();
             builder.Services.AddScoped<IArtworkService, ArtworkService>();
             builder.Services.AddHttpClient<ArtworkService>(client =>
             {
                 client.BaseAddress = new Uri("https://localhost:7102/api/");
             });
             builder.Services.AddBlazoredLocalStorage();
+
+            builder.Services.AddScoped<IUserCollectionsService, UserCollectionsService>();
+
+
 
             var app = builder.Build();
 

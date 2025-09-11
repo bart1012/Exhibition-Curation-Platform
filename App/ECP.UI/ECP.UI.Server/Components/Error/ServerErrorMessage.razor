@@ -1,0 +1,14 @@
+﻿<div class="d-flex flex-column align-center justify-center text-center pa-4">
+    <MudIcon Icon="@Icons.Material.Filled.CloudOff" Color="Color.Error" Style="font-size: 8rem;" />
+    <MudText Typo="Typo.h3" Class="mt-4 mb-2">Server Error</MudText>
+    <MudText Typo="Typo.body1" Class="mb-8">
+        Something went wrong on our end. Please try again later.
+    </MudText>
+    <MudButton OnClick="@(() => StateHasChanged())" Variant="Variant.Filled" Color="Color.Primary" Class="rounded-lg">
+        Try Again
+    </MudButton>
+</div>
+
+@code {
+
+}

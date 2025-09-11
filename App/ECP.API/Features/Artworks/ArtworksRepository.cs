@@ -6,6 +6,7 @@ namespace ECP.API.Features.Artworks
 
     public interface IArtworksRepository
     {
+        Task<Result<Artwork>> GetArtworkById(int id, ArtworkSource source);
         Task<Shared.Result<List<ArtworkPreview>>> GetArtworkPreviewsAsync(int count);
         Task<Shared.Result<List<ArtworkPreview>>> SearchAllArtworkPreviewsAsync(string q);
     }
@@ -14,6 +15,28 @@ namespace ECP.API.Features.Artworks
         private readonly IClevelandMuseumClient _clevelandClient = clevelandClient;
         private readonly IChicagoArtInstituteClient _chicagoClient = chicagoClient;
         private readonly IArtworkMapper _mapper = mapper;
+
+        public async Task<Result<Artwork>> GetArtworkById(int id, ArtworkSource source)
+        {
+            try
+            {
+                Artwork artwork = null;
+
+                switch (source)
+                {
+                    case ArtworkSource.CLEVELAND_MUSEUM: artwork = _mapper.FromCleveland(await _clevelandClient.GetArtworkById(id)); break;
+                    case ArtworkSource.CHICAGO_ART_INSTITUTE: artwork = _mapper.FromChicago(await _chicagoClient.GetArtworkById(id)); break;
+                }
+
+                return Result<Artwork>.Success(artwork);
+            }
+            catch (HttpRequestException ex)
+            {
+                return Shared.Result<Artwork>.Failure($"Failed to fetch artworks from {ex.Source}: {ex.Message}", ex.StatusCode);
+            }
+
+        }
+
         public async Task<Shared.Result<List<ArtworkPreview>>> GetArtworkPreviewsAsync(int count)
         {
             try

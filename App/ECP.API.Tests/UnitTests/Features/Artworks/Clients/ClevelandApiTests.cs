@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECP.API.Tests.UnitTests.Features.Artworks
+namespace ECP.API.Tests.UnitTests.Features.Artworks.Clients
 {
-    internal class ChicagoApiTests
+    internal class ClevelandApiTests
     {
     }
 }

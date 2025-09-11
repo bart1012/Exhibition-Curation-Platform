@@ -1,0 +1,33 @@
+﻿@using MudBlazor
+
+<MudGrid Spacing="2" Justify="Justify.Center" Class="mb-10">
+    @foreach (var query in popularQueries)
+    {
+        <MudItem >
+            <MudButton Variant="Variant.Filled"
+                       Size="Size.Small"
+                       Class="rounded-pill"
+                       Style="border: 1px solid #fff;background-color: rgba(0,0,0,0.35); color:white"
+                       Color="Color.Tertiary"
+                       Href="@($"/search?q={query}")">
+                @query
+            </MudButton>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private List<string> popularQueries = new List<string>
+    {
+        "Van Gogh",
+        "Impressionism",
+        "Abstract Art",
+        "Renaissance",
+        "Sculpture",
+        "Modern Art",
+        "Landscapes",
+        "Portraits",
+        "Photography",
+        "Ancient Egypt"
+    };
+}

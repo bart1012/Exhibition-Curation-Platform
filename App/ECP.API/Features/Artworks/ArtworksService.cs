@@ -9,6 +9,7 @@ namespace ECP.API.Features.Artworks
 {
     public interface IArtworksService
     {
+        Task<Result<Artwork>> GetArtworkByIdAsync(int id, ArtworkSource source);
         Task<Shared.Result<PaginatedResponse<ArtworkPreview>>> GetArtworkPreviewsAsync(int count, int resultsPerPage, int pageNum);
         Task<Shared.Result<PaginatedResponse<ArtworkPreview>>> SearchAllArtworkPreviewsAsync(string q, string? sort, List<string>? filters, int resultsPerPage, int pageNum);
     }
@@ -31,7 +32,7 @@ namespace ECP.API.Features.Artworks
 
         }
 
-        public async Task<Shared.Result<PaginatedResponse<ArtworkPreview>>> SearchAllArtworkPreviewsAsync(string q, string? sort, List<string>? filters, int resultsPerPage = 25, int pageNum = 1)
+        public async Task<Shared.Result<PaginatedResponse<ArtworkPreview>>> SearchAllArtworkPreviewsAsync(string q, string? sort = null, List<string>? filters = null, int resultsPerPage = 25, int pageNum = 1)
         {
             List<ArtworkPreview> artworks = null;
 
@@ -120,7 +121,7 @@ namespace ECP.API.Features.Artworks
         protected Result<List<ArtworkPreview>> Sort(List<ArtworkPreview> list, string sortQuery)
         {
 
-            Result<(string sortby, char order)> queryValidation = ParseAndValidateSortField(sortQuery);
+            Result<(string sortby, char order)> queryValidation = ParseAndValidateSortQuery(sortQuery);
 
             if (!queryValidation.IsSuccess)
             {
@@ -147,7 +148,7 @@ namespace ECP.API.Features.Artworks
             //bool hasSameElements = listA.Intersect(listB).Any();
             foreach (KeyValuePair<string, List<string>> pair in parseOptionsResult.Value)
             {
-                switch (pair.Key)
+                switch (pair.Key.ToLower())
                 {
                     case "artist":
                         query = query.Where(art => art.Artists.Any(artist =>
@@ -179,7 +180,7 @@ namespace ECP.API.Features.Artworks
 
         }
 
-        private Result<(string sortby, char order)> ParseAndValidateSortField(string sortQuery)
+        protected Result<(string sortby, char order)> ParseAndValidateSortQuery(string sortQuery)
         {
             var supportedSortFields = new HashSet<string> { "title", "date" };
 
@@ -211,7 +212,7 @@ namespace ECP.API.Features.Artworks
             }
         }
 
-        private Result<Dictionary<string, List<string>>> ParseAndValidateFilters(List<string>? filterQueries)
+        protected Result<Dictionary<string, List<string>>> ParseAndValidateFilters(List<string>? filterQueries)
         {
 
             if (filterQueries == null || !filterQueries.Any())
@@ -219,7 +220,7 @@ namespace ECP.API.Features.Artworks
                 return Result<Dictionary<string, List<string>>>.Failure($"Sort field cannot be empty or null. Please add a valid filter value or remove the parameter.", System.Net.HttpStatusCode.BadRequest);
             }
 
-            var supportedFields = new HashSet<string> { "artist", "date", "subject", "type", "materials" };
+            var supportedFields = new HashSet<string> { "artist", "date", "subject", "type", "material" };
             var warnings = new List<string>();
 
 
@@ -236,7 +237,7 @@ namespace ECP.API.Features.Artworks
                 }
 
                 var filterKey = filterKeyAndValue[0].Trim().ToLowerInvariant();
-                var filterValue = filterKeyAndValue[1].Trim();
+                var filterValue = filterKeyAndValue[1].ToLowerInvariant().Trim();
 
                 if (supportedFields.Contains(filterKey))
                 {
@@ -264,6 +265,11 @@ namespace ECP.API.Features.Artworks
 
 
 
+        }
+
+        public async Task<Result<Artwork>> GetArtworkByIdAsync(int id, ArtworkSource source)
+        {
+            return await _artworksRepository.GetArtworkById(id, source);
         }
     }
 }
