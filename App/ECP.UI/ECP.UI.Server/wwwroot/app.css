@@ -1,5 +1,8 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 a, .btn-link {
@@ -10,6 +13,10 @@ a, .btn-link {
     color: #fff;
     background-color: #1b6ec2;
     border-color: #1861ac;
+}
+
+.search-results-msg-container {
+    transform: translateY(-5rem);
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {

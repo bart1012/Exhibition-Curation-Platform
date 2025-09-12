@@ -4,7 +4,7 @@
 <div class="search-wrapper">
     <input type="text"
             placeholder="Search for an artwork, artist..."
-            class="search-input"
+               class="search-input"
             @onkeyup="HandleKeyUp"
             @bind="_searchQuery">
     <div class="search-icon">
@@ -24,6 +24,7 @@
     [Parameter]
     public string SearchQuery { get; set; }
 
+
     private string _searchQuery;
 
     private bool _initialized;
@@ -31,7 +32,6 @@
 
     protected override void OnParametersSet()
     {
-        Console.WriteLine("params set");
         if (!_initialized)
         {
             _searchQuery = SearchQuery;

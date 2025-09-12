@@ -7,11 +7,11 @@
 <MudDialogProvider @rendermode="InteractiveServer" />
 <MudSnackbarProvider @rendermode="InteractiveServer" />
 
-<MudLayout>
+<MudLayout Class="d-flex flex-column" Style="height: 100vh;">
     <NavMenuWrapper @rendermode="RenderMode.InteractiveAuto"></NavMenuWrapper>
 
-    <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Fluid="true" Gutters="true" Class="px-5">
+    <MudMainContent Class="flex-grow-1 d-flex">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Gutters="true" Class="px-5 d-flex flex-column flex-grow-1">
             @Body
         </MudContainer>
     </MudMainContent>

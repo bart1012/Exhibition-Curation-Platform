@@ -1,0 +1,94 @@
+﻿@rendermode InteractiveAuto
+@using MudBlazor
+@inject IDialogService DialogService
+
+
+@using ECP.UI.Server.Components.Shared
+<MudGrid>
+    <MudItem xs="0" md="4" lg="4">
+    </MudItem>
+    <MudItem xs="12" md="4" lg="4">
+        <SearchBar SearchQuery="@SearchQuery"></SearchBar>
+    </MudItem>
+    <MudItem xs="12" md="4" lg="4" Class="d-flex align-center">
+        <div class="search-button-container">
+            <MudButton OnClick="OpenFilterDialog" Variant="Variant.Outlined" Color="Color.Dark" StartIcon="@Icons.Material.Filled.FilterList" Class="rounded-pill search-button">
+                Filter
+            </MudButton>
+
+            <MudButtonGroup Color="Color.Default" Variant="Variant.Outlined">
+                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
+                         Class=" search-button "
+                         Style="align-self: auto;"
+                         AnchorOrigin="Origin.BottomCenter"
+                         PopoverOrigin="Origin.TopCenter">
+                    <ActivatorContent>
+                        <MudButton Class="px-10 rounded-l-xl " Style="min-width: 12rem;">
+                            @_sortText
+                        </MudButton>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <MudMenuItem OnClick="() => SetSortButtonText(0)">Creation Date</MudMenuItem>
+                        <MudMenuItem OnClick="() => SetSortButtonText(1)">Alphabetically</MudMenuItem>
+                    </ChildContent>
+                </MudMenu>
+                <MudToggleIconButton @bind-Toggled="_isDescending"
+                                     Icon="@Icons.Material.Filled.ArrowUpward"
+                                     Color="@Color.Dark"
+                                     ToggledIcon="@Icons.Material.Filled.ArrowDownward"
+                                     ToggledColor="@Color.Dark"
+                                     Class=" search-button rounded-r-xl" />
+            </MudButtonGroup>
+        </div>
+    </MudItem>
+</MudGrid>
+
+
+@code {
+    [Parameter]
+    public string? SearchQuery { get; set; }
+
+    private string _sortText = "Sort";
+
+    private bool _isDescending = true;
+
+    private async Task OpenFilterDialog()
+    {
+        var parameters = new DialogParameters();
+        var options = new DialogOptions
+            {
+                CloseOnEscapeKey = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+
+        var dialog = await DialogService.ShowAsync<ArtworkFilterDialog>("Filter Artworks", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data != null)
+        {
+            var filters = (ArtworkFilters)result.Data;
+            // Handle the applied filters
+            await ApplyFilters(filters);
+        }
+    }
+
+    private async Task ApplyFilters(ArtworkFilters filters)
+    {
+        // Implement your filter logic here
+        Console.WriteLine($"Filters applied: Artist={filters.Artist}, Subject={filters.Subject}");
+    }
+
+    private void SetSortButtonText(int id)
+    {
+        switch (id)
+        {
+            case 0:
+                _sortText = "Creation Date";
+                break;
+            case 1:
+                _sortText = "Alphabetically";
+                break;
+        }
+    }
+}

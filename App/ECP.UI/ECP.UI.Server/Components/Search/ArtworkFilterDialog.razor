@@ -1,0 +1,174 @@
+﻿@using MudBlazor
+@inject IDialogService DialogService
+
+<MudDialog>
+    <DialogContent>
+        <MudContainer Style="padding: 0;">
+            <MudGrid>
+                <!-- Artist Filter -->
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="Filters.Artist"
+                                  Label="Artist"
+                                  Placeholder="Enter artist name"
+                                  Clearable="true"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Person" />
+                </MudItem>
+
+                <!-- Date Filter -->
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker @bind-Date="Filters.DateFrom"
+                                   Label="Date From"
+                                   Clearable="true" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker @bind-Date="Filters.DateTo"
+                                   Label="Date To"
+                                   Clearable="true" />
+                </MudItem>
+
+                <!-- Subject Filter -->
+
+                <MudItem xs="12">
+                    <MudSelect @bind-Value="Filters.Subject"
+                               Label="Subject"
+                               Clearable="true"
+                               AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value=@("Portrait")>Portrait</MudSelectItem>
+                        <MudSelectItem Value=@("Landscape")>Landscape</MudSelectItem>
+                        <MudSelectItem Value=@("Still Life")>Still Life</MudSelectItem>
+                        <MudSelectItem Value=@("Abstract")>Abstract</MudSelectItem>
+                        <MudSelectItem Value=@("Religious")>Religious</MudSelectItem>
+                        <MudSelectItem Value=@("Mythology")>Mythology</MudSelectItem>
+                        <MudSelectItem Value=@("Historical")>Historical</MudSelectItem>
+                        <MudSelectItem Value=@("Genre Scene")>Genre Scene</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                <!-- Type Filter -->
+                <MudItem xs="12" sm="6">
+                    <MudSelect @bind-Value="Filters.Type"
+                               Label="Artwork Type"
+                               Clearable="true"
+                               AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value=@("Painting")>Painting</MudSelectItem>
+                        <MudSelectItem Value=@("Sculpture")>Sculpture</MudSelectItem>
+                        <MudSelectItem Value=@("Drawing")>Drawing</MudSelectItem>
+                        <MudSelectItem Value=@("Print")>Print</MudSelectItem>
+                        <MudSelectItem Value=@("Photograph")>Photograph</MudSelectItem>
+                        <MudSelectItem Value=@("Installation")>Installation</MudSelectItem>
+                        <MudSelectItem Value=@("Digital Art")>Digital Art</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                <!-- Material Filter -->
+                <MudItem xs="12" sm="6">
+                    <MudSelect @bind-Value="Filters.Material"
+                               Label="Material"
+                               Clearable="true"
+                               AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value=@("Oil on Canvas")>Oil on Canvas</MudSelectItem>
+                        <MudSelectItem Value=@("Acrylic")>Acrylic</MudSelectItem>
+                        <MudSelectItem Value=@("Watercolor")>Watercolor</MudSelectItem>
+                        <MudSelectItem Value=@("Bronze")>Bronze</MudSelectItem>
+                        <MudSelectItem Value=@("Marble")>Marble</MudSelectItem>
+                        <MudSelectItem Value=@("Wood")>Wood</MudSelectItem>
+                        <MudSelectItem Value=@("Charcoal")>Charcoal</MudSelectItem>
+                        <MudSelectItem Value=@("Ink")>Ink</MudSelectItem>
+                        <MudSelectItem Value=@("Mixed Media")>Mixed Media</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                <!-- Active Filters Display -->
+                <MudItem xs="12">
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">Active Filters:</MudText>
+                    <div class="d-flex flex-wrap gap-2">
+                        @if (!string.IsNullOrEmpty(Filters.Artist))
+                        {
+                            <MudChip T="string" Text="@($"Artist: {Filters.Artist}")"
+                                     OnClose="() => Filters.Artist = string.Empty" />
+                        }
+                        @if (Filters.DateFrom.HasValue || Filters.DateTo.HasValue)
+                        {
+                            <MudChip T="string" Text="@GetDateRangeText()"
+                                     OnClose="() => { Filters.DateFrom = null; Filters.DateTo = null; }" />
+                        }
+                        @if (!string.IsNullOrEmpty(Filters.Subject))
+                        {
+                            <MudChip T="string" Text="@($"Subject: {Filters.Subject}")"
+                                     OnClose="() => Filters.Subject = string.Empty" />
+                        }
+                        @if (!string.IsNullOrEmpty(Filters.Type))
+                        {
+                            <MudChip T="string" Text="@($"Type: {Filters.Type}")"
+                                     OnClose="() => Filters.Type = string.Empty" />
+                        }
+                        @if (!string.IsNullOrEmpty(Filters.Material))
+                        {
+                            <MudChip T="string" Text="@($"Material: {Filters.Material}")"
+                                     OnClose="() => Filters.Material = string.Empty" />
+                        }
+                        @if (HasActiveFilters())
+                        {
+                            <MudButton Size="Size.Small"
+                                       Color="Color.Secondary"
+                                       Variant="Variant.Text"
+                                       OnClick="ClearAllFilters"
+                                       StartIcon="@Icons.Material.Filled.Clear">
+                                Clear All
+                            </MudButton>
+                        }
+                    </div>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Color="Color.Secondary">Cancel</MudButton>
+        <MudButton OnClick="ClearAllFilters" Color="Color.Warning" Variant="Variant.Text">Clear All</MudButton>
+        <MudButton OnClick="Submit" Color="Color.Primary" Variant="Variant.Filled">Apply Filters</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code{
+    [CascadingParameter]
+    IMudDialogInstance MudDialog { get; set; } = null!;
+
+    private ArtworkFilters Filters = new();
+
+    private void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(Filters));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void ClearAllFilters()
+    {
+        Filters = new ArtworkFilters();
+    }
+
+    private bool HasActiveFilters()
+    {
+        return !string.IsNullOrEmpty(Filters.Artist) ||
+               !string.IsNullOrEmpty(Filters.Subject) ||
+               !string.IsNullOrEmpty(Filters.Type) ||
+               !string.IsNullOrEmpty(Filters.Material) ||
+               Filters.DateFrom.HasValue ||
+               Filters.DateTo.HasValue;
+    }
+
+    private string GetDateRangeText()
+    {
+        if (Filters.DateFrom.HasValue && Filters.DateTo.HasValue)
+            return $"Date: {Filters.DateFrom.Value:MMM yyyy} - {Filters.DateTo.Value:MMM yyyy}";
+        else if (Filters.DateFrom.HasValue)
+            return $"Date: From {Filters.DateFrom.Value:MMM yyyy}";
+        else if (Filters.DateTo.HasValue)
+            return $"Date: Until {Filters.DateTo.Value:MMM yyyy}";
+        return "";
+    }
+}

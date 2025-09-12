@@ -19,7 +19,7 @@ namespace ECP.UI.Server.Services
                 CreationYear = 1889,
                 ArtworkTypeDisplay = "Oil on canvas",
                 Materials = new List<string> { "Oil paint", "Canvas" },
-                WebImage = new Image { Url = "https://upload.wikimedia.org/wikipedia/commons/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg" },
+                WebImage = new Image { Url = "https://placehold.co/400x300/e9d5ff/6b21a8?text=Van+Gogh" },
                 Subjects = new List<string> { "Landscape", "Night Sky" }
             });
 
@@ -34,7 +34,7 @@ namespace ECP.UI.Server.Services
                 CreationYear = 1904,
                 ArtworkTypeDisplay = "Bronze sculpture",
                 Materials = new List<string> { "Bronze" },
-                WebImage = new Image { Url = "https://www.rodinmuseum.org/assets/img/collection/103355_0.jpg" },
+                WebImage = new Image { Url = "https://placehold.co/300x500/cbd5e1/1e293b?text=Rodin" },
                 Subjects = new List<string> { "Human Figure", "Philosophy" }
             });
 
@@ -49,7 +49,7 @@ namespace ECP.UI.Server.Services
                 CreationYear = 1936,
                 ArtworkTypeDisplay = "Black-and-white photograph",
                 Materials = new List<string> { "Silver gelatin print" },
-                WebImage = new Image { Url = "https://upload.wikimedia.org/wikipedia/commons/5/54/Dorothea_Lange%2C_Migrant_Mother_02.jpg" },
+                WebImage = new Image { Url = "https://placehold.co/500x400/f3f4f6/1f2937?text=Lange" },
                 Subjects = new List<string> { "Portrait", "Documentary" }
             });
 
@@ -64,7 +64,7 @@ namespace ECP.UI.Server.Services
                 CreationYear = 1665,
                 ArtworkTypeDisplay = "Oil on canvas",
                 Materials = new List<string> { "Oil paint", "Canvas" },
-                WebImage = new Image { Url = "https://upload.wikimedia.org/wikipedia/commons/0/0f/1665_Girl_with_a_Pearl_Earring.jpg" },
+                WebImage = new Image { Url = "https://placehold.co/300x400/94a3b8/0f172a?text=Vermeer" },
                 Subjects = new List<string> { "Portrait" }
             });
 
@@ -79,7 +79,7 @@ namespace ECP.UI.Server.Services
                 CreationYear = 1490,
                 ArtworkTypeDisplay = "Pen and ink on paper",
                 Materials = new List<string> { "Paper", "Ink" },
-                WebImage = new Image { Url = "https://upload.wikimedia.org/wikipedia/commons/2/22/Leonardo_da_Vinci_-_Vitruvian_Man.jpg" },
+                WebImage = new Image { Url = "https://placehold.co/400x400/a5f3fc/0e7490?text=Da+Vinci" },
                 Subjects = new List<string> { "Human Anatomy", "Ideal Proportions" }
             });
 
@@ -94,7 +94,7 @@ namespace ECP.UI.Server.Services
                 CreationYear = 1872,
                 ArtworkTypeDisplay = "Oil on canvas",
                 Materials = new List<string> { "Oil paint", "Canvas" },
-                WebImage = new Image { Url = "https://upload.wikimedia.org/wikipedia/commons/5/59/Monet_-_Impression%2C_Sunrise.jpg" },
+                WebImage = new Image { Url = "https://placehold.co/500x300/fecaca/991b1b?text=Monet" },
                 Subjects = new List<string> { "Landscape", "Harbor" }
             });
 
@@ -109,7 +109,7 @@ namespace ECP.UI.Server.Services
                 CreationYear = 1504,
                 ArtworkTypeDisplay = "Marble sculpture",
                 Materials = new List<string> { "Marble" },
-                WebImage = new Image { Url = "https://upload.wikimedia.org/wikipedia/commons/4/47/Michelangelos_David_in_der_Galleria_dell%27Accademia.jpg" },
+                WebImage = new Image { Url = "https://placehold.co/300x500/94a3b8/1f2937?text=Michelangelo" },
                 Subjects = new List<string> { "Human Figure", "Biblical" }
             });
 
@@ -124,7 +124,7 @@ namespace ECP.UI.Server.Services
                 CreationYear = 1503,
                 ArtworkTypeDisplay = "Oil on poplar panel",
                 Materials = new List<string> { "Oil paint", "Wood" },
-                WebImage = new Image { Url = "https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg" },
+                WebImage = new Image { Url = "https://placehold.co/400x500/92400e/f9fafb?text=Mona+Lisa" },
                 Subjects = new List<string> { "Portrait" }
             });
 
@@ -139,7 +139,7 @@ namespace ECP.UI.Server.Services
                 CreationYear = 1893,
                 ArtworkTypeDisplay = "Oil, tempera, and pastel on cardboard",
                 Materials = new List<string> { "Oil paint", "Cardboard" },
-                WebImage = new Image { Url = "https://upload.wikimedia.org/wikipedia/commons/c/c5/Edvard_Munch%2C_The_Scream%2C_1893.jpg" },
+                WebImage = new Image { Url = "https://placehold.co/400x500/fca5a5/450a0a?text=The+Scream" },
                 Subjects = new List<string> { "Emotional State", "Anxiety" }
             });
 
@@ -154,7 +154,7 @@ namespace ECP.UI.Server.Services
                 CreationYear = 1831,
                 ArtworkTypeDisplay = "Woodblock print",
                 Materials = new List<string> { "Wood", "Paper" },
-                WebImage = new Image { Url = "https://upload.wikimedia.org/wikipedia/commons/a/a2/The_Great_Wave_off_Kanagawa_by_Hokusai.jpg" },
+                WebImage = new Image { Url = "https://placehold.co/500x300/67e8f9/0e7490?text=Hokusai" },
                 Subjects = new List<string> { "Landscape", "Nature" }
             });
 
@@ -169,7 +169,7 @@ namespace ECP.UI.Server.Services
                 CreationYear = 1498,
                 ArtworkTypeDisplay = "Tempera on gesso, pitch, and mastic",
                 Materials = new List<string> { "Tempera paint", "Gesso", "Plaster" },
-                WebImage = new Image { Url = "https://upload.wikimedia.org/wikipedia/commons/4/4b/Leonardo_da_Vinci_-_The_Last_Supper.jpg" },
+                WebImage = new Image { Url = "https://placehold.co/500x300/bfdbfe/1e40af?text=Da+Vinci" },
                 Subjects = new List<string> { "Biblical", "Religious" }
             });
 
@@ -184,7 +184,7 @@ namespace ECP.UI.Server.Services
                 CreationYear = 1937,
                 ArtworkTypeDisplay = "Oil on canvas",
                 Materials = new List<string> { "Oil paint", "Canvas" },
-                WebImage = new Image { Url = "https://upload.wikimedia.org/wikipedia/commons/1/1a/Picasso%2C_Guernica.jpg" },
+                WebImage = new Image { Url = "https://placehold.co/500x300/e7e5e4/44403c?text=Picasso" },
                 Subjects = new List<string> { "War", "Politics" }
             });
 
@@ -199,7 +199,7 @@ namespace ECP.UI.Server.Services
                 CreationYear = 1930,
                 ArtworkTypeDisplay = "Oil on beaverboard",
                 Materials = new List<string> { "Oil paint", "Wood" },
-                WebImage = new Image { Url = "https://upload.wikimedia.org/wikipedia/commons/c/c2/American_Gothic.jpg" },
+                WebImage = new Image { Url = "https://placehold.co/300x400/e0f2f1/042f2e?text=Wood" },
                 Subjects = new List<string> { "Portrait", "Rural Life" }
             });
 
@@ -214,24 +214,11 @@ namespace ECP.UI.Server.Services
                 CreationYear = 1931,
                 ArtworkTypeDisplay = "Oil on canvas",
                 Materials = new List<string> { "Oil paint", "Canvas" },
-                WebImage = new Image { Url = "https://upload.wikimedia.org/wikipedia/commons/d/d3/The_Persistence_of_Memory.jpg" },
+                WebImage = new Image { Url = "https://placehold.co/400x300/fee2e2/991b1b?text=Dalí" },
                 Subjects = new List<string> { "Surrealism", "Time" }
             });
 
-            artworkPreviews.Add(new ArtworkPreview
-            {
-                Id = Guid.NewGuid().ToString(),
-                Source = ArtworkSource.CHICAGO_ART_INSTITUTE,
-                SourceId = 115,
-                ArtworkType = ArtworkType.Painting,
-                Title = "The Birth of Venus",
-                Artists = new List<Artist> { new Artist { Name = "Sandro Botticelli" } },
-                CreationYear = 1486,
-                ArtworkTypeDisplay = "Tempera on canvas",
-                Materials = new List<string> { "Tempera paint", "Canvas" },
-                WebImage = new Image { Url = "https://upload.wikimedia.org/wikipedia/commons/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg" },
-                Subjects = new List<string> { "Mythology", "Classical" }
-            });
+
 
             return artworkPreviews;
         }

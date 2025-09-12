@@ -1,21 +1,23 @@
 ﻿@page "/search"
+@rendermode InteractiveAuto
 
 @using ECP.UI.Server.Components.Error
 @using ECP.UI.Server.Components.Shared
-@rendermode InteractiveAuto
+@using ECP.UI.Server.Components.Search
 
 @inject ArtworkService ArtworkService
 @inject NavigationManager NavManager
+ 
+<SearchQueryPanel SearchQuery="@SearchQuery"></SearchQueryPanel>
 
-@if (_isLoading)
+
+<div class="search-results-container" style="display: flex; flex-direction: column; min-height: 100%; justify-content: center;">
+    @if (_isLoading)
 {
     <Loading></Loading>
 }
 else if (_artworkList != null)
 {
-    <MudText Align="Align.Center" Typo="Typo.h1" style="font-size: 3rem" Class="pb-5"><b>Results for: @SearchQuery</b></MudText>
-    <SearchBar SearchQuery="@SearchQuery"></SearchBar>
-
 
     if (!_artworkList.Any())
     {
@@ -35,7 +37,7 @@ else if (_isServerError)
 {
     <ServerErrorMessage></ServerErrorMessage>
 }
-
+</div>
 
 @code {
     [Parameter]
@@ -60,7 +62,7 @@ else if (_isServerError)
         _artworkList = null;
         try
         {
-            _artworkList = new();
+            _artworkList = ArtworkSeeder.SeedPreviews();
             // var response = await ArtworkService.SearchArtworksByQueryAsync(SearchQuery, 20, PageNumber);
 
             // if (response.IsSuccess)

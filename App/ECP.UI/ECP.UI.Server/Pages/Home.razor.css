@@ -38,7 +38,6 @@
     padding: 0 1rem;
 }
 
-/* Responsive styles for mobile devices */
 @media (max-width: 768px) {
     #inner-content-container {
         width: 100%;

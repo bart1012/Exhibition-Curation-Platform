@@ -1,9 +1,7 @@
 ﻿.search-container {
     width: 100%;
     display: flex;
-    justify-content: center;
-    margin-bottom: 2.5rem;
-    
+    justify-content: center;    
 }
 
 .search-wrapper {
@@ -22,6 +20,13 @@
     outline: none;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     transition: all 0.3s ease-in-out;
+
+    font-family: sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.75;
+    letter-spacing: 0.02857em;
+    box-sizing: border-box;
 }
 
     .search-input:focus {
@@ -66,7 +71,7 @@
 }
 
 ::placeholder {
-    color: white;
+    color: darkgray;
 }
 
 @media (max-width: 768px) {

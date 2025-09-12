@@ -1,37 +1,49 @@
 ﻿.masonry-item {
+    display: inline-block;
+    width: 100%;
     margin-bottom: 1rem;
     break-inside: avoid;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     background-color: #f7f7f7;
-    max-height: 400px;
+    box-sizing: border-box;
+    text-decoration: none;
+    position: relative;
 }
 
 .masonry-content {
     display: flex;
     flex-direction: column;
     height: 100%;
+    position: relative;
 }
 
 .item-image {
     width: 100%;
-    height: 100%;
+    height: auto; 
     object-fit: cover;
+    display: block;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .placeholder-image {
     width: 100%;
-    height: 100%;
+    min-height: 200px; 
+    height: auto;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #ddd;
     color: #888;
+    box-sizing: border-box;
 }
 
 .item-info {
     padding: 0.75rem;
+    flex-shrink: 0; 
+    box-sizing: border-box;
 }
 
 .title {
@@ -39,4 +51,58 @@
     font-size: 1rem;
     margin: 0;
     color: #333;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.hover-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 100;
+}
+
+.masonry-item:hover .hover-overlay {
+    opacity: 1;
+}
+
+.masonry-item:hover .item-image {
+    transform: scale(1.05);
+}
+
+.overlay-content {
+    text-align: center;
+    padding: 1rem;
+    max-width: 90%;
+}
+
+.overlay-title {
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    line-height: 1.3;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+@media (max-width: 640px) {
+    .overlay-title {
+        font-size: 1rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .overlay-title {
+        font-size: 1.2rem;
+    }
 }
