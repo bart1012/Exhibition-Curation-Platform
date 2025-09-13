@@ -17,15 +17,17 @@
 
                 <!-- Date Filter -->
                 <MudItem xs="12" sm="6">
-                    <MudDatePicker @bind-Date="Filters.DateFrom"
-                                   Label="Date From"
-                                   Clearable="true" />
-                </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudDatePicker @bind-Date="Filters.DateTo"
-                                   Label="Date To"
-                                   Clearable="true" />
-                </MudItem>
+    <MudNumericField @bind-Value="Filters.DateFrom"
+                     Label="Date From"
+                     Clearable="true"
+                     Placeholder="e.g. 1900" />
+</MudItem>
+<MudItem xs="12" sm="6">
+    <MudNumericField @bind-Value="Filters.DateTo"
+                     Label="Date To"
+                     Clearable="true"
+                     Placeholder="e.g. 2000" />
+</MudItem>
 
                 <!-- Subject Filter -->
 
@@ -164,11 +166,11 @@
     private string GetDateRangeText()
     {
         if (Filters.DateFrom.HasValue && Filters.DateTo.HasValue)
-            return $"Date: {Filters.DateFrom.Value:MMM yyyy} - {Filters.DateTo.Value:MMM yyyy}";
+            return $"Date: {Filters.DateFrom.Value} - {Filters.DateTo.Value}";
         else if (Filters.DateFrom.HasValue)
-            return $"Date: From {Filters.DateFrom.Value:MMM yyyy}";
+            return $"Date: From {Filters.DateFrom.Value}";
         else if (Filters.DateTo.HasValue)
-            return $"Date: Until {Filters.DateTo.Value:MMM yyyy}";
+            return $"Date: Until {Filters.DateTo.Value}";
         return "";
     }
 }

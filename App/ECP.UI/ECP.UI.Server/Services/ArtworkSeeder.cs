@@ -217,6 +217,62 @@ namespace ECP.UI.Server.Services
                 WebImage = new Image { Url = "https://placehold.co/400x300/fee2e2/991b1b?text=Dalí" },
                 Subjects = new List<string> { "Surrealism", "Time" }
             });
+            artworkPreviews.Add(new ArtworkPreview
+            {
+                Id = Guid.NewGuid().ToString(),
+                Source = ArtworkSource.CHICAGO_ART_INSTITUTE,
+                SourceId = 214,
+                ArtworkType = ArtworkType.Painting,
+                Title = "The Persistence of Memory",
+                Artists = new List<Artist> { new Artist { Name = "Salvador Dalí" } },
+                CreationYear = 1931,
+                ArtworkTypeDisplay = "Oil on canvas",
+                Materials = new List<string> { "Oil paint", "Canvas" },
+                WebImage = new Image { Url = "https://placehold.co/400x300/fee2e2/991b1b?text=Dalí" },
+                Subjects = new List<string> { "Surrealism", "Time" }
+            });
+            artworkPreviews.Add(new ArtworkPreview
+            {
+                Id = Guid.NewGuid().ToString(),
+                Source = ArtworkSource.CHICAGO_ART_INSTITUTE,
+                SourceId = 214,
+                ArtworkType = ArtworkType.Painting,
+                Title = "The Persistence of Memory",
+                Artists = new List<Artist> { new Artist { Name = "Salvador Dalí" } },
+                CreationYear = 1931,
+                ArtworkTypeDisplay = "Oil on canvas",
+                Materials = new List<string> { "Oil paint", "Canvas" },
+                WebImage = new Image { Url = "https://placehold.co/400x300/fee2e2/991b1b?text=Dalí" },
+                Subjects = new List<string> { "Surrealism", "Time" }
+            });
+            artworkPreviews.Add(new ArtworkPreview
+            {
+                Id = Guid.NewGuid().ToString(),
+                Source = ArtworkSource.CHICAGO_ART_INSTITUTE,
+                SourceId = 214,
+                ArtworkType = ArtworkType.Painting,
+                Title = "The Persistence of Memory",
+                Artists = new List<Artist> { new Artist { Name = "Salvador Dalí" } },
+                CreationYear = 1931,
+                ArtworkTypeDisplay = "Oil on canvas",
+                Materials = new List<string> { "Oil paint", "Canvas" },
+                WebImage = new Image { Url = "https://placehold.co/400x300/fee2e2/991b1b?text=Dalí" },
+                Subjects = new List<string> { "Surrealism", "Time" }
+            });
+            artworkPreviews.Add(new ArtworkPreview
+            {
+                Id = Guid.NewGuid().ToString(),
+                Source = ArtworkSource.CHICAGO_ART_INSTITUTE,
+                SourceId = 214,
+                ArtworkType = ArtworkType.Painting,
+                Title = "The Persistence of Memory",
+                Artists = new List<Artist> { new Artist { Name = "Salvador Dalí" } },
+                CreationYear = 1931,
+                ArtworkTypeDisplay = "Oil on canvas",
+                Materials = new List<string> { "Oil paint", "Canvas" },
+                WebImage = new Image { Url = "https://placehold.co/400x300/fee2e2/991b1b?text=Dalí" },
+                Subjects = new List<string> { "Surrealism", "Time" }
+            });
 
 
 

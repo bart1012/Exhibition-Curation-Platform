@@ -1,5 +1,6 @@
 ﻿using ECP.Shared;
 using System.Net;
+using System.Text;
 using System.Text.Json;
 
 namespace ECP.UI.Server.Services
@@ -10,7 +11,7 @@ namespace ECP.UI.Server.Services
 
         Task<Result<Artwork>> GetArtworkByIdAsync(int id, int source);
 
-        Task<Result<PaginatedResponse<ArtworkPreview>>> SearchArtworksByQueryAsync(string q, int resultsPerPage, int pageNum);
+        Task<Result<PaginatedResponse<ArtworkPreview>>> SearchArtworksByQueryAsync(string q, int resultsPerPage, int pageNum, string? sortOptions = null, string? filterOptions = null);
     }
     public class ArtworkService(HttpClient client) : IArtworkService
     {
@@ -26,9 +27,19 @@ namespace ECP.UI.Server.Services
             return await ExecuteApiCallAsync<PaginatedResponse<ArtworkPreview>>($"artworks/previews?count={count}&results_per_page={resultsPerPage}&page_num={pageNum}");
         }
 
-        public async Task<Result<PaginatedResponse<ArtworkPreview>>> SearchArtworksByQueryAsync(string q, int resultsPerPage, int pageNum)
+        public async Task<Result<PaginatedResponse<ArtworkPreview>>> SearchArtworksByQueryAsync(string q, int resultsPerPage, int pageNum, string? sortOptions = null, string? filterOptions = null)
         {
-            return await ExecuteApiCallAsync<PaginatedResponse<ArtworkPreview>>($"artworks/previews/search?&q={q}&results_per_page={resultsPerPage}&page_num={pageNum}");
+            StringBuilder url = new($"artworks/previews/search?&q={q}&limit={resultsPerPage}&p={pageNum}");
+            if (!string.IsNullOrEmpty(sortOptions))
+            {
+                url.Append(sortOptions);
+            }
+            if (!string.IsNullOrEmpty(filterOptions))
+            {
+                url.Append(filterOptions);
+            }
+            Console.WriteLine($"URL: {url.ToString()}");
+            return await ExecuteApiCallAsync<PaginatedResponse<ArtworkPreview>>(url.ToString());
         }
 
         protected async Task<Result<T>> ExecuteApiCallAsync<T>(string url)

@@ -4,11 +4,12 @@
 @using ECP.UI.Server.Components.Error
 @using ECP.UI.Server.Components.Shared
 @using ECP.UI.Server.Components.Search
+@using ECP.UI.Server.Models
 
 @inject ArtworkService ArtworkService
 @inject NavigationManager NavManager
  
-<SearchQueryPanel SearchQuery="@SearchQuery"></SearchQueryPanel>
+<SearchQueryPanel SearchQuery="@SearchQuery" OnSortChanged="@HandleSortChanged" OnFiltersChanged="@HandleFiltersChanged"></SearchQueryPanel>
 
 
 <div class="search-results-container" style="display: flex; flex-direction: column; min-height: 100%; justify-content: center;">
@@ -28,7 +29,7 @@ else if (_artworkList != null)
         <MasonryGrid List="@_artworkList"></MasonryGrid>
 
         <div class="pagination-container">
-            <MudPagination SelectedChanged="PageChanged" Color="Color.Primary" class="flex-none px-0" Count="@_totalPages" Size="Size.Large" />
+            <MudPagination Selected="@PageNumber" SelectedChanged="PageChanged" Color="Color.Dark" class="flex-none px-0" Count="@_totalPages" Size="Size.Large" />
         </div>
     }
 
@@ -49,47 +50,79 @@ else if (_isServerError)
     public int PageNumber { get; set; }
 
     private bool _isServerError = false;
-
+    private string? _sortQuery = null;
+    private string? _filtersQuery = null;
     private int _totalPages { get; set; }
 
     private List<ArtworkPreview>? _artworkList = null;
 
     private bool _isLoading = true;
 
-    protected override async Task OnParametersSetAsync()
+    private async Task FetchDataAsync()
     {
         _isLoading = true;
+        _isServerError = false;
         _artworkList = null;
         try
         {
-            _artworkList = ArtworkSeeder.SeedPreviews();
-            // var response = await ArtworkService.SearchArtworksByQueryAsync(SearchQuery, 20, PageNumber);
+            var response = await ArtworkService.SearchArtworksByQueryAsync(SearchQuery, 24, PageNumber, _sortQuery, _filtersQuery);
 
-            // if (response.IsSuccess)
-            // {
-            //     _artworkList = response.Value.Data.ToList();
-            //     _totalPages = response.Value.Info.TotalPages;
-            // }
-            // else
-            // {
-            //     _isServerError = true;
-            // }
+            if (response.IsSuccess)
+            {
+                _artworkList = response.Value.Data.ToList();
+                _totalPages = response.Value.Info.TotalPages;
+            }
+            else
+            {
+                _isServerError = true;
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching search results from SearchResults.razor: {ex.Message}");
             _artworkList = null;
+            _isServerError = true;
         }
         finally
         {
             _isLoading = false;
+            StateHasChanged();
         }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _isLoading = true;
+        _artworkList = null;
+        await FetchDataAsync();
 
 
     }
 
     private void PageChanged(int i)
     {
-        NavManager.NavigateTo($"/search?q={SearchQuery}&p={i}");
+        NavManager.NavigateTo($"/search?q={SearchQuery}&p={i}{_filtersQuery}{_sortQuery}");
+    }
+
+    private async Task HandleFiltersChanged(string filters)
+    {
+        _filtersQuery = filters;
+        PageNumber = 1;
+        NavManager.NavigateTo($"/search?q={SearchQuery}&p={PageNumber}{_filtersQuery}");
+        await FetchDataAsync();
+    }
+
+    private async Task HandleSortChanged(SortOptions options)
+    {
+        Console.WriteLine($"Options: sortby: {options.SortBy}, isDescending = {options.IsDescending}");
+        if (string.IsNullOrEmpty(options.SortBy))
+        {
+            return;
+        }
+        string sortQuery = options.BuildSortQuery();
+        _sortQuery = sortQuery;
+        PageNumber = 1;
+        NavManager.NavigateTo($"/search?q={SearchQuery}&p={PageNumber}{_filtersQuery}{_sortQuery}");
+        await FetchDataAsync();
     }
 }

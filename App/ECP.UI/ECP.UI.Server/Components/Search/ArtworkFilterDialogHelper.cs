@@ -1,50 +1,58 @@
 ﻿using ECP.Shared;
-using Microsoft.AspNetCore.Components;
-using MudBlazor;
 
 namespace ECP.UI.Server.Components.Search
 {
-    public class ArtworkFilterDialogHelper
+    public class ArtworkFilterDialogHelper(ArtworkFilters filters)
     {
-        [CascadingParameter]
-        IMudDialogInstance MudDialog { get; set; } = null!;
 
-        private ArtworkFilters Filters = new();
-
-        private void Submit()
-        {
-            MudDialog.Close(DialogResult.Ok(Filters));
-        }
-
-        private void Cancel()
-        {
-            MudDialog.Cancel();
-        }
-
-        private void ClearAllFilters()
-        {
-            Filters = new ArtworkFilters();
-        }
+        private ArtworkFilters _filters = filters;
 
         private bool HasActiveFilters()
         {
-            return !string.IsNullOrEmpty(Filters.Artist) ||
-                   !string.IsNullOrEmpty(Filters.Subject) ||
-                   !string.IsNullOrEmpty(Filters.Type) ||
-                   !string.IsNullOrEmpty(Filters.Material) ||
-                   Filters.DateFrom.HasValue ||
-                   Filters.DateTo.HasValue;
+            return !string.IsNullOrEmpty(filters.Artist) ||
+                   !string.IsNullOrEmpty(filters.Subject) ||
+                   !string.IsNullOrEmpty(filters.Type) ||
+                   !string.IsNullOrEmpty(filters.Material) ||
+                   filters.DateFrom.HasValue ||
+                   filters.DateTo.HasValue;
         }
 
-        private string GetDateRangeText()
+        public string BuildFilterQuery()
         {
-            if (Filters.DateFrom.HasValue && Filters.DateTo.HasValue)
-                return $"Date: {Filters.DateFrom.Value:MMM yyyy} - {Filters.DateTo.Value:MMM yyyy}";
-            else if (Filters.DateFrom.HasValue)
-                return $"Date: From {Filters.DateFrom.Value:MMM yyyy}";
-            else if (Filters.DateTo.HasValue)
-                return $"Date: Until {Filters.DateTo.Value:MMM yyyy}";
-            return "";
+            if (!HasActiveFilters())
+            {
+                return string.Empty;
+            }
+
+            var filters = GetActiveFilters();
+
+            if (filters.Count == 0)
+                return string.Empty;
+
+            return string.Join("", filters.Select(f =>
+                $"&filters={Uri.EscapeDataString(f.Key)}:{Uri.EscapeDataString(f.Value)}"));
+        }
+
+        private Dictionary<string, string> GetActiveFilters()
+        {
+            var dict = new Dictionary<string, string>();
+
+            if (!string.IsNullOrEmpty(_filters.Artist))
+                dict["Artist"] = _filters.Artist;
+
+            if (!string.IsNullOrEmpty(_filters.Subject))
+                dict["Subject"] = _filters.Subject;
+
+            if (!string.IsNullOrEmpty(_filters.Type))
+                dict["Type"] = _filters.Type;
+
+            if (!string.IsNullOrEmpty(_filters.Material))
+                dict["Material"] = _filters.Material;
+
+            if (_filters.DateFrom.HasValue || _filters.DateTo.HasValue)
+                dict["Date"] = _filters.Date;
+
+            return dict;
         }
     }
 }

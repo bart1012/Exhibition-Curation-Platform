@@ -1,5 +1,6 @@
 ﻿@rendermode InteractiveAuto
 @using MudBlazor
+@using ECP.UI.Server.Models
 @inject IDialogService DialogService
 
 
@@ -28,11 +29,12 @@
                         </MudButton>
                     </ActivatorContent>
                     <ChildContent>
-                        <MudMenuItem OnClick="() => SetSortButtonText(0)">Creation Date</MudMenuItem>
-                        <MudMenuItem OnClick="() => SetSortButtonText(1)">Alphabetically</MudMenuItem>
+                        <MudMenuItem OnClick="@(() => SetSortField(0))">Creation Date</MudMenuItem>
+                        <MudMenuItem OnClick="@(() => SetSortField(1))">Alphabetically</MudMenuItem>
                     </ChildContent>
                 </MudMenu>
-                <MudToggleIconButton @bind-Toggled="_isDescending"
+                <MudToggleIconButton Toggled="_isDescending"
+                                     ToggledChanged="SetSortDirection"
                                      Icon="@Icons.Material.Filled.ArrowUpward"
                                      Color="@Color.Dark"
                                      ToggledIcon="@Icons.Material.Filled.ArrowDownward"
@@ -48,8 +50,14 @@
     [Parameter]
     public string? SearchQuery { get; set; }
 
-    private string _sortText = "Sort";
+    [Parameter]
+    public EventCallback<string> OnFiltersChanged { get; set; }
 
+    [Parameter]
+    public EventCallback<SortOptions> OnSortChanged { get; set; }
+
+    private string _sortText = "Sort";
+    private string _sortBy = string.Empty;
     private bool _isDescending = true;
 
     private async Task OpenFilterDialog()
@@ -68,27 +76,45 @@
         if (!result.Canceled && result.Data != null)
         {
             var filters = (ArtworkFilters)result.Data;
-            // Handle the applied filters
             await ApplyFilters(filters);
         }
     }
 
     private async Task ApplyFilters(ArtworkFilters filters)
     {
-        // Implement your filter logic here
-        Console.WriteLine($"Filters applied: Artist={filters.Artist}, Subject={filters.Subject}");
+        ArtworkFilterDialogHelper filterHelper = new(filters);
+        string urlFilterQuery = filterHelper.BuildFilterQuery();
+        OnFiltersChanged.InvokeAsync(urlFilterQuery);
+    }
+
+    private async void SetSortField(int id)
+    {
+        SetSortButtonText(id);
+        _sortBy = id == 0 ? "date" : "title";
+        await OnSortChanged.InvokeAsync(new SortOptions(){SortBy = _sortBy, IsDescending = _isDescending});
+
+    }
+
+    private async Task SetSortDirection(bool newIsDescending)
+    {
+        _isDescending = newIsDescending;
+        await OnSortChanged.InvokeAsync(new SortOptions() { SortBy = _sortBy, IsDescending = _isDescending });
+
     }
 
     private void SetSortButtonText(int id)
     {
+
+
         switch (id)
-        {
-            case 0:
-                _sortText = "Creation Date";
-                break;
-            case 1:
-                _sortText = "Alphabetically";
-                break;
-        }
+            {
+                case 0:
+                    _sortText = "Creation Date";
+                    break;
+                case 1:
+                    _sortText = "Alphabetically";
+                    break;
+            }
+
     }
 }

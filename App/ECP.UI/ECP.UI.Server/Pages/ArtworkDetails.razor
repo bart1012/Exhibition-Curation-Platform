@@ -1,124 +1,127 @@
 ﻿@page "/artwork/{ArtworkId:int}/{SourceId:int}"
 @inject ArtworkService ArtworkService
-@rendermode InteractiveWebAssembly
+@rendermode InteractiveAuto
 @using ECP.UI.Server.Components.Error
 @using ECP.UI.Server.Components.Shared
 @using ECP.UI.Client.Components
 
-@if (isLoading)
-{
-    <Loading></Loading>
-}
-else if (_artwork != null)
-{
-    <MudGrid Class="pa-4">
-        <!-- artwork image -->
-        <MudItem xs="12" sm="6" Class="d-flex justify-center">
-            @if (!string.IsNullOrEmpty(_artwork.Images?.Thumbnail?.Url))
-            {
-                <MudImage Src="@_artwork.Images.Thumbnail.Url" Alt="@_artwork.Title"
-                          Class="rounded-lg shadow-lg"
-                          Style="max-width: 100%; height: auto;" />
-            }
-            else
-            {
-                <MudImage Src="https://placehold.co/600x400/2c3e50/ecf0f1?text=Image+Not+Found"
-                          Alt="Image Not Found"
-                          Class="rounded-lg shadow-lg"
-                          Style="max-width: 100%; height: auto;" />
-            }
-        </MudItem>
+<div class="artwork-details-container">
+    @if (isLoading)
+    {
+        <Loading></Loading>
+    }
+    else if (_artwork != null)
+    {
+    <MudGrid Class="d-flex" style="height: 100%; width: 100%; margin: 0; padding: 0; padding-bottom: 2rem; ">
+            <!-- artwork image -->
+            <MudItem xs="12" sm="7" style="height: 100%;" Class="m-0 pa-0 align-content-start d-flex" >
+                @if (!string.IsNullOrEmpty(_artwork.Images?.Web?.Url))
+                {
+                    <MudImage Src="@_artwork.Images.Web.Url" Alt="@_artwork.Title"
+                              Class="rounded-lg shadow-lg"
+                              Style="max-width: 100%; width: 100%; height: 100%;"
+                              ObjectFit="ObjectFit.Contain"/>
+                }
+                else
+                {
+                    <MudImage Src="https://placehold.co/600x400/2c3e50/ecf0f1?text=Image+Not+Found"
+                              Alt="Image Not Found"
+                              ObjectFit="ObjectFit.Contain"
+                              Class="rounded-lg shadow-lg"
+                              Style="max-width: 100%; height: 100%;" />
+                }
+            </MudItem>
 
-        <!-- Artwork information -->
-        <MudItem xs="12" sm="6">
-            <MudCard Outlined="true" Elevation="4">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h3">@_artwork.Title</MudText>
-                        @if (_artwork.Artists != null && _artwork.Artists.Any())
+            <!-- Artwork information -->
+            <MudItem xs="12" sm="5" class="ma-0 pa-0 pl-5 py-5" style="height: 100%">
+                <MudCard  Elevation="0" style="height: 100%">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h3">@_artwork.Title</MudText>
+                            @if (_artwork.Artists != null && _artwork.Artists.Any())
+                            {
+                                <MudText Typo="Typo.h5" Class="mt-2">
+                                    @string.Join(", ", _artwork.Artists.Select(a => a.Name))
+                                </MudText>
+                            }
+                            <!-- save artwork button-->
+
+                            <SaveToCollection></SaveToCollection>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudDivider />
+                    <MudCardContent>
+                        <MudText Typo="Typo.body1" Class="mb-4">
+                            <strong>Creation Date:</strong> @_artwork.CreationDate
+                        </MudText>
+                        <MudText Typo="Typo.body1" Class="mb-4">
+                            <strong>Medium:</strong> @_artwork.Medium
+                        </MudText>
+                        @if (_artwork.Dimensions != null)
                         {
-                            <MudText Typo="Typo.h5" Class="mt-2">
-                                @string.Join(", ", _artwork.Artists.Select(a => a.Name))
+                            <MudText Typo="Typo.body1" Class="mb-4">
+                                <strong>Dimensions:</strong>
+                                @(_artwork.Dimensions.Width) x @(_artwork.Dimensions.Height) cm
+                                @if (_artwork.Dimensions.Depth.HasValue)
+                                {
+                                    @($" x {_artwork.Dimensions.Depth.Value} cm")
+                                }
                             </MudText>
                         }
-                        <!-- save artwork button-->
-
-                        <SaveToCollection></SaveToCollection>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudDivider />
-                <MudCardContent>
-                    <MudText Typo="Typo.body1" Class="mb-4">
-                        <strong>Creation Date:</strong> @_artwork.CreationDate
-                    </MudText>
-                    <MudText Typo="Typo.body1" Class="mb-4">
-                        <strong>Medium:</strong> @_artwork.Medium
-                    </MudText>
-                    @if (_artwork.Dimensions != null)
+                        @if (!string.IsNullOrWhiteSpace(_artwork.Description))
+                        {
+                            <MudText Typo="Typo.body2" Class="mb-4">
+                                <div class="mt-4" style="text-align: justify;">
+                                    @_artwork.Description
+                                </div>
+                            </MudText>
+                        }
+                        @if (_artwork.Subjects != null && _artwork.Subjects.Any())
+                        {
+                            <MudList T="string">
+                                <MudListItem>
+                                    <MudText Typo="Typo.h6">Subjects</MudText>
+                                    @foreach (var subject in _artwork.Subjects)
+                                    {
+                                        <MudChip Label="true" Color="Color.Dark" Class="ma-1 rounded-pill">@subject</MudChip>
+                                    }
+                                </MudListItem>
+                            </MudList>
+                        }
+                        @if (_artwork.Styles != null && _artwork.Styles.Any())
+                        {
+                            <MudList T="string">
+                                <MudListItem>
+                                    <MudText Typo="Typo.h6">Styles</MudText>
+                                    @foreach (var style in _artwork.Styles)
+                                    {
+                                        <MudChip Label="true" Color="Color.Dark" Class="ma-1 rounded-pill">@style</MudChip>
+                                    }
+                                </MudListItem>
+                            </MudList>
+                        }
+                    </MudCardContent>
+                    @if (!string.IsNullOrEmpty(_artwork.SourceUrl))
                     {
-                        <MudText Typo="Typo.body1" Class="mb-4">
-                            <strong>Dimensions:</strong>
-                            @(_artwork.Dimensions.Width) x @(_artwork.Dimensions.Height) cm
-                            @if (_artwork.Dimensions.Depth.HasValue)
-                            {
-                                @($" x {_artwork.Dimensions.Depth.Value} cm")
-                            }
-                        </MudText>
+                        <MudCardActions Class="d-flex justify-end">
+                            <MudButton Href="@_artwork.SourceUrl" Target="_blank" Variant="Variant.Filled" Color="Color.Dark" class="rounded-pill">
+                                View Source
+                            </MudButton>
+                        </MudCardActions>
                     }
-                    @if (!string.IsNullOrWhiteSpace(_artwork.Description))
-                    {
-                        <MudText Typo="Typo.body2" Class="mb-4">
-                            <div class="mt-4" style="text-align: justify;">
-                                @_artwork.Description
-                            </div>
-                        </MudText>
-                    }
-                    @if (_artwork.Subjects != null && _artwork.Subjects.Any())
-                    {
-                        <MudList T="string">
-                            <MudListItem>
-                                <MudText Typo="Typo.h6">Subjects</MudText>
-                                @foreach (var subject in _artwork.Subjects)
-                                {
-                                    <MudChip Label="true" Color="Color.Primary" Class="ma-1">@subject</MudChip>
-                                }
-                            </MudListItem>
-                        </MudList>
-                    }
-                    @if (_artwork.Styles != null && _artwork.Styles.Any())
-                    {
-                        <MudList T="string">
-                            <MudListItem>
-                                <MudText Typo="Typo.h6">Styles</MudText>
-                                @foreach (var style in _artwork.Styles)
-                                {
-                                    <MudChip Label="true" Color="Color.Secondary" Class="ma-1">@style</MudChip>
-                                }
-                            </MudListItem>
-                        </MudList>
-                    }
-                </MudCardContent>
-                @if (!string.IsNullOrEmpty(_artwork.SourceUrl))
-                {
-                    <MudCardActions Class="d-flex justify-end">
-                        <MudButton Href="@_artwork.SourceUrl" Target="_blank" Variant="Variant.Filled" Color="Color.Primary">
-                            View Source
-                        </MudButton>
-                    </MudCardActions>
-                }
-            </MudCard>
-        </MudItem>
-    </MudGrid>
-}
-else if (_isServerError)
-{
-    <ServerErrorMessage></ServerErrorMessage>
-}
-else
-{
-    <NotFoundMessage></NotFoundMessage>
-}
-
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    }
+    else if (_isServerError)
+    {
+        <ServerErrorMessage></ServerErrorMessage>
+    }
+    else
+    {
+        <NotFoundMessage></NotFoundMessage>
+    }
+</div>
 @code {
     [Parameter]
     public int ArtworkId { get; set; }
@@ -145,32 +148,15 @@ else
 
         try
         {
-            // Mock data retrieval for testing purposes
-            await Task.Delay(1000);// Simulate network delay
+            var response = await ArtworkService.GetArtworkByIdAsync(ArtworkId, SourceId);
 
-            if (ArtworkId == 122130)
+            if (response.IsSuccess)
             {
-                _artwork = new Artwork
-                    {
-                        Id = "122130",
-                        Title = "Les Andelys, Côte d'Aval (Test Instance)",
-                        Artists = new List<Artist> { new Artist { Name = "Paul Signac" } },
-                        CreationDate = "1886",
-                        Medium = "Oil on canvas",
-                        Dimensions = new Dimensions { Width = 92, Height = 60, Depth = 6.4 },
-                        Description = "This is a mock description for testing purposes. It simulates a full artwork object without needing to call the API.",
-                        Images = new Images
-                        {
-                            Thumbnail = new Image { Url = "https://www.artic.edu/iiif/2/43fcfad0-8256-4923-9f9c-03ca90417907/full/843,/0/default.jpg" }
-                        },
-                        Subjects = new List<string> { "Landscapes", "Boats", "Towns", "Water" },
-                        Styles = new List<string> { "Post-Impressionism", "19th Century" },
-                        SourceUrl = "https://www.artic.edu/artworks/122130/les-andelys-cote-d-aval"
-                    };
+                _artwork = response.Value;
             }
             else
             {
-                _artwork = null;
+                _isServerError = true;
             }
         }
         catch (Exception ex)
