@@ -1,0 +1,142 @@
+﻿@using MudBlazor
+@using ECP.UI.Client.Services
+@inject IUserCollectionsService CollectionsService
+
+<div class="d-flex justify-start">
+    @if (!_isExpanded)
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.BookmarkBorder"
+                   Class="rounded-lg mud-elevation-4" OnClick="ToggleExpansion">
+            Save
+        </MudButton>
+    }
+    else
+    {
+        <MudStack Spacing="1">
+            <MudText Typo="Typo.subtitle1" Class="text-muted">Save to a collection</MudText>
+            <MudList T="string" Dense="true" Class="rounded-lg mud-elevation-4">
+                @foreach (var collection in _userCollections)
+                {
+                    <MudListItem OnClick="ToggleExpansion">
+                        <MudText>@collection</MudText>
+                    </MudListItem>
+                }
+                @if (!_isAddingNewCollection)
+                {
+                    <MudListItem OnClick="StartNewCollectionFlow">
+                        <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-2" />
+                        <MudText>Create New Collection</MudText>
+                    </MudListItem>
+                }
+            </MudList>
+
+            @if (_isAddingNewCollection)
+            {
+                <MudStack Row="true" Spacing="1" Class="mt-2">
+                    <MudTextField @bind-Value="_newCollectionName"
+                                  Label="New Collection Name"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Immediate="true"
+                                  Class="flex-grow-1" />
+                    <MudButton OnClick="CreateNewCollection"
+                               Disabled="@(string.IsNullOrWhiteSpace(_newCollectionName))"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Class="align-self-center">
+                        Add
+                    </MudButton>
+                </MudStack>
+            }
+        </MudStack>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Artwork Artwork { get; set; } = null;
+
+    private bool _isExpanded = false;
+    private bool _isAddingNewCollection = false;
+    private string _newCollectionName = string.Empty;
+    private List<string> _userCollections = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchCollections();
+    }
+
+    private async Task ToggleExpansion()
+    {
+        _isExpanded = !_isExpanded;
+        if (!_isExpanded)
+        {
+            _isAddingNewCollection = false;
+            _newCollectionName = string.Empty;
+        }
+        StateHasChanged();
+    }
+
+    private void StartNewCollectionFlow()
+    {
+        _isAddingNewCollection = true;
+        StateHasChanged();
+    }
+
+    private async Task CreateNewCollection()
+    {
+        if (!string.IsNullOrWhiteSpace(_newCollectionName))
+        {
+            try
+            {
+                var addOperationResult = await CollectionsService.CreateCollectionAsync(new Collection(_newCollectionName));
+                if (addOperationResult.IsSuccess)
+                {
+                    await FetchCollections();
+                    Console.WriteLine($"Successfully created collection: {_newCollectionName}");
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to create collection: {addOperationResult.Message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception creating collection: {ex.Message}");
+            }
+            finally
+            {
+                _newCollectionName = string.Empty;
+                _isAddingNewCollection = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task FetchCollections()
+    {
+        try
+        {
+            var collectionsResult = await CollectionsService.GetCollectionsAsync();
+            if (collectionsResult.IsSuccess)
+            {
+                _userCollections = collectionsResult.Value.Collections.Select(c => c.Name).ToList();
+                Console.WriteLine($"Fetched {_userCollections.Count} collections");
+            }
+            else
+            {
+                Console.WriteLine($"Error fetching collections: {collectionsResult.Message}");
+                _userCollections = new List<string>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception fetching collections: {ex.Message}");
+            _userCollections = new List<string>();
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+}

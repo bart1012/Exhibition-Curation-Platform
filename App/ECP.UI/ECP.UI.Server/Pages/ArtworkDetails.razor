@@ -4,6 +4,7 @@
 @using ECP.UI.Server.Components.Error
 @using ECP.UI.Server.Components.Shared
 @using ECP.UI.Client.Components
+@using ECP.UI.Server.Components.Artworks
 
 <div class="artwork-details-container">
     @if (isLoading)
@@ -45,6 +46,7 @@
                                 </MudText>
                             }
                             <!-- save artwork button-->
+                            <!-- <SaveToCollection Artwork="_artwork"></SaveToCollection> -->
                             <SaveToCollection Artwork="_artwork"></SaveToCollection>
                             <!-- -------------------- -->
                         </CardHeaderContent>
