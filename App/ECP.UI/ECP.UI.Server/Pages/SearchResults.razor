@@ -108,13 +108,11 @@ else if (_isServerError)
     {
         _filtersQuery = filters;
         PageNumber = 1;
-        NavManager.NavigateTo($"/search?q={SearchQuery}&p={PageNumber}{_filtersQuery}");
-        await FetchDataAsync();
+        NavManager.NavigateTo($"/search?q={SearchQuery}&p={PageNumber}{_filtersQuery}{_sortQuery}");
     }
 
     private async Task HandleSortChanged(SortOptions options)
     {
-        Console.WriteLine($"Options: sortby: {options.SortBy}, isDescending = {options.IsDescending}");
         if (string.IsNullOrEmpty(options.SortBy))
         {
             return;
@@ -123,6 +121,5 @@ else if (_isServerError)
         _sortQuery = sortQuery;
         PageNumber = 1;
         NavManager.NavigateTo($"/search?q={SearchQuery}&p={PageNumber}{_filtersQuery}{_sortQuery}");
-        await FetchDataAsync();
     }
 }

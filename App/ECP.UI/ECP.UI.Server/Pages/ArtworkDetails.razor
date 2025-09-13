@@ -45,8 +45,8 @@
                                 </MudText>
                             }
                             <!-- save artwork button-->
-
-                            <SaveToCollection></SaveToCollection>
+                            <SaveToCollection Artwork="_artwork"></SaveToCollection>
+                            <!-- -------------------- -->
                         </CardHeaderContent>
                     </MudCardHeader>
                     <MudDivider />
@@ -157,6 +157,8 @@
             else
             {
                 _isServerError = true;
+                _artwork = GetHotReloadPlaceholderArtwork();
+
             }
         }
         catch (Exception ex)
@@ -170,5 +172,28 @@
         }
 
 
+    }
+
+    private Artwork GetHotReloadPlaceholderArtwork()
+    {
+        return new Artwork
+            {
+                Title = "Placeholder Artwork",
+                Artists = new List<Artist> { new Artist { Name = "Hot Reload" } },
+                CreationDate = "2024",
+                Medium = "Digital",
+                Dimensions = new Dimensions { Width = 80, Height = 120 },
+                Description = "This is a placeholder object fetched during hot reload. You can continue working on the UI while the server is not running.",
+                Images = new Images
+                {
+                    Web = new Image
+                    {
+                        Url = "https://placehold.co/800x1200/5C6BC0/FFFFFF?text=Placeholder+Image"
+                    }
+                },
+                Subjects = new List<string> { "Hot Reload", "Development", "Debugging" },
+                Styles = new List<string> { "Informative", "Minimalist" },
+                SourceUrl = "https://example.com"
+            };
     }
 }

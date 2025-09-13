@@ -19,13 +19,13 @@ namespace ECP.UI.Server
                 .AddInteractiveWebAssemblyComponents();
 
             builder.Services.AddScoped<IArtworkService, ArtworkService>();
+            builder.Services.AddScoped<IUserCollectionsService, UserCollectionsService>();
             builder.Services.AddHttpClient<ArtworkService>(client =>
             {
                 client.BaseAddress = new Uri("https://localhost:7102/api/");
             });
             builder.Services.AddBlazoredLocalStorage();
 
-            builder.Services.AddScoped<IUserCollectionsService, UserCollectionsService>();
 
 
 

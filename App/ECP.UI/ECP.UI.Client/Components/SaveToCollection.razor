@@ -8,7 +8,7 @@
     {
         <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.BookmarkBorder"
                    Class="rounded-lg mud-elevation-4" OnClick="ToggleExpansion">
-                    @(_isSaved ? "Saved" : "Save")
+            @(_isSaved ? "Saved" : "Save")
         </MudButton>
     }
     else
@@ -108,7 +108,8 @@
         var operationResult = await CollectionsService.AddArtworkToCollectionAsync(collection.Id, artwork);
         _isSaving = false;
 
-        if (!operationResult.IsSuccess){
+        if (!operationResult.IsSuccess)
+        {
             _errorOccured = true;
             _isSaved = false;
         }
@@ -132,9 +133,9 @@
         Console.WriteLine($"Creating new collection: {_newCollectionName}");
 
         Collection newUserCollection = new()
-        {
+            {
                 Name = _newCollectionName
-        };
+            };
 
         var createCollectionOperationResult = await CollectionsService.CreateCollectionAsync(newUserCollection);
         if (!createCollectionOperationResult.IsSuccess) { _errorOccured = true; _isAddingNewCollection = false; _isSaving = false; return; }
