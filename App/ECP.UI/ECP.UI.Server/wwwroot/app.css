@@ -9,6 +9,11 @@ a, .btn-link {
     color: #006bb7;
 }
 
+.page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;

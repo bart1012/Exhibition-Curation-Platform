@@ -1,0 +1,100 @@
+﻿@page "/collections"
+@rendermode InteractiveAuto
+@using ECP.UI.Client.Services
+@using ECP.UI.Server.Components.Artworks
+@inject IUserCollectionsService CollectionsService
+@inherits UserCollectionsBase
+
+<div class="collections-page">
+    <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-6">
+        <!-- Page Header -->
+        <div class="page-header mb-8">
+            <MudText Typo="Typo.h3" Align="Align.Center" Class="mb-2" Style="font-weight: 300; color: var(--mud-palette-text-primary);">
+                Your Collections
+            </MudText>
+            <MudText Typo="Typo.body1" Align="Align.Center" Style="color: var(--mud-palette-text-secondary);">
+                Organize and explore your curated artwork collections
+            </MudText>
+        </div>
+
+        <!-- Collections Grid -->
+        @if (_userCollections?.Any() == true)
+        {
+            <MudGrid Spacing="3" Class="collections-grid">
+                @foreach (Collection item in _userCollections)
+                {
+                    <MudItem xs="6" sm="4" md="3" lg="2"  style="padding: 8px;  height: 15rem;">
+                        <a href="/collection/@item.Id" class="d-flex align-center mud-width-full" style="height: 100%; background-color: white;">
+                            <MudPaper Class="d-flex flex-column" Elevation="2" Style="height: 100%; width: 100%; justify-content: space-between; position: relative;">
+                                <!-- Collection Preview/Icon Area -->
+                                <div class="collection-preview">
+                                    @if (item.Artworks?.Any() == true)
+                                    {
+                                        <!-- Show preview image if collection has artworks -->
+                                        <div class="preview-image-container">
+                                            <MudIcon Icon="@Icons.Material.Filled.Collections"  
+                                                     Style="font-size: 3rem; color: var(--mud-palette-text-disabled);" />
+                                        
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <!-- Empty collection placeholder -->
+                                        <div class="empty-collection-placeholder">
+                                            <MudIcon Icon="@Icons.Material.Filled.Collections"  
+                                                                                Style="font-size: 3rem; color: var(--mud-palette-text-disabled);" />
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- Collection Info -->
+                                <div class="collection-info">
+                                    <MudText Typo="Typo.subtitle1" Class="collection-name">
+                                        @item.Name
+                                    </MudText>
+                                    <MudText Typo="Typo.caption" Class="collection-count">
+                                        @item.Artworks.Count @(item.Artworks.Count == 1 ? "artwork" : "artworks")
+                                    </MudText>
+                                </div>
+               
+                            </MudPaper>
+                        </a>
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+        else
+        {
+            <!-- Empty State -->
+            <div class="empty-state">
+                <MudPaper Class="pa-8 text-center" Style="background: transparent;" Elevation="0">
+                    <MudIcon Icon="@Icons.Material.Filled.Collections"  
+                                            Style="font-size: 4rem; color: var(--mud-palette-text-disabled); margin-bottom: 16px;" />
+                    <MudText Typo="Typo.h6" Class="mb-2" Style="color: var(--mud-palette-text-secondary);">
+                        No Collections Yet
+                    </MudText>
+                    <MudText Typo="Typo.body2" Style="color: var(--mud-palette-text-disabled); max-width: 400px; margin: 0 auto;">
+                        Start building your personal art collection by saving artworks you discover and love.
+                    </MudText>
+                    <MudButton Variant="Variant.Filled"  
+                                               Color="Color.Primary"  
+                                               StartIcon="@Icons.Material.Filled.Add"
+                                               Class="mt-4"
+                                               Href="/explore">
+                        Explore Artworks
+                    </MudButton>
+                </MudPaper>
+            </div>
+        }
+    </MudContainer>
+</div>
+
+
+
+@code {
+    protected async override Task OnInitializedAsync()
+    {
+        await FetchCollections();
+        StateHasChanged();
+    }
+}

@@ -7,8 +7,13 @@
 /*    background-color: red;*/
 }
 
+.search-wrapper{
+    width: 100%;
+    max-width: 50rem; 
+}
+
 .sort-button-text .mud-button-root {
-    min-width: 5rem; 
+    min-width: 5rem;
 }
 
 .search-bar-container {

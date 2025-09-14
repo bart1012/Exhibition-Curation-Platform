@@ -9,7 +9,7 @@
 @inject ArtworkService ArtworkService
 @inject NavigationManager NavManager
  
-<SearchQueryPanel SearchQuery="@SearchQuery" OnSortChanged="@HandleSortChanged" OnFiltersChanged="@HandleFiltersChanged"></SearchQueryPanel>
+<SearchQueryPanel SearchBarColor="SearchBarColor.WHITE" SearchQuery="@SearchQuery" OnSortChanged="@HandleSortChanged" OnFiltersChanged="@HandleFiltersChanged"></SearchQueryPanel>
 
 
 <div class="search-results-container" style="display: flex; flex-direction: column; min-height: 100%; justify-content: center;">
@@ -26,6 +26,23 @@ else if (_artworkList != null)
     }
     else
     {
+        <div class="results-header mb-2">
+                <MudText Typo="Typo.h5" Class="results-title">
+                    @if (!string.IsNullOrWhiteSpace(SearchQuery))
+                    {
+                        <text>Results for "@SearchQuery"</text>
+                    }
+                    else
+                    {
+                        <text>All Artworks</text>
+                    }
+                </MudText>
+                <MudDivider Class="my-3" />
+            <MudText Typo="Typo.body2" Class="text-secondary mb-5">
+                Showing @(((PageNumber - 1) * 25) + 1) - @Math.Min(PageNumber * 25, _totalResults)
+                of @_totalResults results
+            </MudText>
+        </div>
         <MasonryGrid List="@_artworkList"></MasonryGrid>
 
         <div class="pagination-container">
@@ -53,6 +70,7 @@ else if (_isServerError)
     private string? _sortQuery = null;
     private string? _filtersQuery = null;
     private int _totalPages { get; set; }
+    private int _totalResults;
 
     private List<ArtworkPreview>? _artworkList = null;
 
@@ -65,12 +83,13 @@ else if (_isServerError)
         _artworkList = null;
         try
         {
-            var response = await ArtworkService.SearchArtworksByQueryAsync(SearchQuery, 24, PageNumber, _sortQuery, _filtersQuery);
+            var response = await ArtworkService.SearchArtworksByQueryAsync(SearchQuery, 25, PageNumber, _sortQuery, _filtersQuery);
 
             if (response.IsSuccess)
             {
                 _artworkList = response.Value.Data.ToList();
                 _totalPages = response.Value.Info.TotalPages;
+                _totalResults = response.Value.Info.TotalItems;
             }
             else
             {

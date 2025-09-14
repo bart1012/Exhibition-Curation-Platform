@@ -1,5 +1,6 @@
 ﻿@using MudBlazor;
-
+@inject NavigationManager Navigation
+@implements IDisposable
 
     <MudAppBar Elevation="0" Color="Color.Transparent">
     @if (!_drawerOpen)
@@ -15,12 +16,13 @@
     Color="Color.Inherit"
     Edge="Edge.End" />
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="2" Class="mud-drawer-fixed">
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="2" Class="mud-drawer-fixed" Style="z-index:5000">
     <MudDrawerHeader>
         <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
-                       Color="Color.Dark"
+                       Color="Color.Default"
                        Size="Size.Small"
-                       OnClick="@DrawerToggle" />
+                       OnClick="@DrawerToggle" 
+                       Style="color: black;"/>
     </MudDrawerHeader>
     <MudNavMenu Color="Color.Dark">
         <MudNavLink Color="Color.Dark" Href="/" Match="NavLinkMatch.All">Explore</MudNavLink>
@@ -29,15 +31,35 @@
     </MudNavMenu>
 </MudDrawer>
 
-
+<style>
+    .mud-icon-size-medium{
+        fill: black !important;
+    }
+</style>
  
 
 
 @code{
     private bool _drawerOpen = false;
 
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _drawerOpen = false;
+        StateHasChanged();
+    }
+
     private void DrawerToggle()
     {
-        _drawerOpen = !_drawerOpen;
+        _drawerOpen = !_drawerOpen; // Fixed this too!
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
     }
 }

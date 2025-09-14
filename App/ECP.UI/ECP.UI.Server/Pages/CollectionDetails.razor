@@ -1,0 +1,84 @@
+﻿@page "/collection/{CollectionId}"
+@using ECP.UI.Client.Services
+@rendermode InteractiveAuto
+@inject IArtworkService ArtworkService
+@using ECP.UI.Server.Components.Shared
+@inject IUserCollectionsService CollectionsService
+
+
+@if (_isLoading)
+{
+    <div class="d-flex justify-center my-10">
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+    </div>
+}
+else if (Collection != null)
+{
+    <div class="page-header mb-8">
+    <MudText Typo="Typo.h3" Align="Align.Center" Class="mb-2" Style="font-weight: 300; color: var(--mud-palette-text-primary);">
+        @Collection.Name
+    </MudText>
+    <MudText Typo="Typo.body1" Align="Align.Center" Style="color: var(--mud-palette-text-secondary);">
+        @(Collection.Artworks.Count > 1 ? $"{Collection.Artworks.Count} Artworks" : $"{Collection.Artworks.Count} Artwork")
+    </MudText>
+    </div>
+    <!-- Use the _artworks list to get the count -->
+    @if (_artworks != null)
+    {
+        <MasonryGrid List="_artworks"></MasonryGrid>
+    }
+
+}
+else
+{
+    <MudText Typo="Typo.h5" Align="Align.Center" Class="my-10">Collection not found</MudText>
+}
+
+
+@code {
+
+    [Parameter]
+    public string CollectionId { get; set; }
+
+    private Collection? Collection { get; set; } = null;
+
+    private List<ArtworkPreview>? _artworks = null;
+
+    private bool _isLoading = true;
+
+
+    protected async override Task OnParametersSetAsync()
+    {
+        _isLoading = true;
+        Collection = null;
+        _artworks = null;
+        var fetchCollectionInfoResult = await CollectionsService.GetCollectionAsync(CollectionId);
+
+        if (fetchCollectionInfoResult.IsSuccess)
+        {
+            Collection = fetchCollectionInfoResult.Value;
+        }
+        else
+        {
+            Console.WriteLine($"\n\nError fetching collection {CollectionId}: {fetchCollectionInfoResult.Message}");
+            _isLoading = false;
+            return;
+        }
+
+        var fetchArtworksResult = await CollectionsService.GetCollectionArtworksAsync(CollectionId);
+        if (fetchArtworksResult.IsSuccess)
+        {
+            _artworks = fetchArtworksResult.Value;
+        }
+        else
+        {
+            Console.WriteLine($"Error fetching artworks for collection '{Collection.Name}': {fetchArtworksResult.Message}");
+        }
+
+        _isLoading = false;
+
+    }
+
+    
+
+}

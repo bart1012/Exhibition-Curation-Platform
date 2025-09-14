@@ -5,13 +5,12 @@
 
 
 @using ECP.UI.Server.Components.Shared
-<MudGrid>
-    <MudItem xs="0" md="4" lg="4">
+<MudGrid Class="pt-5">
+
+    <MudItem xs="12" md="8" lg="8" Class="pt-0 pr-5">
+        <SearchBar SearchBarColor="@SearchBarColor" SearchQuery="@SearchQuery"></SearchBar>
     </MudItem>
-    <MudItem xs="12" md="4" lg="4">
-        <SearchBar SearchQuery="@SearchQuery"></SearchBar>
-    </MudItem>
-    <MudItem xs="12" md="4" lg="4" Class="d-flex align-center">
+    <MudItem xs="12" md="4" lg="4" Class="d-flex align-center pa-0">
         <div class="search-button-container">
             <MudButton OnClick="OpenFilterDialog" Variant="Variant.Outlined" Color="Color.Dark" StartIcon="@Icons.Material.Filled.FilterList" Class="rounded-pill search-button">
                 Filter
@@ -21,7 +20,7 @@
                 <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
                          Class=" search-button "
                          Style="align-self: auto;"
-                         AnchorOrigin="Origin.BottomCenter"
+                         AnchorOrigin="Origin.BottomLeft"
                          PopoverOrigin="Origin.TopCenter">
                     <ActivatorContent>
                         <MudButton Class="px-10 rounded-l-xl " Style="min-width: 12rem;">
@@ -49,6 +48,9 @@
 @code {
     [Parameter]
     public string? SearchQuery { get; set; }
+
+    [Parameter]
+    public SearchBarColor SearchBarColor { get; set; } = SearchBarColor.BLACK;
 
     [Parameter]
     public EventCallback<string> OnFiltersChanged { get; set; }

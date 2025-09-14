@@ -6,124 +6,698 @@
 @using ECP.UI.Client.Components
 @using ECP.UI.Server.Components.Artworks
 
-<div class="artwork-details-container">
+<div class="artwork-details-container" >
     @if (isLoading)
     {
-        <Loading></Loading>
+        <div class="loading-state">
+            <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+            <MudText Typo="Typo.body1" Class="mt-4 text-secondary">Loading artwork details...</MudText>
+        </div>
     }
     else if (_artwork != null)
     {
-    <MudGrid Class="d-flex" style="height: 100%; width: 100%; margin: 0; padding: 0; padding-bottom: 2rem; ">
-            <!-- artwork image -->
-            <MudItem xs="12" sm="7" style="height: 100%;" Class="m-0 pa-0 align-content-start d-flex" >
-                @if (!string.IsNullOrEmpty(_artwork.Images?.Web?.Url))
-                {
-                    <MudImage Src="@_artwork.Images.Web.Url" Alt="@_artwork.Title"
-                              Class="rounded-lg shadow-lg"
-                              Style="max-width: 100%; width: 100%; height: 100%;"
-                              ObjectFit="ObjectFit.Contain"/>
-                }
-                else
-                {
-                    <MudImage Src="https://placehold.co/600x400/2c3e50/ecf0f1?text=Image+Not+Found"
-                              Alt="Image Not Found"
-                              ObjectFit="ObjectFit.Contain"
-                              Class="rounded-lg shadow-lg"
-                              Style="max-width: 100%; height: 100%;" />
-                }
+        <MudGrid Class="artwork-grid h-100 ma-0 pa-0">
+            <MudItem xs="12" md="7" style="border: 1px solid gray" Class=" pa-0 artwork-image-panel">
+                <div class="image-container">
+                    @if (!string.IsNullOrEmpty(_artwork.Images?.Web?.Url))
+                    {
+                        <MudImage Src="@_artwork.Images.Web.Url"
+                                  Alt="@_artwork.Title"
+                                  Class="artwork-main-image"
+                                  ObjectFit="ObjectFit.Contain" />
+
+                        <div class="image-overlay">
+                            <MudIconButton Icon="@Icons.Material.Outlined.ZoomIn"
+                                           Color="Color.Surface"
+                                           Class="zoom-button"
+                                           Title="Click to zoom" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="image-placeholder">
+                            <MudIcon Icon="@Icons.Material.Outlined.Image"
+                                     Style="font-size: 4rem;"
+                                     Class="text-secondary mb-2" />
+                            <MudText Typo="Typo.body1" Class="text-secondary">Image not available</MudText>
+                        </div>
+                    }
+                </div>
             </MudItem>
 
-            <!-- Artwork information -->
-            <MudItem xs="12" sm="5" class="ma-0 pa-0 pl-5 py-5" style="height: 100%">
-                <MudCard  Elevation="0" style="height: 100%">
-                    <MudCardHeader>
-                        <CardHeaderContent>
-                            <MudText Typo="Typo.h3">@_artwork.Title</MudText>
+            <MudItem xs="12" md="5" style="border: 1px solid gray" Class=" artwork-details-panel">
+                <div class="details-content">
+                    <div class="artwork-header">
+                        <div class="title-section" style="padding: 16px;">
+                            <MudText Typo="Typo.h3" Class="artwork-title mb-2" Align="Align.Start" Style="font-weight: 300; color: var(--mud-palette-text-primary);">
+                                @_artwork.Title
+                            </MudText>
                             @if (_artwork.Artists != null && _artwork.Artists.Any())
                             {
-                                <MudText Typo="Typo.h5" Class="mt-2">
-                                    @string.Join(", ", _artwork.Artists.Select(a => a.Name))
+                                <MudText Typo="Typo.body1" Class="artwork-artist text-secondary" Align="Align.Start" Style="color: var(--mud-palette-text-secondary);">
+                                    by @string.Join(", ", _artwork.Artists.Select(a => a.Name))
                                 </MudText>
                             }
-                            <!-- save artwork button-->
-                            <!-- <SaveToCollection Artwork="_artwork"></SaveToCollection> -->
-                            <SaveToCollection Artwork="_artwork"></SaveToCollection>
-                            <!-- -------------------- -->
-                        </CardHeaderContent>
-                    </MudCardHeader>
-                    <MudDivider />
-                    <MudCardContent>
-                        <MudText Typo="Typo.body1" Class="mb-4">
-                            <strong>Creation Date:</strong> @_artwork.CreationDate
-                        </MudText>
-                        <MudText Typo="Typo.body1" Class="mb-4">
-                            <strong>Medium:</strong> @_artwork.Medium
-                        </MudText>
-                        @if (_artwork.Dimensions != null)
-                        {
-                            <MudText Typo="Typo.body1" Class="mb-4">
-                                <strong>Dimensions:</strong>
-                                @(_artwork.Dimensions.Width) x @(_artwork.Dimensions.Height) cm
-                                @if (_artwork.Dimensions.Depth.HasValue)
-                                {
-                                    @($" x {_artwork.Dimensions.Depth.Value} cm")
-                                }
-                            </MudText>
-                        }
-                        @if (!string.IsNullOrWhiteSpace(_artwork.Description))
-                        {
-                            <MudText Typo="Typo.body2" Class="mb-4">
-                                <div class="mt-4" style="text-align: justify;">
-                                    @_artwork.Description
+                        </div>
+                        <div class="action-section">
+                            <SaveToCollection ArtworkPreview="_artworkPreview"></SaveToCollection>
+                        </div>
+                    </div>
+
+                    <hr style="my-3" />
+
+                    <div class="details-scroll-area">
+                        <MudCard Class="info-card mb-4" Elevation="1">
+                            <MudCardContent Class="pa-4">
+                                <MudText Typo="Typo.h6" Class="mb-3 text-primary">Artwork Details</MudText>
+
+                                <div class="info-grid">
+                                    @* Date Information *@
+                                    @if (!string.IsNullOrEmpty(_artwork.DateDisplay))
+                                    {
+                                        <div class="info-item">
+                                            <MudIcon Icon="@Icons.Material.Outlined.CalendarToday" Size="Size.Small" Class="info-icon" />
+                                            <div class="info-content">
+                                                <MudText Typo="Typo.caption" Class="info-label">Creation Date</MudText>
+                                                <MudText Typo="Typo.body2" Class="info-value">
+                                                    @(_artwork.DateDisplay ?? _artwork.DateDisplay ?? "Unknown")
+                                                </MudText>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* Medium/Materials Information *@
+                                    @if (!string.IsNullOrEmpty(_artwork.MediumDisplay) || (_artwork.Materials != null && _artwork.Materials.Any()))
+                                    {
+                                        <div class="info-item">
+                                            <MudIcon Icon="@Icons.Material.Outlined.Palette" Size="Size.Small" Class="info-icon" />
+                                            <div class="info-content">
+                                                <MudText Typo="Typo.caption" Class="info-label">Medium</MudText>
+                                                <MudText Typo="Typo.body2" Class="info-value">
+                                                    @if (!string.IsNullOrEmpty(_artwork.MediumDisplay))
+                                                    {
+                                                        @_artwork.MediumDisplay
+                                                    }
+                                                    else if (_artwork.Materials != null && _artwork.Materials.Any())
+                                                    {
+                                                        @string.Join(", ", _artwork.Materials)
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>Unknown</span>
+                                                    }
+                                                </MudText>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* Dimensions *@
+                                    @if (_artwork.Dimensions != null)
+                                    {
+                                        <div class="info-item">
+                                            <MudIcon Icon="@Icons.Material.Outlined.AspectRatio" Size="Size.Small" Class="info-icon" />
+                                            <div class="info-content">
+                                                <MudText Typo="Typo.caption" Class="info-label">Dimensions</MudText>
+                                                @if (_artwork.Dimensions != null && _artwork.Dimensions.Width > 0 && _artwork.Dimensions.Height > 0)
+                                                {
+                                                    <MudText Typo="Typo.body2" Class="info-value">
+                                                        @(_artwork.Dimensions.Width.ToString("F2")) × @(_artwork.Dimensions.Height.ToString("F2")) cm
+                                                        @if (_artwork.Dimensions.Depth.HasValue)
+                                                        {
+                                                            @($" × {_artwork.Dimensions.Depth.Value} cm")
+                                                        }
+                                                    </MudText>
+                                                }
+                                                else if (!string.IsNullOrEmpty(_artwork.DimensionsDisplay))
+                                                {
+                                                    <MudText Typo="Typo.body2" Class="info-value">
+                                                        @_artwork.DimensionsDisplay
+                                                    </MudText>
+}
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* Type/Classification *@
+                                    @if (!string.IsNullOrEmpty(_artwork.TypeDisplay))
+                                    {
+                                        <div class="info-item">
+                                            <MudIcon Icon="@Icons.Material.Outlined.Category" Size="Size.Small" Class="info-icon" />
+                                            <div class="info-content">
+                                                <MudText Typo="Typo.caption" Class="info-label">Type</MudText>
+                                                <MudText Typo="Typo.body2" Class="info-value">@_artwork.TypeDisplay</MudText>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* Culture/Place of Origin *@
+                                    @if (!string.IsNullOrEmpty(_artwork.PlaceOfOrigin) || (_artwork.Culture != null && _artwork.Culture.Any()))
+                                    {
+                                        <div class="info-item">
+                                            <MudIcon Icon="@Icons.Material.Outlined.Place" Size="Size.Small" Class="info-icon" />
+                                            <div class="info-content">
+                                                <MudText Typo="Typo.caption" Class="info-label">Origin</MudText>
+                                                <MudText Typo="Typo.body2" Class="info-value">
+                                                    @if (!string.IsNullOrEmpty(_artwork.PlaceOfOrigin))
+                                                    {
+                                                        @_artwork.PlaceOfOrigin
+                                                    }
+                                                    else if (_artwork.Culture != null && _artwork.Culture.Any())
+                                                    {
+                                                        @string.Join(", ", _artwork.Culture)
+                                                    }
+                                                </MudText>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* Current Location *@
+                                    @if (!string.IsNullOrEmpty(_artwork.CurrentLocation))
+                                    {
+                                        <div class="info-item">
+                                            <MudIcon Icon="@Icons.Material.Outlined.Museum" Size="Size.Small" Class="info-icon" />
+                                            <div class="info-content">
+                                                <MudText Typo="Typo.caption" Class="info-label">Current Location</MudText>
+                                                <MudText Typo="Typo.body2" Class="info-value">@_artwork.CurrentLocation</MudText>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* Department *@
+                                    @if (!string.IsNullOrEmpty(_artwork.Department))
+                                    {
+                                        <div class="info-item">
+                                            <MudIcon Icon="@Icons.Material.Outlined.Business" Size="Size.Small" Class="info-icon" />
+                                            <div class="info-content">
+                                                <MudText Typo="Typo.caption" Class="info-label">Department</MudText>
+                                                <MudText Typo="Typo.body2" Class="info-value">@_artwork.Department</MudText>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* Gallery *@
+                                    @if (!string.IsNullOrEmpty(_artwork.Gallery))
+                                    {
+                                        <div class="info-item">
+                                            <MudIcon Icon="@Icons.Material.Outlined.Store" Size="Size.Small" Class="info-icon" />
+                                            <div class="info-content">
+                                                <MudText Typo="Typo.caption" Class="info-label">Gallery</MudText>
+                                                <MudText Typo="Typo.body2" Class="info-value">@_artwork.Gallery</MudText>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* Period *@
+                                    @if (!string.IsNullOrEmpty(_artwork.Period))
+                                    {
+                                        <div class="info-item">
+                                            <MudIcon Icon="@Icons.Material.Outlined.History" Size="Size.Small" Class="info-icon" />
+                                            <div class="info-content">
+                                                <MudText Typo="Typo.caption" Class="info-label">Period</MudText>
+                                                <MudText Typo="Typo.body2" Class="info-value">@_artwork.Period</MudText>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* Dynasty *@
+                                    @if (!string.IsNullOrEmpty(_artwork.Dynasty))
+                                    {
+                                        <div class="info-item">
+                                            <MudIcon Icon="@Icons.Material.Outlined.AccountTree" Size="Size.Small" Class="info-icon" />
+                                            <div class="info-content">
+                                                <MudText Typo="Typo.caption" Class="info-label">Dynasty</MudText>
+                                                <MudText Typo="Typo.body2" Class="info-value">@_artwork.Dynasty</MudText>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* School *@
+                                    @if (!string.IsNullOrEmpty(_artwork.School))
+                                    {
+                                        <div class="info-item">
+                                            <MudIcon Icon="@Icons.Material.Outlined.School" Size="Size.Small" Class="info-icon" />
+                                            <div class="info-content">
+                                                <MudText Typo="Typo.caption" Class="info-label">School</MudText>
+                                                <MudText Typo="Typo.body2" Class="info-value">@_artwork.School</MudText>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* Movement *@
+                                    @if (!string.IsNullOrEmpty(_artwork.Movement))
+                                    {
+                                        <div class="info-item">
+                                            <MudIcon Icon="@Icons.Material.Outlined.TrendingUp" Size="Size.Small" Class="info-icon" />
+                                            <div class="info-content">
+                                                <MudText Typo="Typo.caption" Class="info-label">Movement</MudText>
+                                                <MudText Typo="Typo.body2" Class="info-value">@_artwork.Movement</MudText>
+                                            </div>
+                                        </div>
+                                    }
+
+                                
+
+                                    @* Series Information *@
+                                    @if (!string.IsNullOrEmpty(_artwork.SeriesTitle))
+                                    {
+                                        <div class="info-item">
+                                            <MudIcon Icon="@Icons.Material.Outlined.CollectionsBookmark" Size="Size.Small" Class="info-icon" />
+                                            <div class="info-content">
+                                                <MudText Typo="Typo.caption" Class="info-label">Series</MudText>
+                                                <MudText Typo="Typo.body2" Class="info-value">
+                                                    @_artwork.SeriesTitle
+                                                    @if (_artwork.SeriesNumber.HasValue)
+                                                    {
+                                                        @($" (#{_artwork.SeriesNumber.Value})")
+                                                    }
+                                                </MudText>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
-                            </MudText>
-                        }
-                        @if (_artwork.Subjects != null && _artwork.Subjects.Any())
+                            </MudCardContent>
+                        </MudCard>
+
+                        @if (!string.IsNullOrWhiteSpace(_artwork.Description) || !string.IsNullOrWhiteSpace(_artwork.LongDescription))
                         {
-                            <MudList T="string">
-                                <MudListItem>
-                                    <MudText Typo="Typo.h6">Subjects</MudText>
-                                    @foreach (var subject in _artwork.Subjects)
-                                    {
-                                        <MudChip Label="true" Color="Color.Dark" Class="ma-1 rounded-pill">@subject</MudChip>
-                                    }
-                                </MudListItem>
-                            </MudList>
+                            <MudCard Class="description-card mb-4" Elevation="1">
+                                <MudCardContent Class="pa-4">
+                                    <MudText Typo="Typo.h6" Class="mb-3 text-primary">Description</MudText>
+                                    <MudText Typo="Typo.body2" Class="description-text">
+                                        @(_artwork.LongDescription ?? _artwork.Description)
+                                    </MudText>
+                                </MudCardContent>
+                            </MudCard>
                         }
-                        @if (_artwork.Styles != null && _artwork.Styles.Any())
+
+                        @if ((_artwork.Classifications != null && _artwork.Classifications.Any()) ||
+                       (_artwork.Categories != null && _artwork.Categories.Any()) ||
+                       (_artwork.Techniques != null && _artwork.Techniques.Any()))
                         {
-                            <MudList T="string">
-                                <MudListItem>
-                                    <MudText Typo="Typo.h6">Styles</MudText>
-                                    @foreach (var style in _artwork.Styles)
+                            <MudCard Class="classification-card mb-4" Elevation="1">
+                                <MudCardContent Class="pa-4">
+                                    <MudText Typo="Typo.h6" Class="mb-3 text-primary">Classification</MudText>
+
+                                    @if (_artwork.Classifications != null && _artwork.Classifications.Any())
                                     {
-                                        <MudChip Label="true" Color="Color.Dark" Class="ma-1 rounded-pill">@style</MudChip>
+                                        <div class="tag-section mb-3">
+                                            <MudText Typo="Typo.subtitle2" Class="mb-2 d-flex align-center">
+                                                <MudIcon Icon="@Icons.Material.Outlined.Label" Size="Size.Small" Class="mr-2" />
+                                                Classifications
+                                            </MudText>
+                                            <div class="chip-container">
+                                                @foreach (var classification in _artwork.Classifications)
+                                                {
+                                                    <MudChip T="string" Label="true"
+                                                             Color="Color.Info"
+                                                             Variant="Variant.Outlined"
+                                                             Size="Size.Small"
+                                                             Class="ma-1">
+                                                        @classification
+                                                    </MudChip>
+                                                }
+                                            </div>
+                                        </div>
                                     }
-                                </MudListItem>
-                            </MudList>
+
+                                    @if (_artwork.Techniques != null && _artwork.Techniques.Any())
+                                    {
+                                        <div class="tag-section mb-3">
+                                            <MudText Typo="Typo.subtitle2" Class="mb-2 d-flex align-center">
+                                                <MudIcon Icon="@Icons.Material.Outlined.Build" Size="Size.Small" Class="mr-2" />
+                                                Techniques
+                                            </MudText>
+                                            <div class="chip-container">
+                                                @foreach (var technique in _artwork.Techniques)
+                                                {
+                                                    <MudChip T="string" Label="true"
+                                                             Color="Color.Success"
+                                                             Variant="Variant.Outlined"
+                                                             Size="Size.Small"
+                                                             Class="ma-1">
+                                                        @technique
+                                                    </MudChip>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if (_artwork.Categories != null && _artwork.Categories.Any())
+                                    {
+                                        <div class="tag-section">
+                                            <MudText Typo="Typo.subtitle2" Class="mb-2 d-flex align-center">
+                                                <MudIcon Icon="@Icons.Material.Outlined.Folder" Size="Size.Small" Class="mr-2" />
+                                                Categories
+                                            </MudText>
+                                            <div class="chip-container">
+                                                @foreach (var category in _artwork.Categories)
+                                                {
+                                                    <MudChip T="string" Label="true"
+                                                             Color="Color.Warning"
+                                                             Variant="Variant.Outlined"
+                                                             Size="Size.Small"
+                                                             Class="ma-1">
+                                                        @category
+                                                    </MudChip>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </MudCardContent>
+                            </MudCard>
                         }
-                    </MudCardContent>
+
+                        @if ((_artwork.Subjects != null && _artwork.Subjects.Any()) ||
+                       (_artwork.Styles != null && _artwork.Styles.Any()) ||
+                       (_artwork.Keywords != null && _artwork.Keywords.Any()))
+                        {
+                            <MudCard Class="tags-card mb-4" Elevation="1">
+                                <MudCardContent Class="pa-4">
+                                    @if (_artwork.Subjects != null && _artwork.Subjects.Any())
+                                    {
+                                        <div class="tag-section mb-3">
+                                            <MudText Typo="Typo.subtitle2" Class="mb-2 d-flex align-center">
+                                                <MudIcon Icon="@Icons.Material.Outlined.Topic" Size="Size.Small" Class="mr-2" />
+                                                Subjects
+                                            </MudText>
+                                            <div class="chip-container">
+                                                @foreach (var subject in _artwork.Subjects)
+                                                {
+                                                    <MudChip T="string" Label="true"
+                                                             Color="Color.Primary"
+                                                             Variant="Variant.Outlined"
+                                                             Size="Size.Small"
+                                                             Class="ma-1">
+                                                        @subject
+                                                    </MudChip>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if (_artwork.Styles != null && _artwork.Styles.Any())
+                                    {
+                                        <div class="tag-section mb-3">
+                                            <MudText Typo="Typo.subtitle2" Class="mb-2 d-flex align-center">
+                                                <MudIcon Icon="@Icons.Material.Outlined.Style" Size="Size.Small" Class="mr-2" />
+                                                Styles
+                                            </MudText>
+                                            <div class="chip-container">
+                                                @foreach (var style in _artwork.Styles)
+                                                {
+                                                    <MudChip T="string" Label="true"
+                                                             Color="Color.Secondary"
+                                                             Variant="Variant.Outlined"
+                                                             Size="Size.Small"
+                                                             Class="ma-1">
+                                                        @style
+                                                    </MudChip>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if (_artwork.Keywords != null && _artwork.Keywords.Any())
+                                    {
+                                        <div class="tag-section">
+                                            <MudText Typo="Typo.subtitle2" Class="mb-2 d-flex align-center">
+                                                <MudIcon Icon="@Icons.Material.Outlined.Tag" Size="Size.Small" Class="mr-2" />
+                                                Keywords
+                                            </MudText>
+                                            <div class="chip-container">
+                                                @foreach (var keyword in _artwork.Keywords)
+                                                {
+                                                    <MudChip T="string" Label="true"
+                                                             Color="Color.Tertiary"
+                                                             Variant="Variant.Outlined"
+                                                             Size="Size.Small"
+                                                             Class="ma-1">
+                                                        @keyword
+                                                    </MudChip>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </MudCardContent>
+                            </MudCard>
+                        }
+                    </div>
+
                     @if (!string.IsNullOrEmpty(_artwork.SourceUrl))
                     {
-                        <MudCardActions Class="d-flex justify-end">
-                            <MudButton Href="@_artwork.SourceUrl" Target="_blank" Variant="Variant.Filled" Color="Color.Dark" class="rounded-pill">
-                                View Source
+                        <div class="bottom-actions">
+                            <MudDivider Class="mb-3" />
+                            <MudButton Href="@_artwork.SourceUrl"
+                                       Target="_blank"
+                                       Variant="Variant.Outlined"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Outlined.OpenInNew"
+                                       FullWidth="true"
+                                       Class="view-source-btn">
+                                View Original Source
                             </MudButton>
-                        </MudCardActions>
+                        </div>
                     }
-                </MudCard>
+                </div>
             </MudItem>
         </MudGrid>
     }
     else if (_isServerError)
     {
-        <ServerErrorMessage></ServerErrorMessage>
+        <div class="error-state">
+            <MudAlert Severity="Severity.Error" Class="ma-4">
+                <MudText Typo="Typo.h6">Server Error</MudText>
+                <ServerErrorMessage></ServerErrorMessage>
+            </MudAlert>
+        </div>
     }
     else
     {
-        <NotFoundMessage></NotFoundMessage>
+        <div class="error-state">
+            <MudAlert Severity="Severity.Warning" Class="ma-4">
+                <MudText Typo="Typo.h6">Artwork Not Found</MudText>
+                <NotFoundMessage></NotFoundMessage>
+            </MudAlert>
+        </div>
     }
 </div>
+
+<style>
+   .artwork-details-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: calc(100vh - var(--header-height, 80px));
+    overflow: hidden;
+    padding-bottom: 2rem;
+    background: var(--mud-palette-background);
+}
+
+.artwork-grid {
+    height: 100%;
+    display: flex;
+}
+
+.artwork-grid .mud-grid-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.loading-state, .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 2rem;
+}
+
+.artwork-image-panel {
+    height: 100%;
+    overflow: hidden;
+    padding: 0 1rem 0 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--mud-palette-surface);
+}
+
+.image-container {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    background: white;
+}
+
+.artwork-main-image {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.image-overlay {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    opacity: 0.8;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.image-overlay:hover {
+    opacity: 1;
+}
+
+.zoom-button {
+    min-width: 40px;
+    height: 40px;
+}
+
+.image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--mud-palette-text-secondary);
+}
+
+.artwork-details-panel {
+    height: 100%;
+    padding: 1rem;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.artwork-details-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.artwork-details-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.artwork-details-panel::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.artwork-details-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.details-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.artwork-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.title-section {
+    width: 100%;
+    flex-grow: 1;
+    margin-right: 1rem;
+    padding-left: 16px;
+}
+
+.action-section {
+    width: 100%;
+    position: relative;
+    flex-shrink: 0;
+    padding-left: 10px;
+}
+
+.artwork-title {
+    font-weight: 300;
+}
+
+.artwork-artist {
+    font-size: 0.9rem;
+}
+
+.info-card .mud-card-content,
+.description-card .mud-card-content,
+.classification-card .mud-card-content,
+.tags-card .mud-card-content {
+    background: var(--mud-palette-surface);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: flex-start;
+}
+
+.info-icon {
+    margin-right: 0.5rem;
+    color: var(--mud-palette-text-secondary);
+}
+
+.info-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    color: var(--mud-palette-text-secondary);
+    font-weight: 500;
+}
+
+.info-value {
+    font-weight: 400;
+}
+
+.description-text {
+    white-space: pre-wrap;
+    line-height: 1.6;
+}
+
+.tag-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.chip-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.mud-chip {
+    margin: 0.25rem !important;
+}
+
+.bottom-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    margin-top: 1rem;
+    padding: 1rem 0;
+    background: var(--mud-palette-surface);
+}
+
+.view-source-btn {
+    text-transform: none;
+}
+
+
+
+</style>
+
 @code {
     [Parameter]
     public int ArtworkId { get; set; }
@@ -132,6 +706,7 @@
     public int SourceId { get; set; }
 
     private Artwork _artwork = null;
+    private ArtworkPreview _artworkPreview = null;
     private bool isLoading = true;
     private bool _isServerError = false;
 
@@ -155,12 +730,13 @@
             if (response.IsSuccess)
             {
                 _artwork = response.Value;
+                _artworkPreview = ArtworkMappers.ToArtworkPreview(response.Value);
             }
             else
             {
                 _isServerError = true;
                 _artwork = GetHotReloadPlaceholderArtwork();
-
+                _artworkPreview = ArtworkMappers.ToArtworkPreview(_artwork);
             }
         }
         catch (Exception ex)
@@ -172,8 +748,6 @@
         {
             isLoading = false;
         }
-
-
     }
 
     private Artwork GetHotReloadPlaceholderArtwork()
@@ -182,8 +756,8 @@
             {
                 Title = "Placeholder Artwork",
                 Artists = new List<Artist> { new Artist { Name = "Hot Reload" } },
-                CreationDate = "2024",
-                Medium = "Digital",
+                DateDisplay = "2024",
+                TypeDisplay = "Digital",
                 Dimensions = new Dimensions { Width = 80, Height = 120 },
                 Description = "This is a placeholder object fetched during hot reload. You can continue working on the UI while the server is not running.",
                 Images = new Images

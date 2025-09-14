@@ -2,64 +2,100 @@
 @using ECP.UI.Client.Services
 @inject IUserCollectionsService CollectionsService
 
-<div class="d-flex justify-start">
+<div class="d-flex justify-start position-relative">
     @if (!_isExpanded)
     {
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.BookmarkBorder"
+        <MudButton Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.BookmarkBorder"
                    Class="rounded-lg mud-elevation-4" OnClick="ToggleExpansion">
-            Save
+            @(_isSaved ? "Saved" : "Save")
         </MudButton>
     }
     else
     {
-        <MudStack Spacing="1">
-            <MudText Typo="Typo.subtitle1" Class="text-muted">Save to a collection</MudText>
-            <MudList T="string" Dense="true" Class="rounded-lg mud-elevation-4">
-                @foreach (var collection in _userCollections)
-                {
-                    <MudListItem OnClick="ToggleExpansion">
-                        <MudText>@collection</MudText>
-                    </MudListItem>
-                }
-                @if (!_isAddingNewCollection)
-                {
-                    <MudListItem OnClick="StartNewCollectionFlow">
-                        <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-2" />
-                        <MudText>Create New Collection</MudText>
-                    </MudListItem>
-                }
-            </MudList>
+        <div class="position-absolute" style="top: 0; left: 0; z-index: 1000; min-width: 350px; background: white; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+            <MudStack Spacing="2" Class="pa-4">
+                <MudText Typo="Typo.subtitle1" Class="text-muted mb-2">Save to a collection</MudText>
 
-            @if (_isAddingNewCollection)
-            {
-                <MudStack Row="true" Spacing="1" Class="mt-2">
+                <MudSelect T="string"
+                           @bind-Value="_selectedCollection"
+                           Label="Select Collection"
+                           Variant="Variant.Outlined"
+                           AnchorOrigin="Origin.BottomLeft"
+                           MaxHeight="300"
+                           Dense="true">
+                    @foreach (var collection in _userCollections)
+                    {
+                        <MudSelectItem Value="@collection.Id">@collection.Name</MudSelectItem>
+                    }
+                    @if (!_isAddingNewCollection)
+                    {
+                        <MudSelectItem Value="@CreateNew" OnClick="StartNewCollectionFlow">
+                            <MudButton OnClick="StartNewCollectionFlow" Variant="Variant.Text" Color="Color.Primary" Class="w-100 justify-start">
+                                <b>+ Create New Collection</b>
+                            </MudButton>
+                        </MudSelectItem>
+                    }
+                </MudSelect>
+
+                @if (_isAddingNewCollection)
+                {
                     <MudTextField @bind-Value="_newCollectionName"
                                   Label="New Collection Name"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
-                                  Class="flex-grow-1" />
-                    <MudButton OnClick="CreateNewCollection"
-                               Disabled="@(string.IsNullOrWhiteSpace(_newCollectionName))"
-                               Variant="Variant.Filled"
-                               Color="Color.Primary"
-                               Class="align-self-center">
-                        Add
+                                  HelperText="Enter a name for your new collection" />
+                }
+
+                <!-- Action buttons -->
+                <div class="d-flex justify-space-between mt-3">
+                    <MudButton OnClick="ToggleExpansion"
+                               Variant="Variant.Text"
+                               Color="Color.Secondary">
+                        Close
                     </MudButton>
-                </MudStack>
-            }
-        </MudStack>
+
+                    <div class="d-flex gap-2">
+                        @if (_isAddingNewCollection)
+                        {
+                            <MudButton OnClick="CancelNewCollection"
+                                       Variant="Variant.Text"
+                                       Color="Color.Secondary">
+                                Cancel
+                            </MudButton>
+                            <MudButton OnClick="CreateNewCollection"
+                                       Disabled="@(string.IsNullOrWhiteSpace(_newCollectionName))"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary">
+                                Create
+                            </MudButton>
+                        }
+                        else
+                        {
+                            <MudButton OnClick="AddToCollection"
+                                       Disabled="@(string.IsNullOrWhiteSpace(_selectedCollection))"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary">
+                                Add
+                            </MudButton>
+                        }
+                    </div>
+                </div>
+            </MudStack>
+        </div>
     }
 </div>
 
 @code {
     [Parameter]
-    public Artwork Artwork { get; set; } = null;
-
+    public ArtworkPreview ArtworkPreview { get; set; } = null;
+    private string? CreateNew = "NewCollection";
     private bool _isExpanded = false;
+    private bool _isSaved = false;
     private bool _isAddingNewCollection = false;
     private string _newCollectionName = string.Empty;
-    private List<string> _userCollections = new();
+    private string _selectedCollection = string.Empty;
+    private List<Collection> _userCollections = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,6 +109,7 @@
         {
             _isAddingNewCollection = false;
             _newCollectionName = string.Empty;
+            _selectedCollection = string.Empty;
         }
         StateHasChanged();
     }
@@ -80,6 +117,43 @@
     private void StartNewCollectionFlow()
     {
         _isAddingNewCollection = true;
+        _selectedCollection = string.Empty;
+        StateHasChanged();
+    }
+
+    private void CancelNewCollection()
+    {
+        _isAddingNewCollection = false;
+        _newCollectionName = string.Empty;
+        StateHasChanged();
+    }
+
+    private async Task AddToCollection()
+    {
+        Console.WriteLine($"Adding artwork {ArtworkPreview.Title} to collection {_selectedCollection}");
+
+        if (!string.IsNullOrWhiteSpace(_selectedCollection) && ArtworkPreview != null)
+        {
+            try
+            {
+                var addArtworkToCollectionResult = await CollectionsService.AddArtworkToCollectionAsync(_selectedCollection, ArtworkPreview);
+                if (!addArtworkToCollectionResult.IsSuccess)
+                {
+                    Console.WriteLine($"Could not add artwork to collection: {addArtworkToCollectionResult.Message}");
+
+                }
+                else
+                {
+                    _isSaved = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception adding artwork to collection: {ex.Message}");
+            }
+        }
+
+        _isExpanded = !_isExpanded;
         StateHasChanged();
     }
 
@@ -93,6 +167,7 @@
                 if (addOperationResult.IsSuccess)
                 {
                     await FetchCollections();
+                    _selectedCollection = _newCollectionName; // Auto-select the newly created collection
                     Console.WriteLine($"Successfully created collection: {_newCollectionName}");
                 }
                 else
@@ -120,19 +195,19 @@
             var collectionsResult = await CollectionsService.GetCollectionsAsync();
             if (collectionsResult.IsSuccess)
             {
-                _userCollections = collectionsResult.Value.Collections.Select(c => c.Name).ToList();
+                _userCollections = collectionsResult.Value.Collections.ToList();
                 Console.WriteLine($"Fetched {_userCollections.Count} collections");
             }
             else
             {
                 Console.WriteLine($"Error fetching collections: {collectionsResult.Message}");
-                _userCollections = new List<string>();
+                _userCollections = new List<Collection>();
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Exception fetching collections: {ex.Message}");
-            _userCollections = new List<string>();
+            _userCollections = new List<Collection>();
         }
         finally
         {

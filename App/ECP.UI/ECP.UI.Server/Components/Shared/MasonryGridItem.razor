@@ -1,8 +1,8 @@
 ﻿<a href="@($"/artwork/{Artwork.SourceId}/{(int)Artwork.Source}")" class="masonry-item">
     <div class="masonry-content">
-            @if (!string.IsNullOrWhiteSpace(Artwork.WebImage.Url))
+            @if (!string.IsNullOrWhiteSpace(Artwork.Thumbnail.Url))
             {
-                <img src="@Artwork.WebImage.Url" alt="@Artwork.Title" class="item-image" />
+                <img src="@Artwork.Thumbnail.Url" alt="@Artwork.Title" class="item-image" />
             }
             else
             {
