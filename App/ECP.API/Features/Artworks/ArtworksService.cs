@@ -133,7 +133,7 @@ namespace ECP.API.Features.Artworks
             List<ArtworkPreview> sortedList = queryValidation.Value.sortby switch
             {
                 "title" => isAscending ? list.OrderBy(a => a.Title).ToList() : list.OrderByDescending(a => a.Title).ToList(),
-                "date" => isAscending ? list.OrderBy(a => a.CreationYear).ToList() : list.OrderByDescending(a => a.CreationYear).ToList()
+                "date" => isAscending ? list.OrderBy(a => a.SortableYear).ToList() : list.OrderByDescending(a => a.SortableYear).ToList()
             };
 
             return Result<List<ArtworkPreview>>.Success(sortedList);
@@ -143,19 +143,26 @@ namespace ECP.API.Features.Artworks
         protected Result<List<ArtworkPreview>> Filter(List<ArtworkPreview> list, List<string> options)
         {
             Result<Dictionary<string, List<string>>> parseOptionsResult = ParseAndValidateFilters(options);
-            if (!parseOptionsResult.IsSuccess) return Result<List<ArtworkPreview>>.Failure(parseOptionsResult.Message, parseOptionsResult.StatusCode);
+            if (!parseOptionsResult.IsSuccess)
+                return Result<List<ArtworkPreview>>.Failure(parseOptionsResult.Message, parseOptionsResult.StatusCode);
+
             var query = list.AsQueryable();
-            //bool hasSameElements = listA.Intersect(listB).Any();
+
             foreach (KeyValuePair<string, List<string>> pair in parseOptionsResult.Value)
             {
                 switch (pair.Key.ToLower())
                 {
                     case "artist":
-                        query = query.Where(art => art.Artists.Any(artist =>
-                        pair.Value.Any(keyword => artist.Name.ToLowerInvariant().Contains(keyword)))); break;
+                        query = query.Where(art => art.Artists != null &&
+                            art.Artists.Any(artist => artist.Name != null &&
+                                pair.Value.Any(keyword => artist.Name.ToLowerInvariant().Contains(keyword.ToLowerInvariant()))));
+                        break;
+
                     case "subject":
                         query = query.Where(art => art.Subjects.Any(subject =>
-                        pair.Value.Any(keyword => subject.ToLowerInvariant().Contains(keyword)))); break;
+                            pair.Value.Any(keyword => subject.ToLowerInvariant().Contains(keyword.ToLowerInvariant()))));
+                        break;
+
                     case "type":
                         var parsedTypes = new List<ArtworkType>();
                         foreach (string type in pair.Value)
@@ -165,19 +172,58 @@ namespace ECP.API.Features.Artworks
                                 parsedTypes.Add(parsedType);
                             }
                         }
-                        query = query.Where(art => parsedTypes.Any(type => art.ArtworkType == type));
+                        if (parsedTypes.Any())
+                        {
+                            query = query.Where(art => parsedTypes.Contains(art.Type));
+                        }
                         break;
+
                     case "material":
                         query = query.Where(art => art.Materials.Any(material =>
-                        pair.Value.Any(keyword => material.ToLowerInvariant().Contains(keyword)))); break;
-                    default: break;
+                            pair.Value.Any(keyword => material.ToLowerInvariant().Contains(keyword.ToLowerInvariant()))));
+                        break;
+
+                    case "date":
+                        foreach (string dateFilter in pair.Value)
+                        {
+                            if (dateFilter.Contains('-'))
+                            {
+                                var parts = dateFilter.Split('-');
+                                if (parts.Length == 2 &&
+                                    int.TryParse(parts[0], out int startYear) &&
+                                    int.TryParse(parts[1], out int endYear))
+                                {
+                                    query = query.Where(art =>
+                                        (art.DateStart.HasValue && art.DateEnd.HasValue &&
+                                         art.DateStart.Value <= endYear && art.DateEnd.Value >= startYear) ||
+                                        (art.DateStart.HasValue && !art.DateEnd.HasValue &&
+                                         art.DateStart.Value >= startYear && art.DateStart.Value <= endYear) ||
+                                        (art.SortableYear.HasValue &&
+                                         art.SortableYear.Value >= startYear && art.SortableYear.Value <= endYear));
+                                }
+                            }
+                            else
+                            {
+                                if (int.TryParse(dateFilter, out int year))
+                                {
+                                    query = query.Where(art =>
+                                        (art.DateStart.HasValue && art.DateEnd.HasValue &&
+                                         year >= art.DateStart.Value && year <= art.DateEnd.Value) ||
+                                        (art.DateStart.HasValue && !art.DateEnd.HasValue &&
+                                         art.DateStart.Value == year) ||
+                                        (art.SortableYear.HasValue && art.SortableYear.Value == year));
+                                }
+                            }
+                        }
+                        break;
+
+                    default:
+                        break;
                 }
             }
 
             var filteredList = query.ToList();
-
             return Result<List<ArtworkPreview>>.Success(filteredList);
-
         }
 
         protected Result<(string sortby, char order)> ParseAndValidateSortQuery(string sortQuery)
@@ -212,6 +258,28 @@ namespace ECP.API.Features.Artworks
             }
         }
 
+        private bool IsValidDateRange(string dateValue)
+        {
+            if (dateValue.Length == 4 && int.TryParse(dateValue, out int singleYear))
+            {
+                return singleYear > 0 && singleYear <= DateTime.Now.Year + 10;
+            }
+
+            if (dateValue.Contains('-'))
+            {
+                var parts = dateValue.Split('-');
+                if (parts.Length == 2 &&
+                    int.TryParse(parts[0], out int startYear) &&
+                    int.TryParse(parts[1], out int endYear))
+                {
+                    return startYear > 0 && endYear > 0 && startYear <= endYear &&
+                           endYear <= DateTime.Now.Year + 10;
+                }
+            }
+
+            return false;
+        }
+
         protected Result<Dictionary<string, List<string>>> ParseAndValidateFilters(List<string>? filterQueries)
         {
 
@@ -222,14 +290,11 @@ namespace ECP.API.Features.Artworks
 
             var supportedFields = new HashSet<string> { "artist", "date", "subject", "type", "material" };
             var warnings = new List<string>();
-
-
             Dictionary<string, List<string>> filters = new();
 
             foreach (string filterQuery in filterQueries)
             {
                 var filterKeyAndValue = filterQuery.Split(':', 2);
-
                 if (filterKeyAndValue.Length != 2)
                 {
                     warnings.Add($"Invalid filter format: '{filterQuery}'. Expected 'field:value'.");
@@ -237,7 +302,7 @@ namespace ECP.API.Features.Artworks
                 }
 
                 var filterKey = filterKeyAndValue[0].Trim().ToLowerInvariant();
-                var filterValue = filterKeyAndValue[1].ToLowerInvariant().Trim();
+                var filterValue = filterKeyAndValue[1].Trim();
 
                 if (supportedFields.Contains(filterKey))
                 {
@@ -245,7 +310,23 @@ namespace ECP.API.Features.Artworks
                     {
                         filters[filterKey] = new List<string>();
                     }
-                    filters[filterKey].Add(filterValue);
+
+                    if (filterKey == "date")
+                    {
+                        if (IsValidDateRange(filterValue))
+                        {
+                            filters[filterKey].Add(filterValue);
+                        }
+                        else
+                        {
+                            warnings.Add($"Invalid date format: '{filterValue}'. Expected format: 'YYYY-YYYY' (e.g., '1990-2020') or single year 'YYYY'.");
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        filters[filterKey].Add(filterValue.ToLowerInvariant());
+                    }
                 }
                 else
                 {
@@ -256,15 +337,11 @@ namespace ECP.API.Features.Artworks
             if (filters.Any())
             {
                 return Result<Dictionary<string, List<string>>>.Success(filters, string.Join(". ", warnings));
-
             }
             else
             {
-                return Shared.Result<Dictionary<string, List<string>>>.Failure($"No valid filters were found. {string.Join(". ", warnings)}", System.Net.HttpStatusCode.BadRequest);
+                return Result<Dictionary<string, List<string>>>.Failure($"No valid filters were found. {string.Join(". ", warnings)}", System.Net.HttpStatusCode.BadRequest);
             }
-
-
-
         }
 
         public async Task<Result<Artwork>> GetArtworkByIdAsync(int id, ArtworkSource source)

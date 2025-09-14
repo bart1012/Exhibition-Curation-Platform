@@ -50,8 +50,8 @@ namespace ECP.API.Features.Artworks
                 var chicagoResults = chicagoTask.Result;
                 var artworkPreviews = new List<ArtworkPreview>();
 
-                artworkPreviews.AddRange(clevelandResults.Select(a => _mapper.FromClevelandPreview(a)).Where(a => a.WebImage != null).ToList());
-                artworkPreviews.AddRange(chicagoResults.Select(a => _mapper.FromChicagoPreview(a)).Where(a => a.WebImage != null).ToList());
+                artworkPreviews.AddRange(clevelandResults.Select(a => _mapper.FromClevelandPreview(a)).Where(a => a.Thumbnail != null).ToList());
+                artworkPreviews.AddRange(chicagoResults.Select(a => _mapper.FromChicagoPreview(a)).Where(a => a.Thumbnail != null).ToList());
 
                 return Shared.Result<List<ArtworkPreview>>.Success(artworkPreviews);
             }
@@ -77,8 +77,8 @@ namespace ECP.API.Features.Artworks
 
 
 
-                var filteredClevelandList = clevelandResults.Select(a => _mapper.FromClevelandPreview(a)).Where(a => a.WebImage != null).ToList();
-                var filteredChicagoList = chicagoResults.Select(a => _mapper.FromChicagoPreview(a)).Where(a => a.WebImage != null).ToList();
+                var filteredClevelandList = clevelandResults.Select(a => _mapper.FromClevelandPreview(a)).Where(a => a.Thumbnail != null).ToList();
+                var filteredChicagoList = chicagoResults.Select(a => _mapper.FromChicagoPreview(a)).Where(a => a.Thumbnail != null).ToList();
 
                 Console.WriteLine($"Cleveland total: {filteredClevelandList.Count()}");
                 Console.WriteLine($"Chicago total: {filteredChicagoList.Count()}");

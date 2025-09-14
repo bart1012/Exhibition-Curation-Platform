@@ -35,7 +35,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
                     {
                         new Artist(){Name="Sample_Artist_0"}
                     },
-                    WebImage = new Image(){Url="url_0",Width=1080, Height=920}
+                    Thumbnail = new Image(){Url="url_0",Width=1080, Height=920}
                 },
                 new ArtworkPreview()
                 {
@@ -47,7 +47,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
                     {
                         new Artist(){Name="Sample_Artist_1"}
                     },
-                    WebImage = new Image(){Url="url_1",Width=1080, Height=920}
+                    Thumbnail = new Image(){Url="url_1",Width=1080, Height=920}
                 }
             };
             var successResult = Shared.Result<PaginatedResponse<ArtworkPreview>>.Success(new PaginatedResponse<ArtworkPreview>()

@@ -77,11 +77,14 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
             {
                 url.Append($"&limit={parameters.Count}");
             }
+            url.Append("&has_image=1");
 
             if (parameters.PreviewsOnly)
             {
-                url.Append("&fields=id,title,creators,images,creation_date,type&has_image=1");
+                url.Append("&fields=department,collection,creation_date_earliest,creation_date_latest,sortable_date,technique,support_materials,id,title,creators,images,creation_date,type,culture");
+
             }
+
 
             url.Append($"&skip={parameters.Offset}");
 
@@ -90,6 +93,7 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
 
         private async Task<List<ClevelandArtworkPreview>?> FetchCollectionAsync(string url)
         {
+            Console.WriteLine($"\n\n\n\nURL:{url}\n\n\n");
             try
             {
                 var response = await _client.GetAsync(url);

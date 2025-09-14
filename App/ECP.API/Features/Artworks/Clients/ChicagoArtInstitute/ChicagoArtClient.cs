@@ -155,9 +155,12 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
                 url.Append($"&size={parameters.Count}");
             }
 
-            if (parameters.PreviewsOnly)
+            url.Append("&fields=id,title,artist_titles,thumbnail,image_id,date_display,date_start,date_end,artwork_type_title,classification_titles,category_titles,material_titles,medium_display,technique_titles,subject_titles,style_titles,place_of_origin");
+
+
+            if (!parameters.PreviewsOnly)
             {
-                url.Append("&fields=id,title,artist_titles,thumbnail,image_id,date_start,date_end");
+                url.Append(",description,dimensions,dimensions_detail,department_title,gallery_title,term_titles,theme_titles,api_link");
             }
 
             if (parameters.Page != 0)

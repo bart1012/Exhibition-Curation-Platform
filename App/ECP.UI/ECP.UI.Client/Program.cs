@@ -1,5 +1,4 @@
 using Blazored.LocalStorage;
-using ECP.UI.Client.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -13,7 +12,6 @@ namespace ECP.UI.Client
 
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddSingleton<NavigationManager>();
-            builder.Services.AddScoped<IUserCollectionsService, UserCollectionsService>();
 
             await builder.Build().RunAsync();
         }

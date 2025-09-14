@@ -3,20 +3,40 @@
     public class ArtworkPreview
     {
         //Internal Use Properties 
-        public string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
         public ArtworkSource Source { get; set; }
         public int SourceId { get; set; }
-        public ArtworkType ArtworkType { get; set; }
 
-        //Display properties
+        //Basic Information
         public string Title { get; set; }
         public List<Artist>? Artists { get; set; }
-        public int? CreationYear { get; set; }
-        public string ArtworkTypeDisplay { get; set; }
+        public Image? Thumbnail { get; set; }
 
-        public List<string> Materials { get; set; }
-        public Image? WebImage { get; set; }
-        public List<string> Subjects { get; set; }
+        //Date properties
+        public string? DateDisplay { get; set; }
+        public int? DateStart { get; set; }
+        public int? DateEnd { get; set; }
+        public int? SortableYear { get; set; }
+
+        //Type properties
+        public ArtworkType Type { get; set; }
+        public string TypeDisplay { get; set; } = string.Empty;
+        public List<string> Classifications { get; set; } = new();
+        public List<string> Categories { get; set; } = new();
+
+        //Material Properties
+        public List<string> Materials { get; set; } = new();
+        public string? MediumDisplay { get; set; }
+        public List<string> Techniques { get; set; } = new();
+
+        //Subject and style properties
+        public List<string> Subjects { get; set; } = new();
+        public List<string> Styles { get; set; } = new();
+
+        //Cultural properties
+        public List<string> Culture { get; set; } = new();
+        public string? PlaceOfOrigin { get; set; }
+
 
         public override bool Equals(object? obj)
         {

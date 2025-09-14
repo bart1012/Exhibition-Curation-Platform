@@ -49,12 +49,12 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             foreach (var artwork in clevelandArtwork)
             {
                 _mockMapper.Setup(m => m.FromClevelandPreview(artwork))
-                    .Returns(new ArtworkPreview { Id = string.Concat("cleveland_", artwork.Id.ToString()), Source = ArtworkSource.CLEVELAND_MUSEUM, Title = artwork.Title, WebImage = new() });
+                    .Returns(new ArtworkPreview { Id = string.Concat("cleveland_", artwork.Id.ToString()), Source = ArtworkSource.CLEVELAND_MUSEUM, Title = artwork.Title, Thumbnail = new() });
             }
             foreach (var artwork in chicagoArtwork)
             {
                 _mockMapper.Setup(m => m.FromChicagoPreview(artwork))
-                    .Returns(new ArtworkPreview { Id = string.Concat("chicago", artwork.Id.ToString()), Source = ArtworkSource.CHICAGO_ART_INSTITUTE, Title = artwork.Title, WebImage = new() });
+                    .Returns(new ArtworkPreview { Id = string.Concat("chicago", artwork.Id.ToString()), Source = ArtworkSource.CHICAGO_ART_INSTITUTE, Title = artwork.Title, Thumbnail = new() });
             }
         }
 
@@ -113,8 +113,8 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
             _mockClevelandClient.Setup(c => c.GetArtworkPreviews(1)).ReturnsAsync(clevelandArtworks);
             _mockChicagoClient.Setup(c => c.GetArtworkPreviews(1)).ReturnsAsync(chicagoArtworks);
 
-            _mockMapper.Setup(m => m.FromClevelandPreview(clevelandArtworkWithoutImage)).Returns(new ArtworkPreview { SourceId = 2, WebImage = null });
-            _mockMapper.Setup(m => m.FromChicagoPreview(chicagoArtworksWithImage)).Returns(new ArtworkPreview { SourceId = 3, WebImage = new Image() });
+            _mockMapper.Setup(m => m.FromClevelandPreview(clevelandArtworkWithoutImage)).Returns(new ArtworkPreview { SourceId = 2, Thumbnail = null });
+            _mockMapper.Setup(m => m.FromChicagoPreview(chicagoArtworksWithImage)).Returns(new ArtworkPreview { SourceId = 3, Thumbnail = new Image() });
 
             // Act
             var result = await _artworksRepository.GetArtworkPreviewsAsync(1);

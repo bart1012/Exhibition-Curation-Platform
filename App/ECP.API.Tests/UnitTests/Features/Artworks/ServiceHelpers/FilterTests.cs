@@ -15,11 +15,11 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks.Helpers
             _service = new TestableArtworksService();
             _testData = new List<ArtworkPreview>
         {
-            new ArtworkPreview { Title = "Starry Night", Artists = new List<Artist> { new Artist() { Name = "Van Gogh" } }, ArtworkType = ArtworkType.Painting, Materials = new List<string> { "oil", "canvas" }, Subjects = new List<string> { "landscape" } },
-            new ArtworkPreview { Title = "The Persistence of Memory", Artists = new List<Artist> { new Artist() { Name = "Dali" } }, ArtworkType = ArtworkType.Painting, Materials = new List<string> { "oil", "canvas" }, Subjects = new List<string> { "surrealism" } },
-            new ArtworkPreview { Title = "The Thinker", Artists = new List<Artist> { new Artist() { Name = "Rodin" } }, ArtworkType = ArtworkType.Sculpture, Materials = new List<string> { "bronze" }, Subjects = new List<string> { "figure" } },
-            new ArtworkPreview { Title = "Water Lilies", Artists = new List<Artist> { new Artist() { Name = "Monet" } }, ArtworkType = ArtworkType.Painting, Materials = new List<string> { "oil", "canvas" }, Subjects = new List<string> { "landscape" } },
-            new ArtworkPreview { Title = "Vouquet of Sunflowers", Artists = new List<Artist> { new Artist() { Name = "Monet" } }, ArtworkType = ArtworkType.Painting, Materials = new List<string> { "oil", "canvas" }, Subjects = new List<string> { "still-life" } },
+            new ArtworkPreview { Title = "Starry Night", Artists = new List<Artist> { new Artist() { Name = "Van Gogh" } }, Type = ArtworkType.Painting, Materials = new List<string> { "oil", "canvas" }, Subjects = new List<string> { "landscape" } },
+            new ArtworkPreview { Title = "The Persistence of Memory", Artists = new List<Artist> { new Artist() { Name = "Dali" } }, Type = ArtworkType.Painting, Materials = new List<string> { "oil", "canvas" }, Subjects = new List<string> { "surrealism" } },
+            new ArtworkPreview { Title = "The Thinker", Artists = new List<Artist> { new Artist() { Name = "Rodin" } }, Type = ArtworkType.Sculpture, Materials = new List<string> { "bronze" }, Subjects = new List<string> { "figure" } },
+            new ArtworkPreview { Title = "Water Lilies", Artists = new List<Artist> { new Artist() { Name = "Monet" } }, Type = ArtworkType.Painting, Materials = new List<string> { "oil", "canvas" }, Subjects = new List<string> { "landscape" } },
+            new ArtworkPreview { Title = "Vouquet of Sunflowers", Artists = new List<Artist> { new Artist() { Name = "Monet" } }, Type = ArtworkType.Painting, Materials = new List<string> { "oil", "canvas" }, Subjects = new List<string> { "still-life" } },
             };
         }
 
