@@ -49,7 +49,7 @@ namespace App
             app.UseStaticFiles();
             app.MapControllers();
             app.UseRouting();
-
+            app.MapFallbackToPage("/_Host");
             app.UseAuthorization();
 
 

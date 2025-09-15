@@ -1,9 +1,7 @@
 ﻿@page "/artwork/{ArtworkId:int}/{SourceId:int}"
 @inject ArtworkService ArtworkService
 @rendermode InteractiveAuto
-@using ECP.UI.Server.Components.Error
 @using ECP.UI.Server.Components.Shared
-@using ECP.UI.Client.Components
 @using ECP.UI.Server.Components.Artworks
 
 <div class="artwork-details-container" >
@@ -467,7 +465,7 @@
         <div class="error-state">
             <MudAlert Severity="Severity.Error" Class="ma-4">
                 <MudText Typo="Typo.h6">Server Error</MudText>
-                <ServerErrorMessage></ServerErrorMessage>
+                <Error.ServerErrorMessage></Error.ServerErrorMessage>
             </MudAlert>
         </div>
     }
@@ -476,7 +474,7 @@
         <div class="error-state">
             <MudAlert Severity="Severity.Warning" Class="ma-4">
                 <MudText Typo="Typo.h6">Artwork Not Found</MudText>
-                <NotFoundMessage></NotFoundMessage>
+                <Error.NotFoundMessage></Error.NotFoundMessage>
             </MudAlert>
         </div>
     }

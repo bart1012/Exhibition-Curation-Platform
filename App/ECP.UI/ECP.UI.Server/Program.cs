@@ -1,5 +1,4 @@
 using Blazored.LocalStorage;
-using ECP.UI.Client.Services;
 using ECP.UI.Server.Services;
 using MudBlazor.Services;
 using System.Text.Json;
@@ -66,7 +65,7 @@ namespace ECP.UI.Server
             app.MapRazorComponents<ECP.UI.Server.App>()
                 .AddInteractiveServerRenderMode()
                 .AddInteractiveWebAssemblyRenderMode()
-                .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
+                .AddAdditionalAssemblies(typeof(ECP.UI.Client.Program).Assembly);
 
             app.Run();
         }

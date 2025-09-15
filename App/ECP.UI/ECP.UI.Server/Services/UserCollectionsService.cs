@@ -1,7 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using ECP.Shared;
 
-namespace ECP.UI.Client.Services
+namespace ECP.UI.Server.Services
 {
     public interface IUserCollectionsService
     {

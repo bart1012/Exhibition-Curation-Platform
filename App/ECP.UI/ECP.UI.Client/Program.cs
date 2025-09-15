@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 namespace ECP.UI.Client
 {
-    internal class Program
+    public class Program
     {
         static async Task Main(string[] args)
         {

@@ -1,7 +1,7 @@
 ﻿@page "/search"
 @rendermode InteractiveAuto
 
-@using ECP.UI.Server.Components.Error
+@using ECP.UI.Server.Components
 @using ECP.UI.Server.Components.Shared
 @using ECP.UI.Server.Components.Search
 @using ECP.UI.Server.Models
@@ -22,7 +22,7 @@ else if (_artworkList != null)
 
     if (!_artworkList.Any())
     {
-        <NoResultsMessage></NoResultsMessage>
+        <Error.NoResultsMessage></Error.NoResultsMessage>
     }
     else
     {
@@ -53,7 +53,7 @@ else if (_artworkList != null)
 }
 else if (_isServerError)
 {
-    <ServerErrorMessage></ServerErrorMessage>
+    <Error.ServerErrorMessage></Error.ServerErrorMessage>
 }
 </div>
 

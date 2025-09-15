@@ -1,5 +1,5 @@
 ﻿using ECP.Shared;
-using ECP.UI.Client.Services;
+using ECP.UI.Server.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace ECP.UI.Server.Components.Artworks
