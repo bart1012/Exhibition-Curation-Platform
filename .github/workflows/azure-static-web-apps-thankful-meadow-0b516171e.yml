@@ -45,7 +45,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: blazor-app-artifact
-          path: ./wwwroot
+          # Specify a path where the artifact will be downloaded
+          path: ./build_output
 
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
@@ -54,6 +55,7 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_THANKFUL_MEADOW_0B516171E }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "./wwwroot"   
+          # This should be the location of the downloaded artifact's content
+          app_location: "./build_output"
           api_location: ""
-          output_location: "./"       
+          output_location: "/"
