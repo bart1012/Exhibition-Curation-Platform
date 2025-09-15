@@ -29,7 +29,7 @@ jobs:
         # This command publishes the Blazor Server project, which includes the
         # built output of the Blazor WebAssembly client project.
         # It handles all dependencies, so separate restore and build steps are not needed.
-        run: dotnet publish App/ECP.UI/ECP.UI.Server/ECP.Ui.Server.csproj -c Release -o ./publish
+        run: dotnet publish App/ECP.UI/ECP.UI.Server/ECP.UI.Server.csproj -c Release -o ./publish
 
       - name: Upload artifact for deployment job
         # The path here is crucial. When the server project is published,
@@ -66,3 +66,4 @@ jobs:
           app_location: ""
           api_location: ""
           output_location: ""
+
