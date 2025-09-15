@@ -59,11 +59,8 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_THANKFUL_MEADOW_0B516171E }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          # Since you are uploading a pre-built artifact,
-          # you do not need to specify app_location or output_location.
-          # The deploy action will automatically deploy the contents of the artifact.
-          # This assumes the artifact is a zip file of your 'wwwroot' content.
-          app_location: ""
+          app_location: "."
           api_location: ""
-          output_location: ""
+          output_location: "./"
+
 
