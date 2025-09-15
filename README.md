@@ -23,24 +23,24 @@ An application for art enthusiasts to search, explore, and curate their own digi
 
 To run the application locally you must:
 
-1. Clone the Repository: 
+1. Clone the Repository: <br>
 `git clone https://github.com/bart1012/Exhibition-Curation-Platform.git; cd Exhibition-Curation-Platform;`
-2. Run the Projects: 
+2. Run the Projects: <br>
 The solution includes two main projects: ECP.UI.Server (the Blazor front-end) and ECP.API (the back-end API). You will need to run both simultaneously.
 
-    -Open the solution in Visual Studio.
-    -Right-click the solution in the Solution Explorer and select Set Startup Projects....
-    -Choose Multiple startup projects and set both ECP.UI.Server and ECP.API to Start.
-    -Press F5 to run the application.
+    - Open the solution in Visual Studio.
+    - Right-click the solution in the Solution Explorer and select Set Startup Projects....
+    - Choose Multiple startup projects and set both ECP.UI.Server and ECP.API to Start.
+    - Press F5 to run the application.
 
 ## Current Clients
 The back-end API currently utilises the The Cleveland Museum of Art Open Access API and the The Art Institute of Chicago API. 
 
 ## Expansion
 
--User Authentication: Implement a robust registration and login system to allow for secure, persistent user collections on a backend database (e.g., Firestore).
--Expanded API Integrations: Add support for more art APIs by creating new client classes and updating the ArtworkMapper.cs.
--Advanced Collection Features: Introduce new functionality such as sharing collections, adding annotations, and creating public galleries.
+- User Authentication: Implement a robust registration and login system to allow for secure, persistent user collections on a backend database (e.g., Firestore).
+- Expanded API Integrations: Add support for more art APIs by creating new client classes and updating the ArtworkMapper.cs.
+- Advanced Collection Features: Introduce new functionality such as sharing collections, adding annotations, and creating public galleries.
 
 
 
