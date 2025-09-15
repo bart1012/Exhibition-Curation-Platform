@@ -19,13 +19,13 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore App/ECP.API/ECP.API.csproj
 
       - name: Build with dotnet
-        run: dotnet build App/ECP.API/ECP.API.csproj --configuration Release
+        run: dotnet build App/ECP.API/ECP.API.csproj --configuration Release --no-restore
 
       - name: dotnet publish
-        run: dotnet publish App/ECP.API/ECP.API.csproj -c Release -o ./publish
+        run: dotnet publish App/ECP.API/ECP.API.csproj -c Release --no-build -o ./publish
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
