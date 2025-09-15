@@ -19,22 +19,16 @@ jobs:
         with:
           submodules: true
           lfs: false
-      
-      - name: Set up .NET Core
+
+      - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
 
-      - name: dotnet publish
-        # This command publishes the Blazor Server project, which includes the
-        # built output of the Blazor WebAssembly client project.
-        # It handles all dependencies, so separate restore and build steps are not needed.
+      - name: Publish Blazor Server (includes Blazor WASM client)
         run: dotnet publish App/ECP.UI/ECP.UI.Server/ECP.UI.Server.csproj -c Release -o ./publish
 
       - name: Upload artifact for deployment job
-        # The path here is crucial. When the server project is published,
-        # the static files for the WASM app are placed in the wwwroot folder
-        # of the publish output.
         uses: actions/upload-artifact@v4
         with:
           name: blazor-app-artifact
@@ -51,6 +45,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: blazor-app-artifact
+          path: ./wwwroot
 
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
@@ -59,8 +54,6 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_THANKFUL_MEADOW_0B516171E }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "."
+          app_location: "./wwwroot"   
           api_location: ""
-          output_location: "./"
-
-
+          output_location: "./"       
