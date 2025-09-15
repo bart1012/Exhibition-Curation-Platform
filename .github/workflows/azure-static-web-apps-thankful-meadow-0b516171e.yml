@@ -25,14 +25,22 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      - name: Publish Blazor Server (includes Blazor WASM client)
-        run: dotnet publish App/ECP.UI/ECP.UI.Server/ECP.UI.Server.csproj -c Release -o ./publish
+      - name: Publish Blazor App
+        # Change the output path to a simple, predictable location.
+        # This publishes the server-side app, which includes the client's static content.
+        run: dotnet publish App/ECP.UI/ECP.UI.Server/ECP.UI.Server.csproj -c Release -o ./release-output
 
+      # DEBUGGING STEP: List the contents of the published directory
+      - name: Debug - List published files
+        run: ls -R ./release-output
+
+      # This should upload the folder that contains your static content.
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: blazor-app-artifact
-          path: ./publish/wwwroot
+          # The path to the 'wwwroot' folder, relative to the output of the publish command.
+          path: ./release-output/wwwroot
 
   deploy_job:
     runs-on: ubuntu-latest
@@ -45,10 +53,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: blazor-app-artifact
-          path: ./build_output
+          path: ./app-to-deploy
 
-      - name: List files for debugging
-        run: ls -R ./build_output
+      # DEBUGGING STEP: List the contents of the downloaded artifact
+      - name: Debug - List downloaded files
+        run: ls -R ./app-to-deploy
 
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
@@ -57,11 +66,9 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_THANKFUL_MEADOW_0B516171E }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          cwd: $(Pipeline.Workspace)/WebApp
-          app_location: "./build_output/wwwroot"
+          # This should be the root of your static content after the artifact is downloaded.
+          app_location: "./app-to-deploy"
           api_location: ""
           output_location: "/"
           skip_app_build: true
           skip_api_build: true
-
-
