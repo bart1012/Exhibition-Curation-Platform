@@ -1,4 +1,4 @@
-name: Azure Static Web Apps CI/CD
+name: Build and Deploy Blazor WASM to Azure Static Web Apps
 
 on:
   push:
@@ -11,28 +11,70 @@ on:
 
 jobs:
   build_and_deploy_job:
+    # This condition ensures the job runs for pushes and open/synchronized PRs, but not for closed PRs
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4 # Using v4 is generally recommended over v3
         with:
           submodules: true
           lfs: false
-      - name: Build And Deploy
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
+      # Restore dependencies for both projects if they have different dependencies
+      # It's often more robust to restore from the solution or project root.
+      - name: Restore dependencies
+        run: dotnet restore App/ECP.UI/ECP.UI.Client/ECP.UI.Client.csproj # Restore the client project
+
+      # Publish the Blazor WASM client project.
+      # The output will be placed in the 'wwwroot' folder of the client project.
+      - name: Publish Blazor WASM Client
+        run: dotnet publish App/ECP.UI/ECP.UI.Client/ECP.UI.Client.csproj -c Release --no-build --output ./publish/client
+
+      # Upload the published client files as an artifact.
+      # The path should point to the actual output directory from the publish step.
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: blazor-app-artifact # More descriptive name
+          path: ./publish/client # This points to the output of the publish step
+
+  deploy_job:
+    runs-on: ubuntu-latest
+    needs: build_and_deploy_job # Ensure build completes first
+    name: Deploy to Azure Static Web Apps
+    # This condition ensures the deployment only happens on 'push' events to main, not PRs
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: blazor-app-artifact # Must match the upload artifact name
+
+      # This step uses the Azure Static Web Apps Deploy action
+      # It assumes your Blazor WASM app is built into a 'wwwroot' folder
+      - name: Deploy to Azure Static Web Apps
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_THANKFUL_MEADOW_0B516171E }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "App/ECP.UI/ECP.UI.Server" # App source code path
-          api_location: "" # Api source code path - optional
-          output_location: "wwwroot" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
+          # Configuration for the Static Web App build process
+          # These values should point to the client project and its output
+          app_location: "/App/ECP.UI/ECP.UI.Client" # Path to your Blazor WASM client project
+          api_location: "" # Leave blank as your API is hosted separately
+          output_location: "wwwroot" # The folder containing the static files after publish
 
+  # This job is for handling pull request closed events (e.g., for cleanup or notifications)
+  # You can adapt this if you want specific actions on PR close.
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
