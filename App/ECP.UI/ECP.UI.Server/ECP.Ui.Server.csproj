@@ -10,7 +10,7 @@
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="MudBlazor" Version="8.11.0" />
     <ProjectReference Include="..\..\ECP.Shared\ECP.Shared.csproj" />
-    <ProjectReference Include="..\ECP.UI.Client\ECP.UI.Client.csproj" />
+    <ProjectReference Include="..\ECP.UI.Client\ECP.Ui.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.8" />
   </ItemGroup>
 
