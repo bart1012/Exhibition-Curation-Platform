@@ -1,6 +1,6 @@
 ﻿@using ECP.UI.Client
 
-<Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(ECP.UI.Client.Program).Assembly }">
+<Router AppAssembly="typeof(Program).Assembly"  AdditionalAssemblies="new[] { typeof(Client._Imports).Assembly }">
     <Found Context="routeData">
         <RouteView RouteData="routeData" DefaultLayout="typeof(Components.Shared.Layout.MainLayout)" />
         <FocusOnNavigate RouteData="routeData" Selector="h1" />

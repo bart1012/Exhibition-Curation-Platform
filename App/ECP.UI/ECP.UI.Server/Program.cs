@@ -65,7 +65,7 @@ namespace ECP.UI.Server
             app.MapRazorComponents<ECP.UI.Server.App>()
                 .AddInteractiveServerRenderMode()
                 .AddInteractiveWebAssemblyRenderMode()
-                .AddAdditionalAssemblies(typeof(ECP.UI.Client.Program).Assembly);
+                .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
 
             app.Run();
         }

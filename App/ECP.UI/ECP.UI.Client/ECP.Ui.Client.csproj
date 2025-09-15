@@ -20,8 +20,4 @@
     <Folder Include="Pages\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\ECP.Shared\ECP.Shared.csproj" />
-  </ItemGroup>
-
 </Project>
