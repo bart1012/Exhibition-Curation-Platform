@@ -30,12 +30,12 @@ jobs:
       # Restore dependencies for both projects if they have different dependencies
       # It's often more robust to restore from the solution or project root.
       - name: Restore dependencies
-        run: dotnet restore App/ECP.UI/ECP.UI.Client/ECP.UI.Client.csproj # Restore the client project
+        run: dotnet restore App/ECP.UI/ECP.UI.Client/ECP.Ui.Client.csproj # Restore the client project
 
       # Publish the Blazor WASM client project.
       # The output will be placed in the 'wwwroot' folder of the client project.
       - name: Publish Blazor WASM Client
-        run: dotnet publish App/ECP.UI/ECP.UI.Client/ECP.UI.Client.csproj -c Release --no-build --output ./publish/client
+        run: dotnet publish App/ECP.UI/ECP.UI.Client/ECP.Ui.Client.csproj -c Release --no-build --output ./publish/client
 
       # Upload the published client files as an artifact.
       # The path should point to the actual output directory from the publish step.
@@ -86,3 +86,4 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_THANKFUL_MEADOW_0B516171E }}
           action: "close"
+
