@@ -17,9 +17,9 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks.Helpers
             _service = new TestableArtworksService();
             _testData = new()
             {
-                new ArtworkPreview { Title = "C Title", CreationYear = 2000 },
-                new ArtworkPreview { Title = "A Title", CreationYear = 1800 },
-                new ArtworkPreview { Title = "B Title", CreationYear = 1900 }
+                new ArtworkPreview { Title = "C Title", SortableYear = 2000 },
+                new ArtworkPreview { Title = "A Title", SortableYear = 1800 },
+                new ArtworkPreview { Title = "B Title", SortableYear = 1900 }
             };
         }
 
@@ -65,7 +65,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks.Helpers
             // Assert
             Assert.That(result.IsSuccess, Is.True);
             Assert.That(result.Value.Count, Is.EqualTo(3));
-            Assert.That(result.Value.Select(a => a.CreationYear).ToList(), Is.EqualTo(new List<int> { 1800, 1900, 2000 }));
+            Assert.That(result.Value.Select(a => a.SortableYear).ToList(), Is.EqualTo(new List<int> { 1800, 1900, 2000 }));
         }
 
         [Test]
@@ -80,7 +80,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks.Helpers
             // Assert
             Assert.That(result.IsSuccess, Is.True);
             Assert.That(result.Value.Count, Is.EqualTo(3));
-            Assert.That(result.Value.Select(a => a.CreationYear).ToList(), Is.EqualTo(new List<int> { 2000, 1900, 1800 }));
+            Assert.That(result.Value.Select(a => a.SortableYear).ToList(), Is.EqualTo(new List<int> { 2000, 1900, 1800 }));
         }
 
         [Test]

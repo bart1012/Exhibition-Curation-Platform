@@ -20,6 +20,7 @@ namespace App
             builder.Services.AddScoped<IArtworksRepository, ArtworksRepository>();
             builder.Services.AddTransient<IArtworkMapper, ArtworkMapper>();
             builder.Services.AddControllers();
+            builder.Services.AddRazorPages();
             builder.Services.AddMemoryCache(options =>
             {
                 options.SizeLimit = 3000;
