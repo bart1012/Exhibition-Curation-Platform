@@ -24,10 +24,12 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build ECP.sln --configuration Release
+        working-directory: './App'
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish ECP.UI/ECP.UI.Server/ECP.UI.Server.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        working-directory: './App'
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -62,4 +64,5 @@ jobs:
           app-name: 'ECP-Frontend'
           slot-name: 'Production'
           package: .
+
           
