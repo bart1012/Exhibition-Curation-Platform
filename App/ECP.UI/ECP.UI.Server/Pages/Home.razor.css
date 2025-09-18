@@ -38,11 +38,23 @@
     padding: 0 1rem;
 }
 
+
+
+.img-caption {
+    max-height: 2rem;
+    width: 100%;
+/*    margin: auto;*/
+    text-align: center;
+    font-size: 0.75rem;
+    color: gray;
+    position: relative;
+    top: calc(100vh - 65%);  
+}
+
 @media (max-width: 768px) {
     #inner-content-container {
         width: 100%;
         max-width: 100%;
         padding: 0 1rem;
-/*        flex-direction: column-reverse;*/
     }
 }

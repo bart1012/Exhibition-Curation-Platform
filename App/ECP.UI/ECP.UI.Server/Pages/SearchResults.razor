@@ -1,7 +1,7 @@
 ﻿@page "/search"
 @rendermode InteractiveAuto
 
-@using ECP.UI.Server.Components
+@using ECP.UI.Server.Components.Error
 @using ECP.UI.Server.Components.Shared
 @using ECP.UI.Server.Components.Search
 @using ECP.UI.Server.Models
@@ -12,22 +12,22 @@
 <SearchQueryPanel SearchBarColor="SearchBarColor.WHITE" SearchQuery="@SearchQuery" OnSortChanged="@HandleSortChanged" OnFiltersChanged="@HandleFiltersChanged"></SearchQueryPanel>
 
 
-<div class="search-results-container" style="display: flex; flex-direction: column; min-height: 100%; justify-content: center;">
-    @if (_isLoading)
+<div class="search-results-container" style="display: flex; flex-direction: column; height: 100%; justify-content: center;">
+@if (_isLoading)
 {
-    <Loading></Loading>
+    <Loading Message="Fetching relevant artworks..."></Loading>
 }
 else if (_artworkList != null)
 {
 
     if (!_artworkList.Any())
     {
-        <Error.NoResultsMessage></Error.NoResultsMessage>
+        <NoResultsMessage></NoResultsMessage>
     }
     else
     {
         <div class="results-header mb-2">
-                <MudText Typo="Typo.h5" Class="results-title">
+                <MudText Typo="Typo.h5" Class="results-title mt-5">
                     @if (!string.IsNullOrWhiteSpace(SearchQuery))
                     {
                         <text>Results for "@SearchQuery"</text>
@@ -53,7 +53,7 @@ else if (_artworkList != null)
 }
 else if (_isServerError)
 {
-    <Error.ServerErrorMessage></Error.ServerErrorMessage>
+    <ServerErrorMessage></ServerErrorMessage>
 }
 </div>
 
@@ -113,18 +113,26 @@ else if (_isServerError)
     {
         _isLoading = true;
         _artworkList = null;
-        await FetchDataAsync();
 
-
+        InvokeAsync(async () =>
+           {
+               await FetchDataAsync();
+               StateHasChanged();
+           });
     }
+
 
     private void PageChanged(int i)
     {
+        _isLoading = true;
+        StateHasChanged();
         NavManager.NavigateTo($"/search?q={SearchQuery}&p={i}{_filtersQuery}{_sortQuery}");
     }
 
     private async Task HandleFiltersChanged(string filters)
     {
+        _isLoading = true;
+        StateHasChanged();
         _filtersQuery = filters;
         PageNumber = 1;
         NavManager.NavigateTo($"/search?q={SearchQuery}&p={PageNumber}{_filtersQuery}{_sortQuery}");
@@ -136,6 +144,9 @@ else if (_isServerError)
         {
             return;
         }
+
+        _isLoading = true;
+        StateHasChanged();
         string sortQuery = options.BuildSortQuery();
         _sortQuery = sortQuery;
         PageNumber = 1;

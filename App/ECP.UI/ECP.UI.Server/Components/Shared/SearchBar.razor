@@ -70,7 +70,12 @@
         {
             if (!string.IsNullOrWhiteSpace(_searchQuery))
             {
-                NavManager.NavigateTo($"/search?q={_searchQuery}&p=1");
+                var options = new NavigationOptions
+                    {
+                        ForceLoad = false,
+                        ReplaceHistoryEntry = false
+                    };
+                NavManager.NavigateTo($"/search?q={_searchQuery}&p=1", options);
             }
         }
     }

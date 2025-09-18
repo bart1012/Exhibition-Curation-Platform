@@ -1,16 +1,25 @@
 ﻿@rendermode InteractiveServer
 @page "/"
 @using ECP.UI.Server.Components.Shared
+@using ECP.UI.Server.Models
+
 
 <PageTitle>Home</PageTitle>
 
-<div id="outer-content-container" style="@($"background-image: url('{staticImgPaths[_random.Next(0,staticImgPaths.Count-1)]}')")">
+<div id="outer-content-container" style="@($"background-image: url('{backgroundData.ImgUrl}')")">
     <div id="container-overlay">
        <div id="inner-content-container">
-            <SearchBar></SearchBar>
-            <PopularSearchQueries></PopularSearchQueries>
+           <div id="search-container">
+                <SearchBar></SearchBar>
+                <PopularSearchQueries></PopularSearchQueries>
+           </div>
+            <div class="img-caption">       
+                <p>@backgroundData.Title</p>
+                <p>@backgroundData.Artist</p>
+            </div>
         </div>
     </div>
+
 </div>
 <style>
     .mud-icon-size-large, .mud-icon-size-medium {
@@ -20,10 +29,32 @@
 @code{
     public string TextValue { get; set; }
     private Random _random = new();
-    private List<string> staticImgPaths = new()
+    private List<ImageCaption> imgObjects = new List<ImageCaption>
+        {
+            new ImageCaption()
+            {
+                ImgUrl = "https://openaccess-cdn.clevelandart.org/1981.18/1981.18_web.jpg",
+                Title = "The Holy Family on the Steps",
+                Artist = "Nicolas Poussin (French, 1594–1665)"
+            },
+            new ImageCaption()
+            {
+                ImgUrl = "https://openaccess-cdn.clevelandart.org/1951.355/1951.355_web.jpg",
+                Title = "Portrait of a Family Playing Music",
+                Artist = "Pieter de Hooch (Dutch, 1629–1684)"
+            },
+            new ImageCaption()
+            {
+                ImgUrl = "https://openaccess-cdn.clevelandart.org/1965.233/1965.233_web.jpg",
+                Title = "Twilight in the Wilderness",
+                Artist = "Frederic Edwin Church (American, 1826–1900)"
+            }
+        };
+    private ImageCaption backgroundData = null;
+
+    protected override void OnInitialized()
     {
-        "/home/1962.293_web.jpg",
-        "/home/1977.43_web.jpg",
-        "/home/1991.110_web.jpg"
-    };
+        backgroundData = imgObjects[_random.Next(0,2)];
+    }
+
 }

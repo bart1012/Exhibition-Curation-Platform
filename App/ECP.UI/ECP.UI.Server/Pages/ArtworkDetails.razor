@@ -2,20 +2,19 @@
 @inject ArtworkService ArtworkService
 @rendermode InteractiveAuto
 @using ECP.UI.Server.Components.Shared
+@using ECP.UI.Server.Components.Error
 @using ECP.UI.Server.Components.Artworks
 
-<div class="artwork-details-container" >
     @if (isLoading)
     {
-        <div class="loading-state">
-            <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
-            <MudText Typo="Typo.body1" Class="mt-4 text-secondary">Loading artwork details...</MudText>
-        </div>
+        <Loading Message="Preparing artwork..."></Loading>
     }
     else if (_artwork != null)
     {
-        <MudGrid Class="artwork-grid h-100 ma-0 pa-0">
-            <MudItem xs="12" md="7" style="border: 1px solid gray" Class=" pa-0 artwork-image-panel">
+    <div class="artwork-details-container">
+
+        <MudGrid Class="artwork-grid h-100 w-auto ma-0 pa-0" Style="width: 100%; max-width: 100%;">
+            <MudItem xs="12" md="7" style=" border-right: none;" Class=" pa-0 artwork-image-panel">
                 <div class="image-container">
                     @if (!string.IsNullOrEmpty(_artwork.Images?.Web?.Url))
                     {
@@ -43,10 +42,10 @@
                 </div>
             </MudItem>
 
-            <MudItem xs="12" md="5" style="border: 1px solid gray" Class=" artwork-details-panel">
+            <MudItem xs="12" md="5" Class="artwork-details-panel pa-0 pl-5 pr-5">
                 <div class="details-content">
                     <div class="artwork-header">
-                        <div class="title-section" style="padding: 16px;">
+                        <div class="title-section">
                             <MudText Typo="Typo.h3" Class="artwork-title mb-2" Align="Align.Start" Style="font-weight: 300; color: var(--mud-palette-text-primary);">
                                 @_artwork.Title
                             </MudText>
@@ -459,26 +458,14 @@
                 </div>
             </MudItem>
         </MudGrid>
+        </div>
     }
     else if (_isServerError)
     {
-        <div class="error-state">
-            <MudAlert Severity="Severity.Error" Class="ma-4">
-                <MudText Typo="Typo.h6">Server Error</MudText>
-                <Error.ServerErrorMessage></Error.ServerErrorMessage>
-            </MudAlert>
-        </div>
+        <ServerErrorMessage></ServerErrorMessage>
     }
-    else
-    {
-        <div class="error-state">
-            <MudAlert Severity="Severity.Warning" Class="ma-4">
-                <MudText Typo="Typo.h6">Artwork Not Found</MudText>
-                <Error.NotFoundMessage></Error.NotFoundMessage>
-            </MudAlert>
-        </div>
-    }
-</div>
+    
+
 
 <style>
    .artwork-details-container {
@@ -530,7 +517,6 @@
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    background: white;
 }
 
 .artwork-main-image {
@@ -565,7 +551,6 @@
 
 .artwork-details-panel {
     height: 100%;
-    padding: 1rem;
     overflow-y: auto;
     min-height: 0;
 }
@@ -718,15 +703,26 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        _isServerError = false;
         isLoading = true;
         _artwork = null;
 
+        InvokeAsync(async () =>
+           {
+               await FetchDataAsync();
+               StateHasChanged();
+           });
+    }
+
+    private async Task FetchDataAsync()
+    {
         try
         {
             var response = await ArtworkService.GetArtworkByIdAsync(ArtworkId, SourceId);
 
             if (response.IsSuccess)
             {
+                _isServerError = false;
                 _artwork = response.Value;
                 _artworkPreview = ArtworkMappers.ToArtworkPreview(response.Value);
             }

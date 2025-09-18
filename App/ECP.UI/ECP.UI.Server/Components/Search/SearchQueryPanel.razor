@@ -13,33 +13,36 @@
     </MudItem>
     <MudItem xs="12" md="4" lg="4" Class="d-flex align-center pa-0">
         <div class="search-button-container">
+
             <MudButton OnClick="OpenFilterDialog" Variant="Variant.Outlined" Color="Color.Dark" StartIcon="@Icons.Material.Filled.FilterList" Class="rounded-pill search-button">
                 Filter
             </MudButton>
 
             <MudButtonGroup Color="Color.Default" Variant="Variant.Outlined">
-                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
-                         Class=" search-button "
-                         Style="align-self: auto;"
+
+                <MudMenu FullWidth="true"
+                     
                          AnchorOrigin="Origin.BottomLeft"
-                         PopoverOrigin="Origin.TopCenter">
+                         >
                     <ActivatorContent>
-                        <MudButton Class="px-10 rounded-l-xl " Style="min-width: 12rem;">
+                        <MudButton Class="rounded-l-xl px-10" Style="min-width: 12rem;">
                             @_sortText
                         </MudButton>
                     </ActivatorContent>
                     <ChildContent>
-                        <MudMenuItem OnClick="@(() => SetSortField(0))">Creation Date</MudMenuItem>
-                        <MudMenuItem OnClick="@(() => SetSortField(1))">Alphabetically</MudMenuItem>
+                        <MudMenuItem Style="min-width: 12rem;" OnClick="@(() => SetSortField(0))">Creation Date</MudMenuItem>
+                        <MudMenuItem Style="min-width: 12rem;" OnClick="@(() => SetSortField(1))">Alphabetically</MudMenuItem>
                     </ChildContent>
                 </MudMenu>
+
                 <MudToggleIconButton Toggled="_isDescending"
                                      ToggledChanged="SetSortDirection"
                                      Icon="@Icons.Material.Filled.ArrowUpward"
                                      Color="@Color.Dark"
+                                     Size="Size.Small"
                                      ToggledIcon="@Icons.Material.Filled.ArrowDownward"
                                      ToggledColor="@Color.Dark"
-                                     Class=" search-button rounded-r-xl" />
+                                     Class="rounded-r-xl" />
             </MudButtonGroup>
         </div>
     </MudItem>

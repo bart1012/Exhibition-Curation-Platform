@@ -12,6 +12,8 @@
                                   Placeholder="Enter artist name"
                                   Clearable="true"
                                   Adornment="Adornment.Start"
+                                  
+                                  AdornmentColor="Color.Dark"
                                   AdornmentIcon="@Icons.Material.Filled.Person" />
                 </MudItem>
 
@@ -35,7 +37,7 @@
                     <MudSelect @bind-Value="Filters.Subject"
                                Label="Subject"
                                Clearable="true"
-                               AnchorOrigin="Origin.BottomCenter">
+                               AnchorOrigin="Origin.BottomLeft">
                         <MudSelectItem Value=@("Portrait")>Portrait</MudSelectItem>
                         <MudSelectItem Value=@("Landscape")>Landscape</MudSelectItem>
                         <MudSelectItem Value=@("Still Life")>Still Life</MudSelectItem>
@@ -52,7 +54,7 @@
                     <MudSelect @bind-Value="Filters.Type"
                                Label="Artwork Type"
                                Clearable="true"
-                               AnchorOrigin="Origin.BottomCenter">
+                               AnchorOrigin="Origin.BottomLeft">
                         <MudSelectItem Value=@("Painting")>Painting</MudSelectItem>
                         <MudSelectItem Value=@("Sculpture")>Sculpture</MudSelectItem>
                         <MudSelectItem Value=@("Drawing")>Drawing</MudSelectItem>
@@ -68,7 +70,7 @@
                     <MudSelect @bind-Value="Filters.Material"
                                Label="Material"
                                Clearable="true"
-                               AnchorOrigin="Origin.BottomCenter">
+                               AnchorOrigin="Origin.BottomLeft">
                         <MudSelectItem Value=@("Oil on Canvas")>Oil on Canvas</MudSelectItem>
                         <MudSelectItem Value=@("Acrylic")>Acrylic</MudSelectItem>
                         <MudSelectItem Value=@("Watercolor")>Watercolor</MudSelectItem>
@@ -128,7 +130,7 @@
     <DialogActions>
         <MudButton OnClick="Cancel" Color="Color.Secondary">Cancel</MudButton>
         <MudButton OnClick="ClearAllFilters" Color="Color.Warning" Variant="Variant.Text">Clear All</MudButton>
-        <MudButton OnClick="Submit" Color="Color.Primary" Variant="Variant.Filled">Apply Filters</MudButton>
+        <MudButton OnClick="Submit" Color="Color.Dark" Variant="Variant.Filled">Apply Filters</MudButton>
     </DialogActions>
 </MudDialog>
 

@@ -26,20 +26,15 @@
                     <MudItem xs="6" sm="4" md="3" lg="2"  style="padding: 8px;  height: 15rem;">
                         <a href="/collection/@item.Id" class="d-flex align-center mud-width-full" style="height: 100%; background-color: white;">
                             <MudPaper Class="d-flex flex-column" Elevation="2" Style="height: 100%; width: 100%; justify-content: space-between; position: relative;">
-                                <!-- Collection Preview/Icon Area -->
                                 <div class="collection-preview">
                                     @if (item.Artworks?.Any() == true)
                                     {
-                                        <!-- Show preview image if collection has artworks -->
                                         <div class="preview-image-container">
-                                            <MudIcon Icon="@Icons.Material.Filled.Collections"  
-                                                     Style="font-size: 3rem; color: var(--mud-palette-text-disabled);" />
-                                        
+                                            <MudImage ObjectFit="ObjectFit.Cover" Src="@item.Artworks.FirstOrDefault()?.Thumbnail?.Url" Style="height: 100%; width: 100%;"></MudImage> 
                                         </div>
                                     }
                                     else
                                     {
-                                        <!-- Empty collection placeholder -->
                                         <div class="empty-collection-placeholder">
                                             <MudIcon Icon="@Icons.Material.Filled.Collections"  
                                                                                 Style="font-size: 3rem; color: var(--mud-palette-text-disabled);" />
@@ -47,7 +42,6 @@
                                     }
                                 </div>
 
-                                <!-- Collection Info -->
                                 <div class="collection-info">
                                     <MudText Typo="Typo.subtitle1" Class="collection-name">
                                         @item.Name
