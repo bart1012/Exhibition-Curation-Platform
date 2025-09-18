@@ -7,6 +7,7 @@ namespace ECP.UI.Server.Services
     {
         Task<Result<UserCollections>> GetCollectionsAsync();
         Task<Result> CreateCollectionAsync(Collection collection);
+        Task<Result> DeleteCollectionAsync(string collectionID);
         Task<Result> AddArtworkToCollectionAsync(string collectionId, ArtworkPreview artwork);
         Task<Result> RemoveArtworkFromCollectionAsync(string collectionId, string artworkId);
         Task<Result<List<ArtworkPreview>>> GetCollectionArtworksAsync(string collectionId);
@@ -220,6 +221,28 @@ namespace ECP.UI.Server.Services
                 // Corrected message to reflect what the method is doing.
                 Console.WriteLine($"Error getting collection: {e.Message}");
                 return Result<Collection>.Failure($"Failed to get collection: {e.Message}");
+            }
+        }
+
+        public async Task<Result> DeleteCollectionAsync(string collectionID)
+        {
+            try
+            {
+                var userCollections = await EnsureUserCollectionsExistAsync();
+
+                if (!userCollections.Collections.Any(c => c.Id == collectionID))
+                {
+                    return Result.Failure($"No collection with the ID '{collectionID}' was found.");
+                }
+                int index = userCollections.Collections.FindIndex(c => c.Id == collectionID);
+                userCollections.Collections.RemoveAt(index);
+                await _localStorage.SetItemAsync<UserCollections>(COLLECTIONS_KEY, userCollections);
+                return Result.Success();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error removing collection: {e.Message}");
+                return Result.Failure($"Failed to remove collection: {e.Message}");
             }
         }
     }

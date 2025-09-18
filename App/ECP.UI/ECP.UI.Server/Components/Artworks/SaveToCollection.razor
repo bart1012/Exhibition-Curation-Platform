@@ -51,7 +51,6 @@
                                   @ref="_newCollectionNameInputRef" />
                 }
 
-                <!-- Action buttons -->
                 <div class="d-flex justify-space-between mt-3">
                     <MudButton OnClick="ToggleExpansion"
                                Variant="Variant.Text"
@@ -92,7 +91,7 @@
 
 @code {
     [Parameter]
-    public ArtworkPreview ArtworkPreview { get; set; } = null;
+    public ArtworkPreview? ArtworkPreview { get; set; } 
     private MudTextField<string>? _newCollectionNameInputRef;
     private MudSelect<string>? _selectRef;
     private string? CreateNew = "NewCollection";
@@ -101,7 +100,7 @@
     private bool _isAddingNewCollection = false;
     private string _newCollectionName = string.Empty;
     private string _selectedCollection = string.Empty;
-    private List<Collection> _userCollections = new();
+    private List<Collection>? _userCollections;
 
     protected override async Task OnInitializedAsync()
     {

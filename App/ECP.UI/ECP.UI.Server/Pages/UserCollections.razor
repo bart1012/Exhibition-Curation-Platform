@@ -3,11 +3,12 @@
 @using ECP.UI.Server.Services
 @using ECP.UI.Server.Components.Artworks
 @inject IUserCollectionsService CollectionsService
+@inject ISnackbar Snackbar
 @inherits UserCollectionsBase
 
 <div class="collections-page">
     <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-6">
-        <!-- Page Header -->
+     
         <div class="page-header mb-8">
             <MudText Typo="Typo.h3" Align="Align.Center" Class="mb-2" Style="font-weight: 300; color: var(--mud-palette-text-primary);">
                 Your Collections
@@ -17,7 +18,6 @@
             </MudText>
         </div>
 
-        <!-- Collections Grid -->
         @if (_userCollections?.Any() == true)
         {
             <MudGrid Spacing="3" Class="collections-grid">
@@ -42,24 +42,28 @@
                                     }
                                 </div>
 
-                                <div class="collection-info">
+                                <div class="collection-data">
+                                    <div class="collection-info">
                                     <MudText Typo="Typo.subtitle1" Class="collection-name">
                                         @item.Name
                                     </MudText>
                                     <MudText Typo="Typo.caption" Class="collection-count">
                                         @item.Artworks.Count @(item.Artworks.Count == 1 ? "artwork" : "artworks")
                                     </MudText>
+                                    </div>
                                 </div>
                
                             </MudPaper>
                         </a>
+                        <div class="collection-actions" style="position: relative; float: right; top: -100%; right: 0; width: 1.5rem; margin: 1rem;">
+                            <MudIconButton OnClick="() => HandleDelete(item.Id)" Class="ma-0 pa-0" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" />
+                        </div>
                     </MudItem>
                 }
             </MudGrid>
         }
         else
         {
-            <!-- Empty State -->
             <div class="empty-state">
                 <MudPaper Class="pa-8 text-center" Style="background: transparent;" Elevation="0">
                     <MudIcon Icon="@Icons.Material.Filled.Collections"  
@@ -83,12 +87,39 @@
     </MudContainer>
 </div>
 
+<style>
+    .mud-icon-root{
+        fill: white !important;
+        transition: fill 0.3s ease-out;
+    }
 
+    .mud-icon-button:hover .mud-icon-root {
+        fill: #ff441f !important;
+    }
+</style>
 
 @code {
     protected async override Task OnInitializedAsync()
     {
         await FetchCollections();
         StateHasChanged();
+    }
+
+
+    private async Task HandleDelete(string collectionID)
+    {
+        
+        var deleteResult = await CollectionsService.DeleteCollectionAsync(collectionID);
+        if (!deleteResult.IsSuccess)
+        {
+            Snackbar.Add("Ops! There was a problem on our end. Please try again.");
+        }
+        else
+        {
+            int index = _userCollections.FindIndex(c => c.Id == collectionID);
+            _userCollections.RemoveAt(index);
+            StateHasChanged();
+        }
+        
     }
 }
