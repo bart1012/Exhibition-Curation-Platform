@@ -17,12 +17,14 @@
     Edge="Edge.End" />
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="2" Class="mud-drawer-fixed" Style="z-index:5000">
-    <MudDrawerHeader>
+    <MudDrawerHeader Class="pa-0">
         <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
                        Color="Color.Default"
+                       DropShadow="false"
+                       Edge="Edge.Start"
                        Size="Size.Small"
                        OnClick="@DrawerToggle" 
-                       Style="color: black;"/>
+                       Style="padding-left: 2rem; justify-content: start; color: black; width: 100%; height: 100%; border-radius: 0;"/>
     </MudDrawerHeader>
     <MudNavMenu Color="Color.Dark">
         <MudNavLink Color="Color.Dark" Href="/" Match="NavLinkMatch.All">Explore</MudNavLink>
