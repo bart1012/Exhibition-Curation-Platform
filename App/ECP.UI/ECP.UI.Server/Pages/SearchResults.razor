@@ -46,7 +46,7 @@ else if (_artworkList != null)
         <MasonryGrid List="@_artworkList"></MasonryGrid>
 
         <div class="pagination-container">
-            <MudPagination Selected="@PageNumber" SelectedChanged="PageChanged" Color="Color.Dark" class="flex-none px-0" Count="@_totalPages" Size="Size.Large" />
+            <MudPagination Selected="@PageNumber" SelectedChanged="HandlePageChanged" Color="Color.Dark" class="flex-none px-0" Count="@_totalPages" Size="Size.Large" />
         </div>
     }
 
@@ -60,21 +60,24 @@ else if (_isServerError)
 @code {
     [Parameter]
     [SupplyParameterFromQuery(Name = "q")]
-    public string SearchQuery { get; set; }
+    public string? SearchQuery { get; set; }
 
     [Parameter]
     [SupplyParameterFromQuery(Name = "p")]
     public int PageNumber { get; set; }
 
-    private bool _isServerError = false;
-    private string? _sortQuery = null;
-    private string? _filtersQuery = null;
-    private int _totalPages { get; set; }
+    private const int ResultsPerPage = 25;
+    private bool _isLoading;
+    private bool _isServerError;
+    private string? _sortQuery;
+    private string? _filtersQuery;
+    private int _totalPages;
     private int _totalResults;
+
 
     private List<ArtworkPreview>? _artworkList = null;
 
-    private bool _isLoading = true;
+
 
     private async Task FetchDataAsync()
     {
@@ -98,21 +101,37 @@ else if (_isServerError)
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error fetching search results from SearchResults.razor: {ex.Message}");
-            _artworkList = null;
+            Console.WriteLine($"Error fetching search results in SearchResults.razor: {ex.Message}");
             _isServerError = true;
         }
         finally
         {
             _isLoading = false;
-            StateHasChanged();
         }
     }
 
-    protected override async Task OnParametersSetAsync()
+    private void NavigateToUpdatedPage(int newPageNumber, string? newFilters, string? newSort)
+    {
+        _isLoading = true;
+        var uri = NavManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+            {
+                ["q"] = SearchQuery,
+                ["p"] = newPageNumber,
+                ["filters"] = newFilters,
+                ["sort"] = newSort
+            });
+        NavManager.NavigateTo(uri);
+    }
+
+    protected override void OnParametersSet()
     {
         _isLoading = true;
         _artworkList = null;
+
+        if (PageNumber < 1)
+        {
+            PageNumber = 1;
+        }
 
         InvokeAsync(async () =>
            {
@@ -121,35 +140,28 @@ else if (_isServerError)
            });
     }
 
-
-    private void PageChanged(int i)
+    private void HandlePageChanged(int i)
     {
-        _isLoading = true;
-        StateHasChanged();
-        NavManager.NavigateTo($"/search?q={SearchQuery}&p={i}{_filtersQuery}{_sortQuery}");
+        NavigateToUpdatedPage(i, _filtersQuery, _sortQuery);
     }
 
-    private async Task HandleFiltersChanged(string filters)
+    private void HandleFiltersChanged(string filters)
     {
-        _isLoading = true;
-        StateHasChanged();
+
         _filtersQuery = filters;
-        PageNumber = 1;
-        NavManager.NavigateTo($"/search?q={SearchQuery}&p={PageNumber}{_filtersQuery}{_sortQuery}");
+        NavigateToUpdatedPage(1, _filtersQuery, _sortQuery);
+
     }
 
-    private async Task HandleSortChanged(SortOptions options)
+    private void HandleSortChanged(SortOptions options)
     {
         if (string.IsNullOrEmpty(options.SortBy))
         {
             return;
         }
 
-        _isLoading = true;
-        StateHasChanged();
-        string sortQuery = options.BuildSortQuery();
-        _sortQuery = sortQuery;
-        PageNumber = 1;
-        NavManager.NavigateTo($"/search?q={SearchQuery}&p={PageNumber}{_filtersQuery}{_sortQuery}");
+        _sortQuery = options.BuildSortQuery();
+        NavigateToUpdatedPage(1, _filtersQuery, _sortQuery);
+
     }
 }
