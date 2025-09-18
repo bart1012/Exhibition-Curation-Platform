@@ -5,17 +5,18 @@
 @using ECP.UI.Server.Components.Error
 @using ECP.UI.Server.Components.Artworks
 
-    @if (isLoading)
+    @if (_isLoading)
     {
         <Loading Message="Preparing artwork..."></Loading>
     }
     else if (_artwork != null)
     {
-    <div class="artwork-details-container">
+        <div class="artwork-details-container">
 
         <MudGrid Class="artwork-grid h-100 w-auto ma-0 pa-0" Style="width: 100%; max-width: 100%;">
             <MudItem xs="12" md="7" style=" border-right: none;" Class=" pa-0 artwork-image-panel">
                 <div class="image-container">
+              
                     @if (!string.IsNullOrEmpty(_artwork.Images?.Web?.Url))
                     {
                         <MudImage Src="@_artwork.Images.Web.Url"
@@ -41,7 +42,6 @@
                     }
                 </div>
             </MudItem>
-
             <MudItem xs="12" md="5" Class="artwork-details-panel pa-0 pl-5 pr-5">
                 <div class="details-content">
                     <div class="artwork-header">
@@ -60,8 +60,6 @@
                             <SaveToCollection ArtworkPreview="_artworkPreview"></SaveToCollection>
                         </div>
                     </div>
-
-                    <hr style="my-3" />
 
                     <div class="details-scroll-area">
                         <MudCard Class="info-card mb-4" Elevation="1">
@@ -582,7 +580,6 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
 }
 
 .title-section {
@@ -595,8 +592,10 @@
 .action-section {
     width: 100%;
     position: relative;
-    flex-shrink: 0;
+    top: 0;
+    left: 0;
     padding-left: 10px;
+    margin: 1rem 0 1rem 0;
 }
 
 .artwork-title {
@@ -688,23 +687,17 @@
     [Parameter]
     public int SourceId { get; set; }
 
-    private Artwork _artwork = null;
-    private ArtworkPreview _artworkPreview = null;
-    private bool isLoading = true;
-    private bool _isServerError = false;
+    private Artwork? _artwork;
+    private ArtworkPreview? _artworkPreview;
+    private bool _isLoading;
+    private bool _isServerError;
+    private bool _saved;
 
-    private bool _expanded = true;
-    private bool _saved { get; set; } = false;
-
-    private void OnExpandCollapseClick()
-    {
-        _expanded = !_expanded;
-    }
 
     protected override async Task OnParametersSetAsync()
     {
         _isServerError = false;
-        isLoading = true;
+        _isLoading = true;
         _artwork = null;
 
         InvokeAsync(async () =>
@@ -722,25 +715,30 @@
 
             if (response.IsSuccess)
             {
-                _isServerError = false;
                 _artwork = response.Value;
                 _artworkPreview = ArtworkMappers.ToArtworkPreview(response.Value);
+                _isServerError = false;
+
             }
             else
             {
                 _isServerError = true;
+                //temp logic for hot-reload
+                // _artwork = null;
+                // _artworkPreview = null;
                 _artwork = GetHotReloadPlaceholderArtwork();
                 _artworkPreview = ArtworkMappers.ToArtworkPreview(_artwork);
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error fetching artwork: {ex.Message}");
+            Console.WriteLine($"Error fetching artwork in ArtworkDetails.razor: {ex.Message}");
             _artwork = null;
+            _artworkPreview = null;
         }
         finally
         {
-            isLoading = false;
+            _isLoading = false;
         }
     }
 
