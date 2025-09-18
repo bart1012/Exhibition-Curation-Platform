@@ -1,4 +1,4 @@
-﻿namespace ECP.UI.Server.Components.Shared
+﻿namespace ECP.UI.Server.Components.Search
 {
     public enum SearchBarColor
     {

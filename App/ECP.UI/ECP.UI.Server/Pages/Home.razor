@@ -1,7 +1,9 @@
 ﻿@rendermode InteractiveServer
 @page "/"
+@inject IBackgroundService BackgroundService
 @using ECP.UI.Server.Components.Shared
 @using ECP.UI.Server.Models
+@using ECP.UI.Server.Components.Search
 
 
 <PageTitle>Home</PageTitle>
@@ -27,34 +29,12 @@
     }
 </style>
 @code{
-    public string TextValue { get; set; }
-    private Random _random = new();
-    private List<ImageCaption> imgObjects = new List<ImageCaption>
-        {
-            new ImageCaption()
-            {
-                ImgUrl = "https://openaccess-cdn.clevelandart.org/1981.18/1981.18_web.jpg",
-                Title = "The Holy Family on the Steps",
-                Artist = "Nicolas Poussin (French, 1594–1665)"
-            },
-            new ImageCaption()
-            {
-                ImgUrl = "https://openaccess-cdn.clevelandart.org/1951.355/1951.355_web.jpg",
-                Title = "Portrait of a Family Playing Music",
-                Artist = "Pieter de Hooch (Dutch, 1629–1684)"
-            },
-            new ImageCaption()
-            {
-                ImgUrl = "https://openaccess-cdn.clevelandart.org/1965.233/1965.233_web.jpg",
-                Title = "Twilight in the Wilderness",
-                Artist = "Frederic Edwin Church (American, 1826–1900)"
-            }
-        };
-    private ImageCaption backgroundData = null;
+
+    private BackgroundData backgroundData = null;
 
     protected override void OnInitialized()
     {
-        backgroundData = imgObjects[_random.Next(0,2)];
+        backgroundData = BackgroundService.GetBackgroundImage();
     }
 
 }

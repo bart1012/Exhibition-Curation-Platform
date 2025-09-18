@@ -2,8 +2,8 @@ using Blazored.LocalStorage;
 using ECP.UI.Server.Services;
 using MudBlazor.Services;
 using System.Text.Json;
-using ECP.UI.Client;
 using System.Text.Json.Serialization;
+using BackgroundService = ECP.UI.Server.Services.BackgroundService;
 
 namespace ECP.UI.Server
 {
@@ -26,12 +26,13 @@ namespace ECP.UI.Server
             });
 
 
-            // Add services to the container.
+
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents()
                 .AddInteractiveWebAssemblyComponents();
 
             builder.Services.AddScoped<IArtworkService, ArtworkService>();
+            builder.Services.AddSingleton<IBackgroundService, BackgroundService>();
             builder.Services.AddScoped<IUserCollectionsService, UserCollectionsService>();
             builder.Services.AddHttpClient<ArtworkService>(client =>
             {
