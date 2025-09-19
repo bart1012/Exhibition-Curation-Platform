@@ -33,7 +33,7 @@
                                     @if (item.Artworks?.Any() == true)
                                     {
                                         <div class="preview-image-container">
-                                            <MudImage ObjectFit="ObjectFit.Cover" Src="@item.Artworks.FirstOrDefault()?.Thumbnail?.Url" Style="height: 100%; width: 100%;"></MudImage> 
+                                            <MudImage ObjectFit="ObjectFit.Cover" Src="@item.Artworks.LastOrDefault()?.Thumbnail?.Url" Style="height: 100%; width: 100%;"></MudImage> 
                                         </div>
                                     }
                                     else
@@ -122,9 +122,7 @@
         fill: grey !important;
     }
 
-    .mud-button-root svg{
-        fill: white !important;
-    }
+
 
     .add-btn svg{
         fill: white !important;

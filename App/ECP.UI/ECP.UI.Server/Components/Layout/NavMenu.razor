@@ -1,67 +1,83 @@
 ﻿@using MudBlazor;
-@inject NavigationManager Navigation
+@using ECP.UI.Server.Components.Search
+@inject NavigationManager NavManager
 @implements IDisposable
 
-    <MudAppBar Elevation="0" Color="Color.Transparent">
-    @if (!_drawerOpen)
+    <MudAppBar Elevation="0"  Fixed="false" Color="Color.Transparent">
+ 
+  
+   
+    @if (NavManager.ToBaseRelativePath(NavManager.Uri) != "")
     {
-    <MudIconButton Icon="@Icons.Material.Filled.Menu"
-    Color="Color.Inherit"
-    Size="Size.Large"
-    Edge="Edge.Start"
-    OnClick="@DrawerToggle" />
+        <MudLink Color="Color.Default"
+                 Href="/"
+                 >
+            Home
+        </MudLink>
+        <MudSpacer />
+        <MudLink Href="/collections" Class="nav-link collections-link rounded-pill" Underline="Underline.None">
+            <MudIcon Icon="@Icons.Material.Filled.CollectionsBookmark" Style="height: 100%;" />
+            Collections
+        </MudLink>
+        <MudLink Href="/search" Class="nav-link explore-link collections-link rounded-pill" Underline="Underline.None">
+            <MudIcon Icon="@Icons.Material.Filled.Explore" Style="height: 100%;" />
+            Explore
+        </MudLink>
+        <div class="search-controls">
+            <SearchBar SearchBarColor="SearchBarColor.WHITE"></SearchBar>
+        </div>
+     
     }
-    <MudSpacer />
-    <MudIconButton Icon="@Icons.Material.Filled.MoreVert"
-    Color="Color.Inherit"
-    Edge="Edge.End" />
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="2" Class="mud-drawer-fixed" Style="z-index:5000">
-    <MudDrawerHeader Class="pa-0">
-        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
-                       Color="Color.Default"
-                       DropShadow="false"
-                       Edge="Edge.Start"
-                       Size="Size.Small"
-                       OnClick="@DrawerToggle" 
-                       Style="padding-left: 2rem; border-bottom: 1px solid grey; justify-content: start; color: black; width: 100%; height: 100%; border-radius: 0;"/>
-    </MudDrawerHeader>
-    <MudNavMenu Color="Color.Dark">
-        <MudNavLink Color="Color.Dark" Href="/" Match="NavLinkMatch.All">Explore</MudNavLink>
-        <MudNavLink Href="/collections">My Collections</MudNavLink>
-        <MudNavLink Href="/search">Search</MudNavLink>
-    </MudNavMenu>
-</MudDrawer>
+
 
 <style>
-    .mud-icon-size-medium{
-        fill: black !important;
+ 
+
+    .nav-link {
+        display: flex;
+        padding: 0.3rem 1rem 0.3rem 1rem;
+        flex-direction: row;
+        align-content: center;
+        align-items: center;
+        color: dimgray;
+        margin-left: 1rem;
+        transition: transform 1s ease-in-out;
     }
+
+    .explore-link{  
+        margin-right: 1.5rem;
+        margin-left: 0.5rem !important;
+    }
+
+        .nav-link svg {
+        fill: gray !important;
+        margin-right: 0.5rem;
+    }
+
+        .nav-link:hover {
+            background-color: #e3e3e3;
+      }
 </style>
  
 
 
 @code{
-    private bool _drawerOpen = false;
+    
 
     protected override void OnInitialized()
     {
-        Navigation.LocationChanged += OnLocationChanged;
+        NavManager.LocationChanged += OnLocationChanged;
     }
 
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    private void OnLocationChanged(object sender, LocationChangedEventArgs e)
     {
-        _drawerOpen = false;
         StateHasChanged();
-    }
-
-    private void DrawerToggle()
-    {
-        _drawerOpen = !_drawerOpen; // Fixed this too!
     }
 
     public void Dispose()
     {
-        Navigation.LocationChanged -= OnLocationChanged;
+        NavManager.LocationChanged -= OnLocationChanged;
     }
+  
 }

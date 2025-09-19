@@ -8,11 +8,15 @@
 
 @inject ArtworkService ArtworkService
 @inject NavigationManager NavManager
- 
-<SearchQueryPanel SearchBarColor="SearchBarColor.WHITE" SearchQuery="@SearchQuery" OnSortChanged="@HandleSortChanged" OnFiltersChanged="@HandleFiltersChanged"></SearchQueryPanel>
+@inject IDialogService DialogService
 
+ 
 
 <div class="search-results-container" style="display: flex; flex-direction: column; height: 100%; justify-content: center;">
+
+
+ 
+
 @if (_isLoading)
 {
     <Loading Message="Fetching relevant artworks..."></Loading>
@@ -26,6 +30,7 @@ else if (_artworkList != null)
     }
     else
     {
+       
         <div class="results-header mb-2">
                 <MudText Typo="Typo.h5" Class="results-title mt-5">
                     @if (!string.IsNullOrWhiteSpace(SearchQuery))
@@ -38,10 +43,41 @@ else if (_artworkList != null)
                     }
                 </MudText>
                 <MudDivider Class="my-3" />
-            <MudText Typo="Typo.body2" Class="text-secondary mb-5">
-                Showing @(((PageNumber - 1) * 25) + 1) - @Math.Min(PageNumber * 25, _totalResults)
-                of @_totalResults results
-            </MudText>
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <MudText Typo="Typo.body2" Class="text-secondary mb-5">
+                    Showing @(((PageNumber - 1) * 25) + 1) - @Math.Min(PageNumber * 25, _totalResults)
+                    of @_totalResults results
+                </MudText>
+                    <div class="search-controls">
+                        <MudButton OnClick="OpenFilterDialog" Variant="Variant.Outlined" Color="Color.Dark" StartIcon="@Icons.Material.Filled.FilterList" Class="rounded-pill search-button">
+                            Filter
+                        </MudButton>
+                        <MudButtonGroup Color="Color.Default" Variant="Variant.Outlined">
+
+                            <MudMenu FullWidth="true"
+                                     AnchorOrigin="Origin.BottomLeft">
+                                <ActivatorContent>
+                                    <MudButton Class="rounded-l-xl px-10" Style="min-width: 12rem;">
+                                        @_sortText
+                                    </MudButton>
+                                </ActivatorContent>
+                                <ChildContent>
+                                    <MudMenuItem Style="min-width: 12rem;" OnClick="@(() => SetSortField(0))">Creation Date</MudMenuItem>
+                                    <MudMenuItem Style="min-width: 12rem;" OnClick="@(() => SetSortField(1))">Alphabetically</MudMenuItem>
+                                </ChildContent>
+                            </MudMenu>
+
+                            <MudToggleIconButton Toggled="_isDescending"
+                                                 ToggledChanged="SetSortDirection"
+                                                 Icon="@Icons.Material.Filled.ArrowUpward"
+                                                 Color="@Color.Dark"
+                                                 Size="Size.Small"
+                                                 ToggledIcon="@Icons.Material.Filled.ArrowDownward"
+                                                 ToggledColor="@Color.Dark"
+                                                 Class="rounded-r-xl" />
+                        </MudButtonGroup>
+                    </div>
+            </div>
         </div>
         <MasonryGrid List="@_artworkList"></MasonryGrid>
 
@@ -67,7 +103,10 @@ else if (_isServerError)
     public int PageNumber { get; set; }
 
     private const int ResultsPerPage = 25;
+    private bool _isDescending = true;
     private bool _isLoading;
+    private string _sortText = "Sort";
+    private string _sortBy = string.Empty;
     private bool _isServerError;
     private string? _sortQuery;
     private string? _filtersQuery;
@@ -96,6 +135,7 @@ else if (_isServerError)
             }
             else
             {
+                Console.WriteLine($"Fetching data with filter {_filtersQuery}");
                 response = await ArtworkService.SearchArtworksByQueryAsync(SearchQuery, 25, PageNumber, _sortQuery, _filtersQuery);
 
             }
@@ -145,11 +185,71 @@ else if (_isServerError)
             PageNumber = 1;
         }
 
+
+
         InvokeAsync(async () =>
            {
                await FetchDataAsync();
                StateHasChanged();
            });
+    }
+
+    private async Task SetSortDirection(bool newIsDescending)
+    {
+        _isDescending = newIsDescending;
+        HandleSortChanged(new SortOptions() { SortBy = _sortBy, IsDescending = _isDescending });
+
+    }
+
+    private async void SetSortField(int id)
+    {
+        SetSortButtonText(id);
+        _sortBy = id == 0 ? "date" : "title";
+        HandleSortChanged(new SortOptions() { SortBy = _sortBy, IsDescending = _isDescending });
+
+    }
+
+    private void SetSortButtonText(int id)
+    {
+
+
+        switch (id)
+        {
+            case 0:
+                _sortText = "Creation Date";
+                break;
+            case 1:
+                _sortText = "Alphabetically";
+                break;
+        }
+
+    }
+
+    private async Task OpenFilterDialog()
+    {
+        var parameters = new DialogParameters();
+        var options = new DialogOptions
+            {
+                CloseOnEscapeKey = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+
+        var dialog = await DialogService.ShowAsync<ArtworkFilterDialog>("Filter Artworks", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data != null)
+        {
+            var filters = (ArtworkFilters) result.Data;
+            await ApplyFilters(filters);
+        }
+    }
+
+    private async Task ApplyFilters(ArtworkFilters filters)
+    {
+        ArtworkFilterDialogHelper filterHelper = new(filters);
+        string urlFilterQuery = filterHelper.BuildFilterQuery();
+        HandleFiltersChanged(urlFilterQuery);
     }
 
     private void HandlePageChanged(int i)
