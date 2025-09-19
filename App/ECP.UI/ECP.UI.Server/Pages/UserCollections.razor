@@ -1,13 +1,16 @@
 ﻿@page "/collections"
 @rendermode InteractiveAuto
+@using ECP.UI.Server.Components.Collections
 @using ECP.UI.Server.Services
 @using ECP.UI.Server.Components.Artworks
 @inject IUserCollectionsService CollectionsService
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 @inherits UserCollectionsBase
 
+
 <div class="collections-page">
-    <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-6">
+    <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-6 h-100" Style="height: 100%; display: flex; flex-direction: column; ">
      
         <div class="page-header mb-8">
             <MudText Typo="Typo.h3" Align="Align.Center" Class="mb-2" Style="font-weight: 300; color: var(--mud-palette-text-primary);">
@@ -60,13 +63,22 @@
                         </div>
                     </MudItem>
                 }
+                <MudItem xs="6" sm="4" md="3" lg="2" style="padding: 8px;  height: 15rem;">
+                        <div class="add-btn-container">
+                            <MudIconButton Class="add-btn px-6 py-2" Icon="@Icons.Material.Filled.Add"  
+                                           Variant="Variant.Filled"
+                                           OnClick="OpenAddDialog"
+                                           Size="Size.Large"
+                                           Style="width: 100%; height: 100%; font-size: 3rem; color: var(--mud-palette-text-disabled); " />
+                        </div>
+                </MudItem>
             </MudGrid>
         }
         else
         {
             <div class="empty-state">
-                <MudPaper Class="pa-8 text-center" Style="background: transparent;" Elevation="0">
-                    <MudIcon Icon="@Icons.Material.Filled.Collections"  
+                <MudPaper Class="pa-8 text-center d-flex flex-column" Style="background: transparent; justify-content: center; text-align: center;" Elevation="0">
+                    <MudIcon Color="Color.Primary" Icon="@Icons.Material.Filled.Collections"  
                                             Style="font-size: 4rem; color: var(--mud-palette-text-disabled); margin-bottom: 16px;" />
                     <MudText Typo="Typo.h6" Class="mb-2" Style="color: var(--mud-palette-text-secondary);">
                         No Collections Yet
@@ -77,9 +89,18 @@
                     <MudButton Variant="Variant.Filled"  
                                                Color="Color.Primary"  
                                                StartIcon="@Icons.Material.Filled.Add"
+                                               IconColor="Color.Secondary"
                                                Class="mt-4"
                                                Href="/explore">
                         Explore Artworks
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled"  
+                               Color="Color.Primary"  
+                               StartIcon="@Icons.Material.Filled.Add"
+                               IconColor="Color.Secondary"
+                               Class="mt-4"
+                               OnClick="OpenAddDialog">
+                        Create New Collection
                     </MudButton>
                 </MudPaper>
             </div>
@@ -88,13 +109,25 @@
 </div>
 
 <style>
-    .mud-icon-root{
+    .collection-actions svg{
         fill: white !important;
         transition: fill 0.3s ease-out;
     }
 
-    .mud-icon-button:hover .mud-icon-root {
+    .collection-actions:hover svg {
         fill: #ff441f !important;
+    }
+    .empty-state svg{
+        width: 100%;
+        fill: grey !important;
+    }
+
+    .mud-button-root svg{
+        fill: white !important;
+    }
+
+    .add-btn svg{
+        fill: white !important;
     }
 </style>
 
@@ -105,6 +138,38 @@
         StateHasChanged();
     }
 
+    private async Task OpenAddDialog()
+    {
+        var options = new DialogOptions
+            {
+                CloseOnEscapeKey = true,
+                MaxWidth = MaxWidth.ExtraSmall,
+                FullWidth = true
+            };
+
+        var dialog = await DialogService.ShowAsync<NewCollectionDialog>("Add New Collection", options);
+        var result = await dialog.Result;
+        if (!result.Canceled && result.Data != null)
+        {
+            var collectionName = (string) result.Data;
+            await CreateNewCollection(collectionName);
+        }
+    }
+
+    private async Task CreateNewCollection(string collectionName)
+    {
+        Collection newCollection = new Collection(collectionName);
+        var addResult = await CollectionsService.CreateCollectionAsync(newCollection);
+        if (!addResult.IsSuccess)
+        {
+            Snackbar.Add("Ops! There was a problem on our end. Please try again.");
+        }
+        else
+        {
+            _userCollections.Add(newCollection);
+            StateHasChanged();
+        }
+    }
 
     private async Task HandleDelete(string collectionID)
     {
