@@ -3,12 +3,13 @@
 @inject NavigationManager NavManager
 @implements IDisposable
 
-    <MudAppBar Elevation="0"  Fixed="false" Color="Color.Transparent">
+    <MudAppBar Elevation="0" Fixed="false" Color="Color.Transparent" WrapContent="true" Class="px-2">
  
   
    
     @if (NavManager.ToBaseRelativePath(NavManager.Uri) != "")
     {
+
         <MudLink Color="Color.Default"
                  Href="/"
                  >
@@ -16,23 +17,38 @@
         </MudLink>
         <MudSpacer />
         <MudLink Href="/collections" Class="nav-link collections-link rounded-pill" Underline="Underline.None">
-            <MudIcon Icon="@Icons.Material.Filled.CollectionsBookmark" Style="height: 100%;" />
-            Collections
+            <MudIcon Icon="@Icons.Material.Filled.CollectionsBookmark" Style="height: 100%;" Class="nav-icon"/>
+             <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                Collections
+            </MudHidden>
         </MudLink>
         <MudLink Href="/search" Class="nav-link explore-link collections-link rounded-pill" Underline="Underline.None">
-            <MudIcon Icon="@Icons.Material.Filled.Explore" Style="height: 100%;" />
-            Explore
+            <MudIcon Icon="@Icons.Material.Filled.Explore" Style="height: 100%;" Class="nav-icon" />
+            <MudHidden Breakpoint="Breakpoint.SmAndDown">
+                Explore
+            </MudHidden>
         </MudLink>
-        <div class="search-controls">
-            <SearchBar SearchBarColor="SearchBarColor.WHITE"></SearchBar>
-        </div>
+        <MudHidden Breakpoint="Breakpoint.SmAndDown">
+            <div class="search-controls">
+                <SearchBar SearchBarColor="SearchBarColor.WHITE"></SearchBar>
+            </div>
+        </MudHidden>
+        <MudHidden Breakpoint="Breakpoint.LgAndUp">
+            <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Large"></MudIcon>
+        </MudHidden>
+      
      
     }
     </MudAppBar>
 
 
 <style>
- 
+     @@media (min-width: 960px) {
+        .nav-icon{
+            font-size: 2.25rem !important;
+        }
+    }
+   
 
     .nav-link {
         display: flex;

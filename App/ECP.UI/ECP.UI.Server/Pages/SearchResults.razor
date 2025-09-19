@@ -12,11 +12,7 @@
 
  
 
-<div class="search-results-container" style="display: flex; flex-direction: column; height: 100%; justify-content: center;">
-
-
- 
-
+<main class="search-results-container">
 @if (_isLoading)
 {
     <Loading Message="Fetching relevant artworks..."></Loading>
@@ -43,7 +39,7 @@ else if (_artworkList != null)
                     }
                 </MudText>
                 <MudDivider Class="my-3" />
-            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+            <div class="search-results-info" style="display: flex; flex-direction: row; justify-content: space-between;">
                 <MudText Typo="Typo.body2" Class="text-secondary mb-5">
                     Showing @(((PageNumber - 1) * 25) + 1) - @Math.Min(PageNumber * 25, _totalResults)
                     of @_totalResults results
@@ -91,7 +87,7 @@ else if (_isServerError)
 {
     <ServerErrorMessage></ServerErrorMessage>
 }
-</div>
+</main>
 
 @code {
     [Parameter]

@@ -13,5 +13,14 @@
     padding: 2rem;
 }
 
+.search-results-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    max-width: 100vw;
+    background-color: red;
+}
+
 
 
