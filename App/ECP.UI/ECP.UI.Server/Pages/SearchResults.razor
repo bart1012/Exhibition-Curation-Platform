@@ -86,7 +86,19 @@ else if (_isServerError)
         _artworkList = null;
         try
         {
-            var response = await ArtworkService.SearchArtworksByQueryAsync(SearchQuery, 25, PageNumber, _sortQuery, _filtersQuery);
+
+            Result<PaginatedResponse<ArtworkPreview>> response;
+
+            if (string.IsNullOrEmpty(SearchQuery))
+            {
+                response = await ArtworkService.GetArtworkPreviewsAsync(200, 25, PageNumber);
+
+            }
+            else
+            {
+                response = await ArtworkService.SearchArtworksByQueryAsync(SearchQuery, 25, PageNumber, _sortQuery, _filtersQuery);
+
+            }
 
             if (response.IsSuccess)
             {

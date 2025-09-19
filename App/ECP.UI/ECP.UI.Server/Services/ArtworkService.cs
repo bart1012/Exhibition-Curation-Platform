@@ -38,7 +38,6 @@ namespace ECP.UI.Server.Services
             {
                 url.Append(filterOptions);
             }
-            Console.WriteLine($"URL FROM UI SERVICE: {url.ToString()}");
             return await ExecuteApiCallAsync<PaginatedResponse<ArtworkPreview>>(url.ToString());
         }
 
