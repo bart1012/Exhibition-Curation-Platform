@@ -7,9 +7,6 @@
     margin-bottom: 2rem;
 }
 
-.collections-grid {
-    margin: 0;
-}
 
 .collection-item-wrapper {
     padding: 8px;
@@ -137,14 +134,7 @@
     font-weight: 400;
 }
 
-.empty-state {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1 1 auto;
-    position: relative;
-    top: -10%;
-}
+
 
 @media (max-width: 600px) {
     .collections-page {
@@ -165,7 +155,7 @@
     }
 }
 
-@media (min-width: 960px) {
+@media (max-width: 960px) {
     .collection-card {
         height: 240px;
     }

@@ -17,13 +17,13 @@
         </MudLink>
         <MudSpacer />
         <MudLink Href="/collections" Class="nav-link collections-link rounded-pill" Underline="Underline.None">
-            <MudIcon Icon="@Icons.Material.Filled.CollectionsBookmark" Style="height: 100%;" Class="nav-icon"/>
+            <MudIcon Size="Size.Medium" Icon="@Icons.Material.Filled.CollectionsBookmark" Style="height: 100%;" Class="nav-icon" />
              <MudHidden Breakpoint="Breakpoint.SmAndDown">
                 Collections
             </MudHidden>
         </MudLink>
         <MudLink Href="/search" Class="nav-link explore-link collections-link rounded-pill" Underline="Underline.None">
-            <MudIcon Icon="@Icons.Material.Filled.Explore" Style="height: 100%;" Class="nav-icon" />
+            <MudIcon Size="Size.Medium" Icon="@Icons.Material.Filled.Explore" Style="height: 100%;" Class="nav-icon" />
             <MudHidden Breakpoint="Breakpoint.SmAndDown">
                 Explore
             </MudHidden>
@@ -34,7 +34,7 @@
             </div>
         </MudHidden>
         <MudHidden Breakpoint="Breakpoint.LgAndUp">
-            <MudIcon Icon="@Icons.Material.Filled.Search" Size="Size.Large"></MudIcon>
+            <MudIcon Class="nav-icon" Icon="@Icons.Material.Filled.Search" Size="Size.Large"></MudIcon>
         </MudHidden>
       
      
@@ -43,9 +43,10 @@
 
 
 <style>
-     @@media (min-width: 960px) {
+     @@media (max-width: 960px) {
         .nav-icon{
             font-size: 2.25rem !important;
+            fill: gray !important;
         }
     }
    
