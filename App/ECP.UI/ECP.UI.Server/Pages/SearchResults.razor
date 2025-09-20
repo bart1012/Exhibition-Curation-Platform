@@ -1,80 +1,94 @@
 ﻿@page "/search"
 @rendermode InteractiveAuto
 
-@using ECP.UI.Server.Components
+@using ECP.UI.Server.Components.Error
 @using ECP.UI.Server.Components.Shared
 @using ECP.UI.Server.Components.Search
 @using ECP.UI.Server.Models
 
 @inject ArtworkService ArtworkService
 @inject NavigationManager NavManager
+@inject IDialogService DialogService
+
  
-<SearchQueryPanel SearchBarColor="SearchBarColor.WHITE" SearchQuery="@SearchQuery" OnSortChanged="@HandleSortChanged" OnFiltersChanged="@HandleFiltersChanged"></SearchQueryPanel>
 
-
-<div class="search-results-container" style="display: flex; flex-direction: column; min-height: 100%; justify-content: center;">
-    @if (_isLoading)
+<main class="search-results-container">
+@if (_isLoading)
 {
-    <Loading></Loading>
+    <Loading Message="Fetching relevant artworks..."></Loading>
 }
 else if (_artworkList != null)
 {
 
     if (!_artworkList.Any())
     {
-        <Error.NoResultsMessage></Error.NoResultsMessage>
+        <NoResultsMessage></NoResultsMessage>
     }
     else
     {
-        <div class="results-header mb-2">
-                <MudText Typo="Typo.h5" Class="results-title">
-                    @if (!string.IsNullOrWhiteSpace(SearchQuery))
-                    {
-                        <text>Results for "@SearchQuery"</text>
-                    }
-                    else
-                    {
-                        <text>All Artworks</text>
-                    }
-                </MudText>
-                <MudDivider Class="my-3" />
-            <MudText Typo="Typo.body2" Class="text-secondary mb-5">
-                Showing @(((PageNumber - 1) * 25) + 1) - @Math.Min(PageNumber * 25, _totalResults)
-                of @_totalResults results
-            </MudText>
-        </div>
+       
+        <SearchResultsHeader 
+            SearchQuery="SearchQuery"
+            PageNumber="PageNumber"
+            TotalResults="_totalResults"
+            OnFilterClick="OpenFilterDialog"
+            OnSortDirectionClick="SetSortDirection"
+            OnSortFieldClick="SetSortField" />
+
         <MasonryGrid List="@_artworkList"></MasonryGrid>
 
         <div class="pagination-container">
-            <MudPagination Selected="@PageNumber" SelectedChanged="PageChanged" Color="Color.Dark" class="flex-none px-0" Count="@_totalPages" Size="Size.Large" />
+            <MudPagination BoundaryCount="1" MiddleCount="1" Style="max-width: 100%;" Selected="@PageNumber" SelectedChanged="HandlePageChanged" Color="Color.Dark" Count="@_totalPages" Size="Size.Large" />
         </div>
     }
 
 }
 else if (_isServerError)
 {
-    <Error.ServerErrorMessage></Error.ServerErrorMessage>
+    <ServerErrorMessage></ServerErrorMessage>
 }
-</div>
+</main>
+
+<style>
+    .sort-direction-btn svg{
+        font-size: 1.25rem !important;
+        padding-top: 2.5px !important;
+    }
+
+    .sort-direction-btn {
+        padding-top: 0;
+    }
+
+    .no-hover:hover {
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+</style>
 
 @code {
     [Parameter]
     [SupplyParameterFromQuery(Name = "q")]
-    public string SearchQuery { get; set; }
+    public string? SearchQuery { get; set; }
 
     [Parameter]
     [SupplyParameterFromQuery(Name = "p")]
     public int PageNumber { get; set; }
 
-    private bool _isServerError = false;
-    private string? _sortQuery = null;
-    private string? _filtersQuery = null;
-    private int _totalPages { get; set; }
+    private const int ResultsPerPage = 25;
+    private bool _isDescending = true;
+    private bool _isLoading;
+    private string _sortText = "Sort";
+    private string _sortBy = string.Empty;
+    private bool _isServerError;
+    private string? _sortQuery;
+    private string? _filtersQuery;
+    private int _totalPages;
     private int _totalResults;
+
 
     private List<ArtworkPreview>? _artworkList = null;
 
-    private bool _isLoading = true;
+
 
     private async Task FetchDataAsync()
     {
@@ -83,7 +97,19 @@ else if (_isServerError)
         _artworkList = null;
         try
         {
-            var response = await ArtworkService.SearchArtworksByQueryAsync(SearchQuery, 25, PageNumber, _sortQuery, _filtersQuery);
+
+            Result<PaginatedResponse<ArtworkPreview>> response;
+
+            if (string.IsNullOrEmpty(SearchQuery))
+            {
+                response = await ArtworkService.GetArtworkPreviewsAsync(200, 25, PageNumber);
+
+            }
+            else
+            {
+                response = await ArtworkService.SearchArtworksByQueryAsync(SearchQuery, 25, PageNumber, _sortQuery, _filtersQuery);
+
+            }
 
             if (response.IsSuccess)
             {
@@ -98,47 +124,110 @@ else if (_isServerError)
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error fetching search results from SearchResults.razor: {ex.Message}");
-            _artworkList = null;
+            Console.WriteLine($"Error fetching search results in SearchResults.razor: {ex.Message}");
             _isServerError = true;
         }
         finally
         {
             _isLoading = false;
-            StateHasChanged();
         }
     }
 
-    protected override async Task OnParametersSetAsync()
+    private void NavigateToUpdatedPage(int newPageNumber, string? newFilters, string? newSort)
+    {
+        _isLoading = true;
+        var uri = NavManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+            {
+                ["q"] = SearchQuery,
+                ["p"] = newPageNumber,
+                ["filters"] = newFilters,
+                ["sort"] = newSort
+            });
+        NavManager.NavigateTo(uri);
+    }
+
+    protected override void OnParametersSet()
     {
         _isLoading = true;
         _artworkList = null;
-        await FetchDataAsync();
 
+        if (PageNumber < 1)
+        {
+            PageNumber = 1;
+        }
+
+
+
+        InvokeAsync(async () =>
+           {
+               await FetchDataAsync();
+               StateHasChanged();
+           });
+    }
+
+    private async Task SetSortDirection(bool newIsDescending)
+    {
+        _isDescending = newIsDescending;
+        HandleSortChanged(new SortOptions() { SortBy = _sortBy, IsDescending = _isDescending });
 
     }
 
-    private void PageChanged(int i)
+    private async void SetSortField(int id)
     {
-        NavManager.NavigateTo($"/search?q={SearchQuery}&p={i}{_filtersQuery}{_sortQuery}");
+        _sortBy = id == 0 ? "date" : "title";
+        HandleSortChanged(new SortOptions() { SortBy = _sortBy, IsDescending = _isDescending });
+
     }
 
-    private async Task HandleFiltersChanged(string filters)
+    private async Task OpenFilterDialog()
     {
+        var parameters = new DialogParameters();
+        var options = new DialogOptions
+            {
+                CloseOnEscapeKey = true,
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
+            };
+
+        var dialog = await DialogService.ShowAsync<ArtworkFilterDialog>("Filter Artworks", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data != null)
+        {
+            var filters = (ArtworkFilters) result.Data;
+            await ApplyFilters(filters);
+        }
+    }
+
+    private async Task ApplyFilters(ArtworkFilters filters)
+    {
+        ArtworkFilterDialogHelper filterHelper = new(filters);
+        string urlFilterQuery = filterHelper.BuildFilterQuery();
+        HandleFiltersChanged(urlFilterQuery);
+    }
+
+    private void HandlePageChanged(int i)
+    {
+        NavigateToUpdatedPage(i, _filtersQuery, _sortQuery);
+    }
+
+    private void HandleFiltersChanged(string filters)
+    {
+
         _filtersQuery = filters;
-        PageNumber = 1;
-        NavManager.NavigateTo($"/search?q={SearchQuery}&p={PageNumber}{_filtersQuery}{_sortQuery}");
+        NavigateToUpdatedPage(1, _filtersQuery, _sortQuery);
+
     }
 
-    private async Task HandleSortChanged(SortOptions options)
+    private void HandleSortChanged(SortOptions options)
     {
         if (string.IsNullOrEmpty(options.SortBy))
         {
             return;
         }
-        string sortQuery = options.BuildSortQuery();
-        _sortQuery = sortQuery;
-        PageNumber = 1;
-        NavManager.NavigateTo($"/search?q={SearchQuery}&p={PageNumber}{_filtersQuery}{_sortQuery}");
+
+        _sortQuery = options.BuildSortQuery();
+        NavigateToUpdatedPage(1, _filtersQuery, _sortQuery);
+
     }
 }

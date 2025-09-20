@@ -1,0 +1,42 @@
+﻿@inherits LayoutComponentBase
+
+
+<MudThemeProvider @rendermode="InteractiveServer" Theme="MyCustomTheme" />
+<MudPopoverProvider @rendermode="InteractiveServer" />
+
+<MudDialogProvider @rendermode="InteractiveServer" />
+<MudSnackbarProvider @rendermode="InteractiveServer" />
+
+<MudLayout Class="d-flex flex-column" Style="height: 100vh;">
+    <NavMenuWrapper @rendermode="RenderMode.InteractiveAuto"></NavMenuWrapper>
+
+    <MudMainContent Class="flex-grow-1 d-flex pt-0">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Gutters="true" Class="body-container px-5 d-flex flex-column flex-grow-1" Style="padding-bottom: 1rem;">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private bool _drawerOpen = false;
+
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    MudTheme MyCustomTheme = new MudTheme()
+        {
+            PaletteLight = new PaletteLight()
+            {
+                Primary = "#000000"       
+                
+            },
+            PaletteDark = new PaletteDark()
+            {
+                Primary = Colors.Blue.Lighten1
+            }
+
+         
+    };
+}

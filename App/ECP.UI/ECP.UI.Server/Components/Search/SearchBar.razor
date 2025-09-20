@@ -3,7 +3,7 @@
 <div class="search-container">
 <div class="search-wrapper">
     <input type="text"
-            placeholder="Search for an artwork, artist..."
+            placeholder="Search..."
                class="search-input"
             @onkeyup="HandleKeyUp"
             @bind="_searchQuery">
@@ -24,22 +24,34 @@
 {
     <style>
         .search-input {
-            background-color: white !important;
-            border: 1px solid black !important;
-            color: black !important;
+        background-color: lightgray !important;
+        border: none !important;
+        color: dimgray !important;
         }
 
         .search-icon svg {
-            color: black !important;
+        color: dimgray !important;
         }
 
         .clear-icon {
-            border-left: 1px solid black !important;
+        border-left: none !important;
         }
 
-            .clear-icon svg {
-                color: black !important;
-            }
+        .clear-icon svg {
+        color: dimgray !important;
+        }
+
+        ::placeholder {
+        color: dimgray !important;
+        }
+    </style>
+}
+else
+{
+    <style>
+        .search-input {
+            height: 4rem;
+        }
     </style>
 }
 
@@ -70,7 +82,12 @@
         {
             if (!string.IsNullOrWhiteSpace(_searchQuery))
             {
-                NavManager.NavigateTo($"/search?q={_searchQuery}&p=1");
+                var options = new NavigationOptions
+                    {
+                        ForceLoad = false,
+                        ReplaceHistoryEntry = false
+                    };
+                NavManager.NavigateTo($"/search?q={_searchQuery}&p=1", options);
             }
         }
     }

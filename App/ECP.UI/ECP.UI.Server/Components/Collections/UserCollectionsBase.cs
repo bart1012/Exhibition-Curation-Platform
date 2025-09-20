@@ -11,6 +11,8 @@ namespace ECP.UI.Server.Components.Artworks
 
         protected List<Collection> _userCollections = new();
 
+        protected bool DeleteError;
+
         protected async Task FetchCollections()
         {
             try
@@ -34,5 +36,6 @@ namespace ECP.UI.Server.Components.Artworks
             }
 
         }
+
     }
 }

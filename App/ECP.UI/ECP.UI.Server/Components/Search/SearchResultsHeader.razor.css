@@ -1,0 +1,11 @@
+﻿.search-results-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+@media (max-width: 960px) {
+    .search-results-info {
+        flex-direction: column;
+    }
+}

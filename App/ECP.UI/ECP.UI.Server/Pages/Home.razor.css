@@ -38,11 +38,43 @@
     padding: 0 1rem;
 }
 
+
+
+.img-caption {
+    max-height: 2rem;
+    width: fit-content;
+    text-align: center;
+    font-size: 0.75rem;
+    color: gray;
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+@media (max-width: 992px) {
+    #inner-content-container {
+        width: 80%;
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+}
+
 @media (max-width: 768px) {
+    #inner-content-container {
+        width: 80%;
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+}
+
+@media (max-width: 480px) {
     #inner-content-container {
         width: 100%;
         max-width: 100%;
         padding: 0 1rem;
-/*        flex-direction: column-reverse;*/
     }
+
+
+   
 }

@@ -1,0 +1,55 @@
+﻿<div class="empty-state" role="status">
+    <MudPaper Class="pa-8 text-center d-flex flex-column" Style="background: transparent; justify-content: center; text-align: center;" Elevation="0">
+        <MudIcon aria-hidden="true" Color="Color.Primary" Icon="@Icons.Material.Filled.Collections"  
+                 Style="font-size: 4rem; color: var(--mud-palette-text-disabled); margin-bottom: 16px;" />
+        <MudText Typo="Typo.h6" Class="mb-2" Style="color: var(--mud-palette-text-secondary);">
+            No Collections Yet
+        </MudText>
+        <MudText Typo="Typo.body2" Style="color: var(--mud-palette-text-disabled); max-width: 400px; margin: 0 auto;">
+            Start building your personal art collection by saving artworks you discover and love.
+        </MudText>
+
+        <MudButton Variant="Variant.Filled"  
+                   Color="Color.Primary"  
+                   StartIcon="@Icons.Material.Filled.Add"
+                   IconColor="Color.Secondary"
+                   Class="create-new-collection mt-4"
+
+                   aria-label="Create New Collection"
+                   OnClick="() => OnOpenDialog.InvokeAsync()">
+            Create New Collection
+        </MudButton>
+    </MudPaper>
+</div>
+
+<style>
+
+    .empty-state svg{
+        width: 100%;
+        fill: grey !important;
+    }
+
+    .create-new-collection svg{
+        fill: white !important;
+    }
+
+    .create-new-collection:focus-visible {
+        outline: 3px solid blue;
+    }   
+
+    .empty-state{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1 1 auto;
+        position: relative;
+        top: -10%;
+    }
+
+</style>
+
+@code {
+    [Parameter]
+
+    public EventCallback OnOpenDialog { get; set; }
+}

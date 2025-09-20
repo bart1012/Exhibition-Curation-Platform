@@ -1,7 +1,16 @@
-﻿<div class="d-flex justify-center align-center" style="height: 100vh;">
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+﻿<div class="loading-state">
+    <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+    @if (string.IsNullOrEmpty(Message))
+    {
+        <MudText Typo="Typo.body1" Class="mt-4 text-secondary">Loading...</MudText>
+    }
+    else
+    {
+        <MudText Typo="Typo.body1" Class="mt-4 text-secondary">@Message</MudText>
+    }
 </div>
 
 @code {
-
+    [Parameter]
+    public string? Message { get; set; }
 }

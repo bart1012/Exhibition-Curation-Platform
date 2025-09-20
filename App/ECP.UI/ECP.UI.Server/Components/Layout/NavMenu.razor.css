@@ -1,3 +1,5 @@
+
+
 .navbar-toggler {
     appearance: none;
     cursor: pointer;
@@ -13,6 +15,14 @@
 
 .navbar-toggler:checked {
     background-color: rgba(255, 255, 255, 0.5);
+}
+
+.search-controls{
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
+    gap: 1rem;
+
 }
 
 .top-row {

@@ -5,14 +5,14 @@
 <div class="d-flex justify-start position-relative">
     @if (!_isExpanded)
     {
-        <MudButton Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.BookmarkBorder"
+        <MudButton Variant="Variant.Filled"  StartIcon="@Icons.Material.Filled.BookmarkBorder"
                    Class="rounded-lg mud-elevation-4" OnClick="ToggleExpansion">
             @(_isSaved ? "Saved" : "Save")
         </MudButton>
     }
     else
     {
-        <div class="position-absolute" style="top: 0; left: 0; z-index: 1000; min-width: 350px; background: white; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
+        <div class="collections-select-menu">
             <MudStack Spacing="2" Class="pa-4">
                 <MudText Typo="Typo.subtitle1" Class="text-muted mb-2">Save to a collection</MudText>
 
@@ -22,16 +22,18 @@
                            Variant="Variant.Outlined"
                            AnchorOrigin="Origin.BottomLeft"
                            MaxHeight="300"
-                           Dense="true">
+                           Dense="true"
+                           @ref="_selectRef">
                     @foreach (var collection in _userCollections)
                     {
                         <MudSelectItem Value="@collection.Id">@collection.Name</MudSelectItem>
                     }
                     @if (!_isAddingNewCollection)
                     {
-                        <MudSelectItem Value="@CreateNew" OnClick="StartNewCollectionFlow">
-                            <MudButton OnClick="StartNewCollectionFlow" Variant="Variant.Text" Color="Color.Primary" Class="w-100 justify-start">
-                                <b>+ Create New Collection</b>
+                        <MudSelectItem Value="@CreateNew" Class="pa-0 ma-0">
+                            <MudButton Style="width: 100%; height: 100%;" OnClick="StartNewCollectionFlow" Variant="Variant.Text" Color="Color.Primary" Class="w-100 justify-start w-100 h-100 pa-0 pa-2">
+                                <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-1"></MudIcon>
+                                <b>Create New Collection</b>
                             </MudButton>
                         </MudSelectItem>
                     }
@@ -44,10 +46,11 @@
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Immediate="true"
-                                  HelperText="Enter a name for your new collection" />
+                                  HelperText="Enter a name for your new collection"
+                                  AutoFocus="true"
+                                  @ref="_newCollectionNameInputRef" />
                 }
 
-                <!-- Action buttons -->
                 <div class="d-flex justify-space-between mt-3">
                     <MudButton OnClick="ToggleExpansion"
                                Variant="Variant.Text"
@@ -88,14 +91,16 @@
 
 @code {
     [Parameter]
-    public ArtworkPreview ArtworkPreview { get; set; } = null;
+    public ArtworkPreview? ArtworkPreview { get; set; } 
+    private MudTextField<string>? _newCollectionNameInputRef;
+    private MudSelect<string>? _selectRef;
     private string? CreateNew = "NewCollection";
     private bool _isExpanded = false;
     private bool _isSaved = false;
     private bool _isAddingNewCollection = false;
     private string _newCollectionName = string.Empty;
     private string _selectedCollection = string.Empty;
-    private List<Collection> _userCollections = new();
+    private List<Collection>? _userCollections;
 
     protected override async Task OnInitializedAsync()
     {
@@ -116,6 +121,8 @@
 
     private void StartNewCollectionFlow()
     {
+        _selectRef?.ToggleMenu();
+
         _isAddingNewCollection = true;
         _selectedCollection = string.Empty;
         StateHasChanged();
@@ -167,7 +174,7 @@
                 if (addOperationResult.IsSuccess)
                 {
                     await FetchCollections();
-                    _selectedCollection = _newCollectionName; // Auto-select the newly created collection
+                    _selectedCollection = _userCollections.Last().Id;
                     Console.WriteLine($"Successfully created collection: {_newCollectionName}");
                 }
                 else

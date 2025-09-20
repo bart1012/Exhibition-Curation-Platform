@@ -1,0 +1,78 @@
+﻿<div class="search-controls">
+    <div class="sort-controls">
+        <MudMenu FullWidth="true"
+                 Style="border:none; display: block; height: 100%;"
+                 AnchorOrigin="Origin.BottomLeft"
+                 aria-label="Sort options">
+            <ActivatorContent>
+                <MudButton aria-haspopup="true"
+                           aria-expanded="false" 
+                           aria-label="@($"Current sort: {_sortText}")" 
+                           Ripple="false" Class="no-hover px-0 pt-0 sort-btn" 
+                           Style="min-width: auto; border:none; display:flex; justify-content: start;">
+                    @_sortText
+                </MudButton>
+            </ActivatorContent>
+            <ChildContent>
+                <MudMenuItem OnClick="@(() => SetSort(0))">Creation Date</MudMenuItem>
+                <MudMenuItem OnClick="@(() => SetSort(1))">Alphabetically</MudMenuItem>
+            </ChildContent>
+        </MudMenu>
+
+        <MudToggleIconButton Toggled="_isDescending"
+                             ToggledChanged="() => OnSortDirectionClick.InvokeAsync()"
+                             Icon="@Icons.Material.Filled.ArrowUpward"
+                             Color="@Color.Dark"
+                             Size="Size.Small"
+                             Ripple="false"
+                             ToggledIcon="@Icons.Material.Filled.ArrowDownward"
+                             ToggledColor="@Color.Dark"
+                             Class="no-hover rounded-r-xl px-1 pt-0 pb-0 sort-direction-btn"
+                             aria-label="@(_isDescending ? "Toggle ascending" : "Toggle descending")"
+                             Style="border:none; display: flex; align-items: start;" />
+    </div>
+    <MudButton Ripple="false" 
+        Style="border:none; display: flex; align-items: start;" 
+        OnClick="() => OnFilterClick.InvokeAsync()" 
+        Variant="Variant.Outlined"
+        aria-label="Filter"
+        Color="Color.Dark" EndIcon="@Icons.Material.Filled.FilterList" 
+        Class="no-hover pt-0 rounded-pill">
+        Filter
+    </MudButton>
+</div>
+@code {
+    [Parameter]
+    public EventCallback OnFilterClick { get; set; }
+    [Parameter]
+    public EventCallback<bool> OnSortDirectionClick { get; set; }
+    [Parameter]
+    public EventCallback<int> OnSortFieldClick { get; set; }
+
+    private bool _isDescending;
+    private string _sortText = "Sort";
+    private string _sortBy = string.Empty;
+
+    private async Task SetSort(int id)
+    {
+        SetSortButtonText(id);
+        await OnSortFieldClick.InvokeAsync(id);
+    }
+
+    private void SetSortButtonText(int id)
+    {
+
+
+        switch (id)
+        {
+            case 0:
+                _sortText = "Creation Date";
+                break;
+            case 1:
+                _sortText = "Alphabetically";
+                break;
+        }
+
+    }
+
+}
