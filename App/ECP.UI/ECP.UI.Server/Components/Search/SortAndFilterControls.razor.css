@@ -1,0 +1,26 @@
+﻿.search-controls {
+    display: flex;
+    flex-direction: row;
+}
+
+.sort-controls {
+    display: flex;
+    flex-direction: row;
+    padding: 0 0.5rem 0 0.5rem;
+}
+
+.search-controls button:hover {
+    background-color: none !important;
+    box-shadow: none !important;
+}
+
+@media (max-width: 960px) {
+
+    .search-controls {
+        justify-content: space-between;
+    }
+
+    .sort-btn {
+        padding: 0 !important;
+    }
+}
