@@ -1,6 +1,6 @@
 ﻿.masonry-item {
     flex: 0 0 auto;
-    width: calc(100% - 0rem); /* Single column by default */
+    width: calc(100% - 0rem); 
     height: 20rem;
     display: block;
     margin-bottom: 0;
@@ -118,25 +118,25 @@
 }
 @media (min-width: 640px) {
     .masonry-item {
-        width: calc(50% - 0.5rem); /* 2 columns */
+        width: calc(50% - 0.5rem); 
     }
 }
 
 @media (min-width: 768px) {
     .masonry-item {
-        width: calc(33.333% - 0.667rem); /* 3 columns */
+        width: calc(33.333% - 0.667rem); 
     }
 }
 
 @media (min-width: 1024px) {
     .masonry-item {
-        width: calc(25% - 0.75rem); /* 4 columns */
+        width: calc(25% - 0.75rem);
     }
 }
 
 @media (min-width: 1280px) {
     .masonry-item {
-        width: calc(20% - 0.8rem); /* 5 columns */
+        width: calc(20% - 0.8rem);
     }
 }
 

@@ -1,4 +1,6 @@
-﻿<a href="@($"/artwork/{Artwork.SourceId}/{(int)Artwork.Source}")" class="masonry-item">
+﻿@if (IsRemovable)
+{
+<div class="masonry-item">
     <div class="masonry-content">
             @if (!string.IsNullOrWhiteSpace(Artwork.Thumbnail.Url))
             {
@@ -13,11 +15,68 @@
             <div class="hover-overlay">
                 <div class="overlay-content">
                     <h5 class="overlay-title">@Artwork.Title</h5>
+                  
+                        <MudIconButton Class="ma-0 pa-0 collection-item"
+                                       Icon="@Icons.Material.Outlined.Delete"
+                                       Color="Color.Error"                          
+                                         OnClick="@(() => OnDelete.InvokeAsync(Artwork.Id))"
+                                       aria-label="@($"Delete collection {Artwork?.Title}")" />
+                                
+                </div>
+            </div>
+        </div>
+</div>
+}else{
+    <a href="@($"/artwork/{Artwork.SourceId}/{(int)Artwork.Source}")" class="masonry-item">
+    <div class="masonry-content">
+            @if (!string.IsNullOrWhiteSpace(Artwork.Thumbnail.Url))
+            {
+                <img src="@Artwork.Thumbnail.Url" alt="@Artwork.Title" class="item-image" />
+            }
+            else
+            {
+                <div class="placeholder-image">
+                    <p>No Image</p>
+                </div>
+            }
+            <div class="hover-overlay">
+                <div class="overlay-content">
+                    <h5 class="overlay-title">@Artwork.Title</h5>                          
                 </div>
             </div>
         </div>
 </a>
+}
+@if (IsRemovable)
+{
+    <style>
+        .collection-item{
+            position: absolute;
+            float: right;
+            top: 1rem;
+            right: 1rem;
+            width: 1.5rem;
+            margin: 1rem;
+        }
+
+        .collection-item svg{
+            fill: white !important;
+        }
+
+        .collection-item svg:hover {
+            fill: red !important;
+        }
+    </style>
+}
+
 @code {
     [Parameter]
     public ArtworkPreview Artwork { get; set; }
+
+    [Parameter]
+    public bool IsRemovable { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<string> OnDelete { get; set; }
+
 }

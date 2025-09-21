@@ -4,6 +4,8 @@
 @inject IArtworkService ArtworkService
 @using ECP.UI.Server.Components.Shared
 @inject IUserCollectionsService CollectionsService
+@inject ISnackbar Snackbar
+
 
 
 @if (_isLoading)
@@ -19,13 +21,19 @@ else if (Collection != null)
         @Collection.Name
     </MudText>
     <MudText Typo="Typo.body1" Align="Align.Center" Style="color: var(--mud-palette-text-secondary);">
-        @(Collection.Artworks.Count > 1 ? $"{Collection.Artworks.Count} Artworks" : $"{Collection.Artworks.Count} Artwork")
+            @if(_artworks != null)
+            {
+                @(_artworks.Count > 1 ? $"{_artworks.Count} Artworks" : $"{_artworks.Count} Artwork")
+            }
+            else
+            {
+                @(Collection.Artworks.Count > 1 ? $"{Collection.Artworks.Count} Artworks" : $"{Collection.Artworks.Count} Artwork")
+            }
     </MudText>
     </div>
-    <!-- Use the _artworks list to get the count -->
     @if (_artworks != null)
     {
-        <MasonryGrid List="_artworks"></MasonryGrid>
+        <MasonryGrid List="_artworks" OnItemDelete="HandleArtworkDelete" IsContentRemovable="true"></MasonryGrid>
     }
 
 }
@@ -46,6 +54,20 @@ else
 
     private bool _isLoading = true;
 
+    private async Task HandleArtworkDelete(string artworkID)
+    {
+        var deleteResult = await CollectionsService.RemoveArtworkFromCollectionAsync(Collection?.Id,artworkID);
+        if (!deleteResult.IsSuccess)
+        {
+            Snackbar.Add("Ops! There was a problem on our end. Please try again.");
+        }
+        else
+        {
+            int index = _artworks.FindIndex(a => a.Id == artworkID);
+            _artworks?.RemoveAt(index);
+            StateHasChanged();
+        }
+    }
 
     protected async override Task OnParametersSetAsync()
     {

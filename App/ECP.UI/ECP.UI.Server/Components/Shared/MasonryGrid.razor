@@ -1,7 +1,7 @@
 ﻿<div class="masonry-grid">
     @foreach (var item in List)
     {
-        <MasonryGridItem Artwork="item" />
+        <MasonryGridItem Artwork="item" OnDelete="OnItemDelete" IsRemovable="IsContentRemovable"/>
     }
 </div>
 
@@ -15,4 +15,10 @@
 @code {
     [Parameter]
     public List<ArtworkPreview> List { get; set; }
+
+    [Parameter]
+    public bool IsContentRemovable { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnItemDelete { get; set; }
 }
