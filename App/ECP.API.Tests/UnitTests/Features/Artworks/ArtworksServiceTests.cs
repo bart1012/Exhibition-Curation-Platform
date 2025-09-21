@@ -60,7 +60,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
                 .ReturnsAsync(repositoryResult);
 
             // Act
-            var serviceResult = await _artworksService.GetArtworkPreviewsAsync(expectedCount);
+            var serviceResult = await _artworksService.GetArtworkPreviewsAsync(expectedCount, 25, 1);
 
             // Assert
             serviceResult.IsSuccess.Should().BeTrue();
@@ -90,7 +90,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
                 .ReturnsAsync(repositoryResult);
 
             // Act
-            var serviceResult = await _artworksService.GetArtworkPreviewsAsync(expectedCount);
+            var serviceResult = await _artworksService.GetArtworkPreviewsAsync(expectedCount, 25, 1);
 
             // Assert
             serviceResult.IsSuccess.Should().BeTrue();
@@ -120,7 +120,7 @@ namespace ECP.API.Tests.UnitTests.Features.Artworks
                 .ReturnsAsync(repositoryResult);
 
             // Act
-            var serviceResult = await _artworksService.GetArtworkPreviewsAsync(expectedCount);
+            var serviceResult = await _artworksService.GetArtworkPreviewsAsync(expectedCount, 25, 1);
 
             // Assert
             serviceResult.IsSuccess.Should().BeFalse();
