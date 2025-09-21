@@ -10,6 +10,10 @@ namespace App
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Configuration
+            .AddJsonFile("appsettings.api.json", optional: false, reloadOnChange: true)
+            .AddJsonFile($"appsettings.api.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddEndpointsApiExplorer();
