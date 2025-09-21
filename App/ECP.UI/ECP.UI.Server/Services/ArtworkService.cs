@@ -16,10 +16,11 @@ namespace ECP.UI.Server.Services
     public class ArtworkService(HttpClient client) : IArtworkService
     {
         private readonly HttpClient _httpClient = client;
+        private readonly string BASE_URL = "https://exhibition-api-bart1012-fdcgghfubqh2dyhr.ukwest-01.azurewebsites.net/api/artworks";
 
         public async Task<Result<Artwork>> GetArtworkByIdAsync(int id, int source)
         {
-            string url = $"https://localhost:7102/api/artworks?id={id}&source={source}";
+            string url = $"{BASE_URL}?id={id}&source={source}";
             try
             {
                 HttpResponseMessage response = await _httpClient.GetAsync(url);
@@ -53,7 +54,7 @@ namespace ECP.UI.Server.Services
 
         public async Task<Result<PaginatedResponse<ArtworkPreview>>> GetArtworkPreviewsAsync(int count, int resultsPerPage, int pageNum)
         {
-            string url = $"artworks/previews?count={count}&results_per_page={resultsPerPage}&page_num={pageNum}";
+            string url = $"{BASE_URL}/previews?count={count}&results_per_page={resultsPerPage}&page_num={pageNum}";
             try
             {
                 HttpResponseMessage response = await _httpClient.GetAsync(url);
@@ -91,7 +92,7 @@ namespace ECP.UI.Server.Services
 
         public async Task<Result<PaginatedResponse<ArtworkPreview>>> SearchArtworksByQueryAsync(string q, int resultsPerPage, int pageNum, string? sortOptions = null, string? filterOptions = null)
         {
-            StringBuilder url = new($"artworks/previews/search?&q={q}&limit={resultsPerPage}&p={pageNum}");
+            StringBuilder url = new($"{BASE_URL}/previews/search?&q={q}&limit={resultsPerPage}&p={pageNum}");
 
             if (!string.IsNullOrEmpty(sortOptions))
             {
@@ -104,7 +105,6 @@ namespace ECP.UI.Server.Services
 
             try
             {
-                Console.WriteLine($"\n\nAPI ENDPOINT: {url.ToString()}\n\n");
                 HttpResponseMessage response = await _httpClient.GetAsync(url.ToString());
 
                 if (!response.IsSuccessStatusCode)
