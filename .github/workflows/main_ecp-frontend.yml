@@ -24,11 +24,11 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build ECP.sln --configuration Release --verbosity normal
+        run: dotnet build ECP.UI/ECP.UI.Server/ECP.UI.Server.csproj --configuration Release --verbosity normal
         working-directory: './App'
 
       - name: dotnet publish
-        run: dotnet publish ECP.UI/ECP.UI.Server/ECP.UI.Server.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp" --no-build
+        run: dotnet publish ECP.UI/ECP.UI.Server/ECP.UI.Server.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
         working-directory: './App'
 
       - name: Upload artifact for deployment job
@@ -66,4 +66,7 @@ jobs:
           package: .
 
           
+
+
+
 
