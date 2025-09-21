@@ -8,10 +8,10 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum.Models
         public int Id { get; set; }
 
         [JsonPropertyName("title")]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         [JsonPropertyName("creation_date")]
-        public string CreationDateDisplay { get; set; }
+        public string? CreationDateDisplay { get; set; }
 
         [JsonPropertyName("creation_date_earliest")]
         public int? DateStart { get; set; }
@@ -23,31 +23,31 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum.Models
         public int? SortableYear { get; set; }
 
         [JsonPropertyName("type")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
         [JsonPropertyName("technique")]
-        public string Technique { get; set; }
+        public string? Technique { get; set; }
 
         [JsonPropertyName("collection")]
-        public string Collection { get; set; }
+        public string? Collection { get; set; }
 
         [JsonPropertyName("culture")]
-        public List<string> Cultures { get; set; }
+        public List<string?>? Cultures { get; set; }
 
         [JsonPropertyName("department")]
-        public string Department { get; set; }
+        public string? Department { get; set; }
 
         [JsonPropertyName("creators")]
-        public List<ClevelandMuseumArtist> Creators { get; set; }
+        public List<ClevelandMuseumArtist?>? Creators { get; set; }
 
         [JsonPropertyName("images")]
-        public ClevelandMuseumImages Images { get; set; }
+        public ClevelandMuseumImages? Images { get; set; }
 
         [JsonPropertyName("alternate_images")]
-        public List<ClevelandMuseumImages> AltImages { get; set; }
+        public List<ClevelandMuseumImages?>? AltImages { get; set; }
 
         [JsonPropertyName("support_materials")]
-        public List<Material>? Materials { get; set; }
+        public List<Material?>? Materials { get; set; }
 
     }
 

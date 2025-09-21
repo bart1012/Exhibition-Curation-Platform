@@ -52,7 +52,7 @@
                             @if (_artwork.Artists != null && _artwork.Artists.Any())
                             {
                                 <MudText Typo="Typo.body1" Class="artwork-artist text-secondary" Align="Align.Start" Style="color: var(--mud-palette-text-secondary);">
-                                    by @string.Join(", ", _artwork.Artists.Select(a => a.Name))
+                                    by @string.Join(", ", _artwork.Artists.Where(a => !string.IsNullOrEmpty(a?.Name)).Select(a => a.Name))
                                 </MudText>
                             }
                         </div>
@@ -279,7 +279,7 @@
                                 <MudCardContent Class="pa-4">
                                     <MudText Typo="Typo.h6" Class="mb-3 text-primary">Description</MudText>
                                     <MudText Typo="Typo.body2" Class="description-text">
-                                        @(_artwork.LongDescription ?? _artwork.Description)
+                                        @((MarkupString)(_artwork.LongDescription ?? _artwork.Description ?? ""))
                                     </MudText>
                                 </MudCardContent>
                             </MudCard>

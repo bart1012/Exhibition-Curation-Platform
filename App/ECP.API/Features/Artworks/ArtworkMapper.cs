@@ -103,7 +103,7 @@ namespace ECP.API.Features.Artworks
                 Artists = chicagoArtwork.ArtistTitles?.Select(name => new Artist
                 {
                     Name = name,
-                }).ToList(),
+                }).ToList() ?? new List<Artist>(),
 
                 // Date properties
                 DateDisplay = chicagoArtwork.DateDisplay,
@@ -131,7 +131,7 @@ namespace ECP.API.Features.Artworks
                 PlaceOfOrigin = chicagoArtwork.PlaceOfOrigin,
 
                 // Physical properties
-                Dimensions = chicagoArtwork.Dimensions,
+                Dimensions = chicagoArtwork?.Dimensions?[0],
 
                 // Content and description
                 Description = chicagoArtwork.Description,

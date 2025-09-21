@@ -65,7 +65,7 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute.Models
         public string? DimensionsDisplay { get; set; }
 
         [JsonPropertyName("dimensions_detail")]
-        public Dimensions? Dimensions { get; set; }
+        public List<Dimensions?>? Dimensions { get; set; }
 
         [JsonPropertyName("department_title")]
         public string? Department { get; set; }
