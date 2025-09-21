@@ -104,6 +104,7 @@ namespace ECP.UI.Server.Services
 
             try
             {
+                Console.WriteLine($"\n\nAPI ENDPOINT: {url.ToString()}\n\n");
                 HttpResponseMessage response = await _httpClient.GetAsync(url.ToString());
 
                 if (!response.IsSuccessStatusCode)

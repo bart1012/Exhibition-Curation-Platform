@@ -61,41 +61,29 @@ namespace ECP.API.Features.Artworks
 
             var allArtworks = artworks ?? new List<ArtworkPreview>();
 
-            if (!string.IsNullOrEmpty(sort))
-            {
-                var sortResult = Sort(allArtworks, sort);
-
-                if (sortResult.IsSuccess)
-                {
-                    var sortedArtworks = sortResult.Value;
-
-                    var paginatedSortedResponse = PaginatedResponseBuilder<ArtworkPreview>.Build(sortedArtworks, resultsPerPage, pageNum);
-
-                    return Shared.Result<PaginatedResponse<ArtworkPreview>>.Success(paginatedSortedResponse);
-                }
-
-                return Shared.Result<PaginatedResponse<ArtworkPreview>>.Failure(sortResult.Message, sortResult.StatusCode);
-
-            }
+            var processedArtworks = allArtworks;
 
             if (filters != null && filters.Any())
             {
-                var filteredResult = Filter(allArtworks, filters);
-
-                if (filteredResult.IsSuccess)
+                var filteredResult = Filter(processedArtworks, filters);
+                if (!filteredResult.IsSuccess)
                 {
-                    var filteredArtworks = filteredResult.Value;
-
-                    var paginatedSortedResponse = PaginatedResponseBuilder<ArtworkPreview>.Build(filteredArtworks, resultsPerPage, pageNum);
-
-                    return Shared.Result<PaginatedResponse<ArtworkPreview>>.Success(paginatedSortedResponse);
+                    return Shared.Result<PaginatedResponse<ArtworkPreview>>.Failure(filteredResult.Message, filteredResult.StatusCode);
                 }
-
-                return Shared.Result<PaginatedResponse<ArtworkPreview>>.Failure(filteredResult.Message, filteredResult.StatusCode);
-
+                processedArtworks = filteredResult.Value;
             }
 
-            var paginatedResponse = PaginatedResponseBuilder<ArtworkPreview>.Build(allArtworks, resultsPerPage, pageNum);
+            if (!string.IsNullOrEmpty(sort))
+            {
+                var sortResult = Sort(processedArtworks, sort);
+                if (!sortResult.IsSuccess)
+                {
+                    return Shared.Result<PaginatedResponse<ArtworkPreview>>.Failure(sortResult.Message, sortResult.StatusCode);
+                }
+                processedArtworks = sortResult.Value;
+            }
+
+            var paginatedResponse = PaginatedResponseBuilder<ArtworkPreview>.Build(processedArtworks, resultsPerPage, pageNum);
 
             return Shared.Result<PaginatedResponse<ArtworkPreview>>.Success(paginatedResponse);
 

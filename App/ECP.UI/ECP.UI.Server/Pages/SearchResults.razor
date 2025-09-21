@@ -10,47 +10,43 @@
 @inject NavigationManager NavManager
 @inject IDialogService DialogService
 
- 
-
 <main class="search-results-container">
-@if (_isLoading)
-{
-    <Loading Message="Fetching relevant artworks..."></Loading>
-}
-else if (_artworkList != null)
-{
-     <SearchResultsHeader SearchQuery="@SearchQuery"
-        PageNumber="PageNumber"
-        TotalResults="_totalResults"
-        OnFilterClick="OpenFilterDialog"
-        OnSortDirectionChanged="HandleSortDirectionChanged"
-        OnSortFieldChanged="HandleSortFieldChanged"
-                             SortText="@_sortText"
-        IsDescending="_currentSort.IsDescending" />
-
-    if (!_artworkList.Any())
+    @if (_isLoading)
     {
-        <NoResultsMessage></NoResultsMessage>
+        <Loading Message="Fetching relevant artworks..."></Loading>
     }
-    else
+    else if (_artworkList != null)
     {
+        <SearchResultsHeader SearchQuery="@SearchQuery"
+                             PageNumber="PageNumber"
+                             TotalResults="_totalResults"
+                             OnFilterClick="OpenFilterDialog"
+                             OnSortDirectionChanged="HandleSortDirectionChanged"
+                             OnSortFieldChanged="HandleSortFieldChanged"
+                             SortText="@SortText"
+                             IsDescending="CurrentSort.IsDescending" />
 
-        <MasonryGrid List="@_artworkList"></MasonryGrid>
+        if (!_artworkList.Any())
+        {
+            <NoResultsMessage></NoResultsMessage>
+        }
+        else
+        {
+            <MasonryGrid List="@_artworkList"></MasonryGrid>
 
-        <div class="pagination-container">
-            <MudPagination BoundaryCount="1" MiddleCount="1" Style="max-width: 100%;" Selected="@PageNumber" SelectedChanged="HandlePageChanged" Color="Color.Dark" Count="@_totalPages" Size="Size.Large" />
-        </div>
+            <div class="pagination-container">
+                <MudPagination BoundaryCount="1" MiddleCount="1" Style="max-width: 100%;" Selected="@PageNumber" SelectedChanged="HandlePageChanged" Color="Color.Dark" Count="@_totalPages" Size="Size.Large" />
+            </div>
+        }
     }
-
-}
-else if (_isServerError)
-{
-    <ServerErrorMessage></ServerErrorMessage>
-}
+    else if (_isServerError)
+    {
+        <ServerErrorMessage></ServerErrorMessage>
+    }
 </main>
 
 <style>
-    .sort-direction-btn svg{
+    .sort-direction-btn svg {
         font-size: 1.25rem !important;
         padding-top: 2.5px !important;
     }
@@ -74,47 +70,93 @@ else if (_isServerError)
     [SupplyParameterFromQuery(Name = "p")]
     public int PageNumber { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "sort")]
+    public string? SortQuery { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "filters")]
+    public string[]? FiltersQuery { get; set; }
+
+    private SortOptions CurrentSort => ParseSortFromUrl(SortQuery);
+    private string SortText => GetSortDisplayText(CurrentSort);
+    private ArtworkFilters? CurrentFilters => ParseFiltersFromUrl(FiltersQuery);
+
     private const int ResultsPerPage = 25;
     private bool _isLoading;
     private bool _isServerError;
-    private string? _sortQuery;
-    private string? _filtersQuery;
-    private ArtworkFilters _currentFilters;
-    private SortOptions _currentSort;
-    private string? _sortText;
     private int _totalPages;
-    private string? _previousSearchQuery;
     private int _totalResults;
-
-
     private List<ArtworkPreview>? _artworkList = null;
 
+    private SortOptions ParseSortFromUrl(string? sortQuery)
+    {
+        if (string.IsNullOrEmpty(sortQuery))
+        {
+            return new SortOptions { SortBy = SortField.Undefined, IsDescending = true };
+        }
 
+        try
+        {
+            bool isDescending = sortQuery.StartsWith("-");
+            bool isAscending = sortQuery.StartsWith("+") || sortQuery.StartsWith("%2B");
+            bool finalDirection = isAscending ? false : true;
+
+            string fieldName = sortQuery.TrimStart('-', '+', '%', '2', 'B');
+            fieldName = Uri.UnescapeDataString(fieldName);
+
+            if (Enum.TryParse<SortField>(fieldName, true, out var sortField) &&
+                sortField != SortField.Undefined)
+            {
+                return new SortOptions { SortBy = sortField, IsDescending = finalDirection };
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error parsing sort query '{sortQuery}': {ex.Message}");
+        }
+
+        return new SortOptions { SortBy = SortField.Undefined, IsDescending = true };
+    }
+
+    private string GetSortDisplayText(SortOptions sort)
+    {
+        return sort.SortBy switch
+        {
+            SortField.Date => "Creation Date",
+            SortField.Alphabetically => "Alphabetically",
+            SortField.Undefined => "Sort",
+            _ => "Sort"
+        };
+    }
 
     private async Task FetchDataAsync()
     {
         _isLoading = true;
         _isServerError = false;
         _artworkList = null;
+
         try
         {
-
             Result<PaginatedResponse<ArtworkPreview>> response;
 
             if (string.IsNullOrEmpty(SearchQuery))
             {
                 response = await ArtworkService.GetArtworkPreviewsAsync(200, 25, PageNumber);
-
             }
             else
             {
-                response = await ArtworkService.SearchArtworksByQueryAsync(SearchQuery, 25, PageNumber, _sortQuery, _filtersQuery);
+                string? sortParam = string.IsNullOrEmpty(SortQuery) ? null : $"&sort={SortQuery}";
+                string? filtersParam = GetFormattedFiltersString();
+                Console.WriteLine($"\n\nSORT PARAMS: {sortParam}");
+                Console.WriteLine($"\n\nFILTER PARAMS: {filtersParam}");
 
+                response = await ArtworkService.SearchArtworksByQueryAsync(SearchQuery, 25, PageNumber, sortParam, filtersParam);
             }
 
             if (response.IsSuccess)
             {
-                if(!response.Value.Data.Any())
+                if (!response.Value.Data.Any())
                 {
                     _artworkList = new();
                     _totalPages = 0;
@@ -126,7 +168,6 @@ else if (_isServerError)
                     _totalPages = response.Value.Info.TotalPages;
                     _totalResults = response.Value.Info.TotalItems;
                 }
-
             }
             else
             {
@@ -144,6 +185,11 @@ else if (_isServerError)
         }
     }
 
+    private string? GetFormattedFiltersString()
+    {
+        return FiltersQuery?.Length > 0 ? $"{string.Join("&filters=", FiltersQuery)}" : null;
+    }
+
     private void NavigateToUpdatedPage(int newPageNumber, string? newFilters, string? newSort)
     {
         _isLoading = true;
@@ -157,32 +203,8 @@ else if (_isServerError)
         NavManager.NavigateTo(uri);
     }
 
-    protected override void OnInitialized()
-    {
-        _currentSort = new() { SortBy = SortField.Undefined, IsDescending = true };
-        _sortText = "Sort";
-    }
-
     protected override void OnParametersSet()
     {
-
-        Console.WriteLine($"OnParametersSet called:");
-        Console.WriteLine($"  Current SearchQuery: '{SearchQuery}'");
-        Console.WriteLine($"  Previous SearchQuery: '{_previousSearchQuery}'");
-        Console.WriteLine($"  Current _filtersQuery: '{_filtersQuery}'");
-
-
-        if (SearchQuery != _previousSearchQuery)
-        {
-            _currentSort = new() { SortBy = SortField.Undefined, IsDescending = true };
-            _sortText = "Sort";
-            _currentFilters = null;
-            _sortQuery = null;
-            _filtersQuery = null;
-        }
-
-        _previousSearchQuery = SearchQuery;
-
         if (PageNumber < 1)
         {
             PageNumber = 1;
@@ -191,18 +213,19 @@ else if (_isServerError)
         _isLoading = true;
         _artworkList = null;
 
-
         InvokeAsync(async () =>
-           {
-               await FetchDataAsync();
-               StateHasChanged();
-           });
+        {
+            await FetchDataAsync();
+            StateHasChanged();
+        });
     }
 
     private async Task OpenFilterDialog()
     {
         var parameters = new DialogParameters();
-        if(_currentFilters != null) parameters.Add("Filters", _currentFilters);
+        if (CurrentFilters != null)
+            parameters.Add("Filters", CurrentFilters);
+
         var options = new DialogOptions
             {
                 CloseOnEscapeKey = true,
@@ -215,8 +238,7 @@ else if (_isServerError)
 
         if (!result.Canceled && result.Data != null)
         {
-            var filters = (ArtworkFilters) result.Data;
-            _currentFilters = filters;
+            var filters = (ArtworkFilters)result.Data;
             ApplyFilters(filters);
         }
     }
@@ -228,42 +250,181 @@ else if (_isServerError)
         HandleFiltersChanged(urlFilterQuery);
     }
 
-    private void HandlePageChanged(int i)
+    private ArtworkFilters? ParseFiltersFromUrl(string[]? filtersQuery)
     {
-        NavigateToUpdatedPage(i, _filtersQuery, _sortQuery);
+
+        if(filtersQuery == null || filtersQuery.Length <= 0)
+        {
+            Console.WriteLine("\n\n empty");
+        }
+
+        foreach (var queryItem in filtersQuery)
+        {         
+            Console.WriteLine($"\n\n\nqueryItem: {queryItem}");
+        }
+
+        if (filtersQuery == null || filtersQuery.Length == 0)
+            return null;
+
+        var filters = new ArtworkFilters();
+        bool hasAnyFilter = false;
+
+        try
+        {
+            var allFilterPairs = new List<string>();
+
+            foreach (var queryItem in filtersQuery)
+            {
+                Console.WriteLine($"\n\n\nqueryItem: {queryItem}");
+                if (string.IsNullOrEmpty(queryItem))
+                    continue;
+
+                string decodedItem = Uri.UnescapeDataString(queryItem);
+
+                if (decodedItem.Contains("&filters="))
+                {
+                    var splitFilters = decodedItem.Split(new[] { "&filters=" }, StringSplitOptions.RemoveEmptyEntries);
+                    allFilterPairs.AddRange(splitFilters);
+                }
+                else
+                {
+                    allFilterPairs.Add(decodedItem);
+                }
+            }
+
+            foreach (var filterPair in allFilterPairs)
+            {
+                if (string.IsNullOrEmpty(filterPair))
+                    continue;
+
+                string cleanFilter = Uri.UnescapeDataString(filterPair);
+                var parts = cleanFilter.Split(':', 2);
+                if (parts.Length != 2)
+                    continue;
+
+                var key = parts[0].Trim().ToLowerInvariant();
+                var value = parts[1].Trim();
+
+                if (string.IsNullOrEmpty(value))
+                    continue;
+
+                switch (key)
+                {
+                    case "artist":
+                        filters.Artist = value;
+                        hasAnyFilter = true;
+                        break;
+                    case "subject":
+                        filters.Subject = value;
+                        hasAnyFilter = true;
+                        break;
+                    case "type":
+                        filters.Type = value;
+                        hasAnyFilter = true;
+                        break;
+                    case "material":
+                        filters.Material = value;
+                        hasAnyFilter = true;
+                        break;
+                    case "date":
+                        ParseDateFilter(value, filters);
+                        if (filters.DateFrom.HasValue || filters.DateTo.HasValue)
+                            hasAnyFilter = true;
+                        break;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error parsing filters from URL: {ex.Message}");
+            Console.WriteLine($"FiltersQuery contents: {string.Join(" | ", filtersQuery ?? new string[0])}");
+            return null;
+        }
+
+        return hasAnyFilter ? filters : null;
+    }
+
+    private void ParseDateFilter(string dateValue, ArtworkFilters filters)
+    {
+        if (string.IsNullOrEmpty(dateValue))
+            return;
+
+        try
+        {
+            string cleanDateValue = Uri.UnescapeDataString(dateValue);
+
+            if (cleanDateValue.Contains('-'))
+            {
+                var dashIndex = cleanDateValue.LastIndexOf('-');
+                if (dashIndex > 0)
+                {
+                    string startPart = cleanDateValue.Substring(0, dashIndex).Trim();
+                    string endPart = cleanDateValue.Substring(dashIndex + 1).Trim();
+
+                    if (int.TryParse(startPart, out int fromYear) && fromYear > 0)
+                        filters.DateFrom = fromYear;
+
+                    if (!string.IsNullOrEmpty(endPart) && int.TryParse(endPart, out int toYear) && toYear > 0)
+                        filters.DateTo = toYear;
+                }
+            }
+            else
+            {
+                if (int.TryParse(cleanDateValue.Trim(), out int year) && year > 0)
+                {
+                    filters.DateFrom = year;
+                    filters.DateTo = year;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error parsing date filter '{dateValue}': {ex.Message}");
+        }
     }
 
     private void HandleFiltersChanged(string filters)
     {
-
-        _filtersQuery = filters;
-        NavigateToUpdatedPage(1, _filtersQuery, _sortQuery);
-
+        var filterNoPrefix = filters.Skip(9);
+        NavigateToUpdatedPage(1, filters, SortQuery);
     }
 
     private void HandleSortDirectionChanged(bool newDirection)
     {
-        if (_currentSort.SortBy == SortField.Undefined)
+        if (CurrentSort.SortBy == SortField.Undefined)
         {
             return;
         }
-        _currentSort.IsDescending = newDirection;
-        _sortQuery = _currentSort.BuildSortQuery();
-        NavigateToUpdatedPage(1, _filtersQuery, _sortQuery);
 
+        var updatedSort = new SortOptions
+            {
+                SortBy = CurrentSort.SortBy,
+                IsDescending = newDirection
+            };
+        string sortQuery = updatedSort.BuildSortQuery();
+        NavigateToUpdatedPage(1, GetFormattedFiltersString(), sortQuery);
     }
 
     private void HandleSortFieldChanged(int fieldId)
     {
-        if (!Enum.IsDefined(typeof(SortField), fieldId) 
-        || (SortField) fieldId == SortField.Undefined
-        || ((SortField) fieldId == _currentSort.SortBy))
+        if (!Enum.IsDefined(typeof(SortField), fieldId) ||
+            (SortField)fieldId == SortField.Undefined ||
+            (SortField)fieldId == CurrentSort.SortBy)
         {
             return;
         }
-        _currentSort.SortBy = (SortField)fieldId;
-        _sortText = _currentSort.SortBy.ToString();
-        _sortQuery = _currentSort.BuildSortQuery();
-        NavigateToUpdatedPage(1, _filtersQuery, _sortQuery);
+
+        var updatedSort = new SortOptions
+            {
+                SortBy = (SortField) fieldId,
+                IsDescending = CurrentSort.IsDescending
+            };
+        string sortQuery = updatedSort.BuildSortQuery();
+        NavigateToUpdatedPage(1, GetFormattedFiltersString(), sortQuery);
+    }
+
+    private void HandlePageChanged(int i)
+    {
+        NavigateToUpdatedPage(i, GetFormattedFiltersString(), SortQuery);
     }
 }

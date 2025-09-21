@@ -29,8 +29,10 @@ namespace ECP.UI.Server.Components.Search
             if (filters.Count == 0)
                 return string.Empty;
 
-            return string.Join("", filters.Select(f =>
-                $"&filters={Uri.EscapeDataString(f.Key).ToLowerInvariant()}:{Uri.EscapeDataString(f.Value)}"));
+            var filterStrings = filters.Select(f =>
+                $"&filters={Uri.EscapeDataString(f.Key).ToLowerInvariant()}:{Uri.EscapeDataString(f.Value)}");
+
+            return string.Join("", filterStrings);
         }
 
         private Dictionary<string, string> GetActiveFilters()

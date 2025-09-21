@@ -7,7 +7,7 @@
 
         public string BuildSortQuery()
         {
-            return $"&sort={(IsDescending ? '-' : "%2B")}{SortBy.ToString().ToLowerInvariant()}";
+            return $"{(IsDescending ? '-' : "%2B")}{SortBy.ToString().ToLowerInvariant()}";
         }
     }
 }
