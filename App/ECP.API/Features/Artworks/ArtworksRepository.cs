@@ -41,13 +41,17 @@ namespace ECP.API.Features.Artworks
         {
             try
             {
-                var clevelandTask = _clevelandClient.GetArtworkPreviews(count);
-                var chicagoTask = _chicagoClient.GetArtworkPreviews(count);
+                int collectionOneAmount = count / 2;
+                int collectionTwoAmount = count - collectionOneAmount;
+
+                var clevelandTask = _clevelandClient.GetArtworkPreviews(collectionOneAmount);
+                var chicagoTask = _chicagoClient.GetArtworkPreviews(collectionTwoAmount);
 
                 await Task.WhenAll(clevelandTask, chicagoTask);
 
                 var clevelandResults = clevelandTask.Result;
                 var chicagoResults = chicagoTask.Result;
+
                 var artworkPreviews = new List<ArtworkPreview>();
 
                 artworkPreviews.AddRange(clevelandResults.Select(a => _mapper.FromClevelandPreview(a)).Where(a => a.Thumbnail != null).ToList());

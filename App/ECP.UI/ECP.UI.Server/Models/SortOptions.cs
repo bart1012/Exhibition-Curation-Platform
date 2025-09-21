@@ -2,13 +2,12 @@
 {
     public class SortOptions
     {
-        public string SortBy { get; set; }
+        public SortField SortBy { get; set; }
         public bool IsDescending { get; set; }
 
         public string BuildSortQuery()
         {
-            if (string.IsNullOrEmpty(SortBy)) return string.Empty;
-            return $"&sort={(IsDescending ? '-' : "%2B")}{SortBy}";
+            return $"&sort={(IsDescending ? '-' : "%2B")}{SortBy.ToString().ToLowerInvariant()}";
         }
     }
 }

@@ -17,7 +17,7 @@ namespace ECP.API.Features.Artworks
     {
         private readonly IArtworksRepository _artworksRepository = artworksRepository;
         private readonly IMemoryCache _cache = memoryCache;
-        public async Task<Shared.Result<PaginatedResponse<ArtworkPreview>>> GetArtworkPreviewsAsync(int count, int resultsPerPage = 25, int pageNum = 1)
+        public async Task<Shared.Result<PaginatedResponse<ArtworkPreview>>> GetArtworkPreviewsAsync(int count, int resultsPerPage, int pageNum)
         {
             Result<List<ArtworkPreview>> repositoryResponse = await _artworksRepository.GetArtworkPreviewsAsync(count);
             if (!repositoryResponse.IsSuccess)
@@ -132,7 +132,7 @@ namespace ECP.API.Features.Artworks
 
             List<ArtworkPreview> sortedList = queryValidation.Value.sortby switch
             {
-                "title" => isAscending ? list.OrderBy(a => a.Title).ToList() : list.OrderByDescending(a => a.Title).ToList(),
+                "alphabetically" => isAscending ? list.OrderBy(a => a.Title).ToList() : list.OrderByDescending(a => a.Title).ToList(),
                 "date" => isAscending ? list.OrderBy(a => a.SortableYear).ToList() : list.OrderByDescending(a => a.SortableYear).ToList()
             };
 
@@ -154,12 +154,13 @@ namespace ECP.API.Features.Artworks
                 {
                     case "artist":
                         query = query.Where(art => art.Artists != null &&
-                            art.Artists.Any(artist => artist.Name != null &&
+                            art.Artists.Any(artist => artist != null && artist.Name != null &&
                                 pair.Value.Any(keyword => artist.Name.ToLowerInvariant().Contains(keyword.ToLowerInvariant()))));
                         break;
 
                     case "subject":
-                        query = query.Where(art => art.Subjects.Any(subject =>
+                        query = query.Where(art => art.Subjects != null &&
+                            art.Subjects.Any(subject => subject != null &&
                             pair.Value.Any(keyword => subject.ToLowerInvariant().Contains(keyword.ToLowerInvariant()))));
                         break;
 
@@ -179,7 +180,8 @@ namespace ECP.API.Features.Artworks
                         break;
 
                     case "material":
-                        query = query.Where(art => art.Materials.Any(material =>
+                        query = query.Where(art => art.Materials != null &&
+                            art.Materials.Any(material => material != null &&
                             pair.Value.Any(keyword => material.ToLowerInvariant().Contains(keyword.ToLowerInvariant()))));
                         break;
 
@@ -228,7 +230,7 @@ namespace ECP.API.Features.Artworks
 
         protected Result<(string sortby, char order)> ParseAndValidateSortQuery(string sortQuery)
         {
-            var supportedSortFields = new HashSet<string> { "title", "date" };
+            var supportedSortFields = new HashSet<string> { "alphabetically", "date" };
 
             if (!string.IsNullOrEmpty(sortQuery))
             {

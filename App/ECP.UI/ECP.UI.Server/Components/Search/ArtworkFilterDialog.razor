@@ -61,7 +61,10 @@
                         <MudSelectItem Value=@("Print")>Print</MudSelectItem>
                         <MudSelectItem Value=@("Photograph")>Photograph</MudSelectItem>
                         <MudSelectItem Value=@("Installation")>Installation</MudSelectItem>
-                        <MudSelectItem Value=@("Digital Art")>Digital Art</MudSelectItem>
+                        <MudSelectItem Value=@("Digital")>Digital Art</MudSelectItem>
+                        <MudSelectItem Value=@("Textile")>Textile</MudSelectItem>
+                        <MudSelectItem Value=@("Ceramic")>Ceramics</MudSelectItem>
+                        <MudSelectItem Value=@("Other")>Other</MudSelectItem>
                     </MudSelect>
                 </MudItem>
 
@@ -128,8 +131,8 @@
         </MudContainer>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel" Color="Color.Secondary">Cancel</MudButton>
-        <MudButton OnClick="ClearAllFilters" Color="Color.Warning" Variant="Variant.Text">Clear All</MudButton>
+        <MudButton OnClick="Cancel" Color="Color.Dark">Cancel</MudButton>
+        <MudButton OnClick="ClearAllFilters" Color="Color.Dark" Variant="Variant.Text">Clear All</MudButton>
         <MudButton OnClick="Submit" Color="Color.Dark" Variant="Variant.Filled">Apply Filters</MudButton>
     </DialogActions>
 </MudDialog>
@@ -138,7 +141,8 @@
     [CascadingParameter]
     IMudDialogInstance MudDialog { get; set; } = null!;
 
-    private ArtworkFilters Filters = new();
+    [Parameter]
+    public ArtworkFilters Filters { get; set; } = new ArtworkFilters();
 
     private void Submit()
     {

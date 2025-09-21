@@ -26,7 +26,7 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
             };
         }
 
-        public async Task<List<ChicagoArtworkPreview>>? GetArtworkPreviews(int count = 25)
+        public async Task<List<ChicagoArtworkPreview>>? GetArtworkPreviews(int count)
         {
             var parameters = new ChicagoApiParameters()
             {
@@ -126,7 +126,7 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine($"An error occurred while fetching artworks: {e.Message}");
+                Console.WriteLine($"An error occurred while fetching Chicago artworks: {e.Message}");
                 return null;
             }
             catch (JsonException e)
@@ -152,7 +152,7 @@ namespace ECP.API.Features.Artworks.Clients.ChicagoArtInstitute
 
             if (parameters.Count != 0)
             {
-                url.Append($"&size={parameters.Count}");
+                url.Append($"&limit={parameters.Count}");
             }
 
             url.Append("&fields=id,title,artist_titles,thumbnail,image_id,date_display,date_start,date_end,artwork_type_title,classification_titles,category_titles,material_titles,medium_display,technique_titles,subject_titles,style_titles,place_of_origin");

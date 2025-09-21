@@ -4,6 +4,8 @@
     {
         public PaginationInfo Info { get; set; }
         public IEnumerable<T> Data { get; set; }
+
+
     }
 
     public class PaginationInfo

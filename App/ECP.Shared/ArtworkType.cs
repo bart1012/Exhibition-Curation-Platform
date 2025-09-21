@@ -7,16 +7,14 @@
         Painting,
         Drawing,
         Print,
-        Photography,
+        Photograph,
         Digital,
 
         Sculpture,
         Installation,
 
-        MixedMedia,
         Textile,
-        Ceramics,
-        Jewelry,
+        Ceramic,
         Other
     }
 }

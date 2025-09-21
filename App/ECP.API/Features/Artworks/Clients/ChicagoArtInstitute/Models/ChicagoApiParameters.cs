@@ -7,5 +7,6 @@
         public int Offset { get; set; }
         public bool PreviewsOnly { get; set; }
         public int Page { get; set; }
+
     }
 }

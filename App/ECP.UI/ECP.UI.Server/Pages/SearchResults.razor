@@ -19,6 +19,14 @@
 }
 else if (_artworkList != null)
 {
+     <SearchResultsHeader SearchQuery="@SearchQuery"
+        PageNumber="PageNumber"
+        TotalResults="_totalResults"
+        OnFilterClick="OpenFilterDialog"
+        OnSortDirectionChanged="HandleSortDirectionChanged"
+        OnSortFieldChanged="HandleSortFieldChanged"
+                             SortText="@_sortText"
+        IsDescending="_currentSort.IsDescending" />
 
     if (!_artworkList.Any())
     {
@@ -26,14 +34,6 @@ else if (_artworkList != null)
     }
     else
     {
-       
-        <SearchResultsHeader 
-            SearchQuery="SearchQuery"
-            PageNumber="PageNumber"
-            TotalResults="_totalResults"
-            OnFilterClick="OpenFilterDialog"
-            OnSortDirectionClick="SetSortDirection"
-            OnSortFieldClick="SetSortField" />
 
         <MasonryGrid List="@_artworkList"></MasonryGrid>
 
@@ -75,14 +75,15 @@ else if (_isServerError)
     public int PageNumber { get; set; }
 
     private const int ResultsPerPage = 25;
-    private bool _isDescending = true;
     private bool _isLoading;
-    private string _sortText = "Sort";
-    private string _sortBy = string.Empty;
     private bool _isServerError;
     private string? _sortQuery;
     private string? _filtersQuery;
+    private ArtworkFilters _currentFilters;
+    private SortOptions _currentSort;
+    private string? _sortText;
     private int _totalPages;
+    private string? _previousSearchQuery;
     private int _totalResults;
 
 
@@ -113,9 +114,19 @@ else if (_isServerError)
 
             if (response.IsSuccess)
             {
-                _artworkList = response.Value.Data.ToList();
-                _totalPages = response.Value.Info.TotalPages;
-                _totalResults = response.Value.Info.TotalItems;
+                if(!response.Value.Data.Any())
+                {
+                    _artworkList = new();
+                    _totalPages = 0;
+                    _totalResults = 0;
+                }
+                else
+                {
+                    _artworkList = response.Value.Data.ToList();
+                    _totalPages = response.Value.Info.TotalPages;
+                    _totalResults = response.Value.Info.TotalItems;
+                }
+
             }
             else
             {
@@ -146,16 +157,39 @@ else if (_isServerError)
         NavManager.NavigateTo(uri);
     }
 
+    protected override void OnInitialized()
+    {
+        _currentSort = new() { SortBy = SortField.Undefined, IsDescending = true };
+        _sortText = "Sort";
+    }
+
     protected override void OnParametersSet()
     {
-        _isLoading = true;
-        _artworkList = null;
+
+        Console.WriteLine($"OnParametersSet called:");
+        Console.WriteLine($"  Current SearchQuery: '{SearchQuery}'");
+        Console.WriteLine($"  Previous SearchQuery: '{_previousSearchQuery}'");
+        Console.WriteLine($"  Current _filtersQuery: '{_filtersQuery}'");
+
+
+        if (SearchQuery != _previousSearchQuery)
+        {
+            _currentSort = new() { SortBy = SortField.Undefined, IsDescending = true };
+            _sortText = "Sort";
+            _currentFilters = null;
+            _sortQuery = null;
+            _filtersQuery = null;
+        }
+
+        _previousSearchQuery = SearchQuery;
 
         if (PageNumber < 1)
         {
             PageNumber = 1;
         }
 
+        _isLoading = true;
+        _artworkList = null;
 
 
         InvokeAsync(async () =>
@@ -165,23 +199,10 @@ else if (_isServerError)
            });
     }
 
-    private async Task SetSortDirection(bool newIsDescending)
-    {
-        _isDescending = newIsDescending;
-        HandleSortChanged(new SortOptions() { SortBy = _sortBy, IsDescending = _isDescending });
-
-    }
-
-    private async void SetSortField(int id)
-    {
-        _sortBy = id == 0 ? "date" : "title";
-        HandleSortChanged(new SortOptions() { SortBy = _sortBy, IsDescending = _isDescending });
-
-    }
-
     private async Task OpenFilterDialog()
     {
         var parameters = new DialogParameters();
+        if(_currentFilters != null) parameters.Add("Filters", _currentFilters);
         var options = new DialogOptions
             {
                 CloseOnEscapeKey = true,
@@ -195,11 +216,12 @@ else if (_isServerError)
         if (!result.Canceled && result.Data != null)
         {
             var filters = (ArtworkFilters) result.Data;
-            await ApplyFilters(filters);
+            _currentFilters = filters;
+            ApplyFilters(filters);
         }
     }
 
-    private async Task ApplyFilters(ArtworkFilters filters)
+    private void ApplyFilters(ArtworkFilters filters)
     {
         ArtworkFilterDialogHelper filterHelper = new(filters);
         string urlFilterQuery = filterHelper.BuildFilterQuery();
@@ -219,15 +241,29 @@ else if (_isServerError)
 
     }
 
-    private void HandleSortChanged(SortOptions options)
+    private void HandleSortDirectionChanged(bool newDirection)
     {
-        if (string.IsNullOrEmpty(options.SortBy))
+        if (_currentSort.SortBy == SortField.Undefined)
         {
             return;
         }
-
-        _sortQuery = options.BuildSortQuery();
+        _currentSort.IsDescending = newDirection;
+        _sortQuery = _currentSort.BuildSortQuery();
         NavigateToUpdatedPage(1, _filtersQuery, _sortQuery);
 
+    }
+
+    private void HandleSortFieldChanged(int fieldId)
+    {
+        if (!Enum.IsDefined(typeof(SortField), fieldId) 
+        || (SortField) fieldId == SortField.Undefined
+        || ((SortField) fieldId == _currentSort.SortBy))
+        {
+            return;
+        }
+        _currentSort.SortBy = (SortField)fieldId;
+        _sortText = _currentSort.SortBy.ToString();
+        _sortQuery = _currentSort.BuildSortQuery();
+        NavigateToUpdatedPage(1, _filtersQuery, _sortQuery);
     }
 }

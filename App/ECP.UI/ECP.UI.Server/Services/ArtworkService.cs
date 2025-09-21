@@ -19,17 +19,80 @@ namespace ECP.UI.Server.Services
 
         public async Task<Result<Artwork>> GetArtworkByIdAsync(int id, int source)
         {
-            return await ExecuteApiCallAsync<Artwork>($"https://localhost:7102/api/artworks?id={id}&source={source}");
+            string url = $"https://localhost:7102/api/artworks?id={id}&source={source}";
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return Result<Artwork>.Failure($"Http Error: {response.StatusCode}", response.StatusCode);
+                }
+
+                string httpContent = await response.Content.ReadAsStringAsync();
+                var artwork = JsonSerializer.Deserialize<Artwork>(httpContent, new JsonSerializerOptions()
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return Result<Artwork>.Success(artwork);
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Http Request Failed: {ex.Message}");
+                return Result<Artwork>.Failure(ex.Message, HttpStatusCode.ServiceUnavailable);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unknown Exception: {ex.Message}");
+                return Result<Artwork>.Failure(ex.Message, HttpStatusCode.InternalServerError);
+            }
+
         }
 
         public async Task<Result<PaginatedResponse<ArtworkPreview>>> GetArtworkPreviewsAsync(int count, int resultsPerPage, int pageNum)
         {
-            return await ExecuteApiCallAsync<PaginatedResponse<ArtworkPreview>>($"artworks/previews?count={count}&results_per_page={resultsPerPage}&page_num={pageNum}");
+            string url = $"artworks/previews?count={count}&results_per_page={resultsPerPage}&page_num={pageNum}";
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return Result<PaginatedResponse<ArtworkPreview>>.Failure($"Http Error: {response.StatusCode}", HttpStatusCode.ServiceUnavailable);
+                }
+
+                if (response.StatusCode == HttpStatusCode.NoContent)
+                {
+                    return Result<PaginatedResponse<ArtworkPreview>>.Success(new PaginatedResponse<ArtworkPreview>());
+                }
+
+                string httpContent = await response.Content.ReadAsStringAsync();
+                var list = JsonSerializer.Deserialize<PaginatedResponse<ArtworkPreview>>(httpContent, new JsonSerializerOptions()
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return Result<PaginatedResponse<ArtworkPreview>>.Success(list);
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Http Request Failed: {ex.Message}");
+                return Result<PaginatedResponse<ArtworkPreview>>.Failure(ex.Message, HttpStatusCode.ServiceUnavailable);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unknown Exception: {ex.Message}");
+                return Result<PaginatedResponse<ArtworkPreview>>.Failure(ex.Message, HttpStatusCode.InternalServerError);
+            }
         }
 
         public async Task<Result<PaginatedResponse<ArtworkPreview>>> SearchArtworksByQueryAsync(string q, int resultsPerPage, int pageNum, string? sortOptions = null, string? filterOptions = null)
         {
             StringBuilder url = new($"artworks/previews/search?&q={q}&limit={resultsPerPage}&p={pageNum}");
+
             if (!string.IsNullOrEmpty(sortOptions))
             {
                 url.Append(sortOptions);
@@ -38,41 +101,44 @@ namespace ECP.UI.Server.Services
             {
                 url.Append(filterOptions);
             }
-            return await ExecuteApiCallAsync<PaginatedResponse<ArtworkPreview>>(url.ToString());
-        }
 
-        protected async Task<Result<T>> ExecuteApiCallAsync<T>(string url)
-        {
             try
             {
-                HttpResponseMessage response = await _httpClient.GetAsync(url);
+                HttpResponseMessage response = await _httpClient.GetAsync(url.ToString());
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return Result<T>.Failure($"Http Error: {response.StatusCode}", HttpStatusCode.ServiceUnavailable);
+                    return Result<PaginatedResponse<ArtworkPreview>>.Failure($"Http Error: {response.StatusCode}", HttpStatusCode.ServiceUnavailable);
+                }
+
+                if (response.StatusCode == HttpStatusCode.NoContent)
+                {
+                    return Result<PaginatedResponse<ArtworkPreview>>.Success(new PaginatedResponse<ArtworkPreview>() { Data = new List<ArtworkPreview>() });
                 }
 
                 string httpContent = await response.Content.ReadAsStringAsync();
-                var list = JsonSerializer.Deserialize<T>(httpContent, new JsonSerializerOptions()
+                var list = JsonSerializer.Deserialize<PaginatedResponse<ArtworkPreview>>(httpContent, new JsonSerializerOptions()
                 {
                     PropertyNameCaseInsensitive = true
                 });
 
-                return Result<T>.Success(list);
+                return Result<PaginatedResponse<ArtworkPreview>>.Success(list);
             }
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"Http Request Failed: {ex.Message}");
-                return Result<T>.Failure(ex.Message, HttpStatusCode.ServiceUnavailable);
+                return Result<PaginatedResponse<ArtworkPreview>>.Failure(ex.Message, HttpStatusCode.ServiceUnavailable);
 
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Unknown Exception: {ex.Message}");
-                return Result<T>.Failure(ex.Message, HttpStatusCode.InternalServerError);
+                return Result<PaginatedResponse<ArtworkPreview>>.Failure(ex.Message, HttpStatusCode.InternalServerError);
             }
 
         }
+
+
 
     }
 }

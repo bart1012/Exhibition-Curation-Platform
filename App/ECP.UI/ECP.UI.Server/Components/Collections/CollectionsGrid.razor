@@ -21,11 +21,7 @@
                         }
                         else
                         {
-                            <div class="empty-collection-placeholder">
-                                <MudIcon Icon="@Icons.Material.Filled.Collections"  
-                                         Style="font-size: 3rem; color: var(--mud-palette-text-disabled);"
-                                         aria-hidden="true" />
-                            </div>
+                            <div class="empty-collection-placeholder" />                     
                         }
                     </div>
 
@@ -63,6 +59,8 @@
 </MudGrid>
 
 <style>
+ 
+
     .mud-grid-spacing-xs-3 {
         margin: 0 !important;
         width: 100% !important;
@@ -144,12 +142,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
-}
+        background: linear-gradient(135deg, #858585 0%, #595959 100%);
+    }
 
-.add-btn-container {
-    background: linear-gradient(135deg, #858585 0%, #595959 100%);
-}
+
 
 .collection-data {
     padding: 16px;

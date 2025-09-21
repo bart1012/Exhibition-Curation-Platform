@@ -1,4 +1,6 @@
-﻿<div class="results-header mb-2">
+﻿@using ECP.UI.Server.Models
+
+<div class="results-header mb-2">
     <MudText Typo="Typo.h5" Class="results-title mt-5">
         @if (!string.IsNullOrWhiteSpace(SearchQuery))
         {
@@ -12,10 +14,15 @@
     <MudDivider Class="my-3" />
     <div class="search-results-info">
         <MudText Typo="Typo.body2" Class="text-secondary mb-5">
-            Showing @(((PageNumber - 1) * 25) + 1) - @Math.Min(PageNumber * 25, TotalResults)
+            Showing @(((PageNumber - 1) * 25) + (TotalResults == 0 ? 0 : 1)) - @Math.Min(PageNumber * 25, TotalResults)
             of @TotalResults results
         </MudText>
-        <SortAndFilterControls OnSortFieldClick="OnSortFieldClick" OnFilterClick="OnFilterClick" OnSortDirectionClick="OnSortDirectionClick"></SortAndFilterControls>
+        <SortAndFilterControls 
+            OnFilterClick="OnFilterClick"
+            OnSortDirectionChanged="OnSortDirectionChanged"
+            OnSortFieldChanged="OnSortFieldChanged"
+            SortText="@SortText"
+            IsDescending="IsDescending"></SortAndFilterControls>
     </div>
 </div>
 @code {
@@ -28,7 +35,11 @@
     [Parameter]
     public EventCallback OnFilterClick { get; set; }
     [Parameter]
-    public EventCallback<bool> OnSortDirectionClick { get; set; }
+    public EventCallback<bool> OnSortDirectionChanged { get; set; }
     [Parameter]
-    public EventCallback<int> OnSortFieldClick { get; set; }
+    public EventCallback<int> OnSortFieldChanged { get; set; }
+    [Parameter]
+    public string? SortText { get; set; }
+    [Parameter]
+    public bool IsDescending { get; set; }
 }

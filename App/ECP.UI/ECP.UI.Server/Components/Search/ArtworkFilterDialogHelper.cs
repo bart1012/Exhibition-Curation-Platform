@@ -30,7 +30,7 @@ namespace ECP.UI.Server.Components.Search
                 return string.Empty;
 
             return string.Join("", filters.Select(f =>
-                $"&filters={Uri.EscapeDataString(f.Key)}:{Uri.EscapeDataString(f.Value)}"));
+                $"&filters={Uri.EscapeDataString(f.Key).ToLowerInvariant()}:{Uri.EscapeDataString(f.Value)}"));
         }
 
         private Dictionary<string, string> GetActiveFilters()

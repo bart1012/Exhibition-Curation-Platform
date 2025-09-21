@@ -12,7 +12,7 @@ namespace ECP.API.Features.Artworks
         private readonly IArtworksService _artworksService = artworksService;
 
         [HttpGet("previews")]
-        public async Task<IActionResult> GetArtworkPreviewAsync([FromQuery] int count, int results_per_page, int page_num)
+        public async Task<IActionResult> GetArtworkPreviewAsync([FromQuery] int count = 75, int results_per_page = 25, int page_num = 1)
         {
             Shared.Result<PaginatedResponse<ArtworkPreview>> response = await _artworksService.GetArtworkPreviewsAsync(count, results_per_page, page_num);
 

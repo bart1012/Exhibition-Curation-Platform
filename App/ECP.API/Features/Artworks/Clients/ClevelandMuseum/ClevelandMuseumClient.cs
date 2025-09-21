@@ -86,6 +86,7 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
             }
 
 
+
             url.Append($"&skip={parameters.Offset}");
 
             return url.ToString();
@@ -93,7 +94,6 @@ namespace ECP.API.Features.Artworks.Clients.ClevelandMuseum
 
         private async Task<List<ClevelandArtworkPreview>?> FetchCollectionAsync(string url)
         {
-            Console.WriteLine($"\n\n\n\nURL:{url}\n\n\n");
             try
             {
                 var response = await _client.GetAsync(url);

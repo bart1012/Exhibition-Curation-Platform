@@ -208,6 +208,8 @@ namespace ECP.API.Features.Artworks
             ArtworkType artworkType = ArtworkType.Undefined;
             Enum.TryParse(chicagoArtworkPreview.ArtworkTypeTitle, true, out artworkType);
 
+            if (chicagoArtworkPreview.ArtworkTypeTitle == "Drawing and Watercolor") artworkType = ArtworkType.Drawing;
+
             List<Artist> artworkArtists = null;
 
             if (chicagoArtworkPreview.ArtistTitles != null && chicagoArtworkPreview.ArtistTitles.Count > 0)

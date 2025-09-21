@@ -1,4 +1,6 @@
-﻿<div class="search-controls">
+﻿@using ECP.UI.Server.Models
+
+<div class="search-controls">
     <div class="sort-controls">
         <MudMenu FullWidth="true"
                  Style="border:none; display: block; height: 100%;"
@@ -7,20 +9,20 @@
             <ActivatorContent>
                 <MudButton aria-haspopup="true"
                            aria-expanded="false" 
-                           aria-label="@($"Current sort: {_sortText}")" 
+                           aria-label="@($"Current sort: {SortText}")"
                            Ripple="false" Class="no-hover px-0 pt-0 sort-btn" 
                            Style="min-width: auto; border:none; display:flex; justify-content: start;">
-                    @_sortText
+                    @SortText
                 </MudButton>
             </ActivatorContent>
             <ChildContent>
-                <MudMenuItem OnClick="@(() => SetSort(0))">Creation Date</MudMenuItem>
-                <MudMenuItem OnClick="@(() => SetSort(1))">Alphabetically</MudMenuItem>
+                <MudMenuItem OnClick="() => OnSortFieldChanged.InvokeAsync(0)">Creation Date</MudMenuItem>
+                <MudMenuItem OnClick="() => OnSortFieldChanged.InvokeAsync(1)">Alphabetically</MudMenuItem>
             </ChildContent>
         </MudMenu>
 
-        <MudToggleIconButton Toggled="_isDescending"
-                             ToggledChanged="() => OnSortDirectionClick.InvokeAsync()"
+        <MudToggleIconButton Toggled="IsDescending"
+                             ToggledChanged="@((bool newToggled) => OnSortDirectionChanged.InvokeAsync(newToggled))"
                              Icon="@Icons.Material.Filled.ArrowUpward"
                              Color="@Color.Dark"
                              Size="Size.Small"
@@ -28,7 +30,7 @@
                              ToggledIcon="@Icons.Material.Filled.ArrowDownward"
                              ToggledColor="@Color.Dark"
                              Class="no-hover rounded-r-xl px-1 pt-0 pb-0 sort-direction-btn"
-                             aria-label="@(_isDescending ? "Toggle ascending" : "Toggle descending")"
+                             aria-label="@(IsDescending ? "Toggle ascending" : "Toggle descending")"
                              Style="border:none; display: flex; align-items: start;" />
     </div>
     <MudButton Ripple="false" 
@@ -45,34 +47,11 @@
     [Parameter]
     public EventCallback OnFilterClick { get; set; }
     [Parameter]
-    public EventCallback<bool> OnSortDirectionClick { get; set; }
+    public EventCallback<bool> OnSortDirectionChanged { get; set; }
     [Parameter]
-    public EventCallback<int> OnSortFieldClick { get; set; }
-
-    private bool _isDescending;
-    private string _sortText = "Sort";
-    private string _sortBy = string.Empty;
-
-    private async Task SetSort(int id)
-    {
-        SetSortButtonText(id);
-        await OnSortFieldClick.InvokeAsync(id);
-    }
-
-    private void SetSortButtonText(int id)
-    {
-
-
-        switch (id)
-        {
-            case 0:
-                _sortText = "Creation Date";
-                break;
-            case 1:
-                _sortText = "Alphabetically";
-                break;
-        }
-
-    }
-
+    public EventCallback<int> OnSortFieldChanged { get; set; }
+    [Parameter]
+    public string? SortText { get; set; }
+    [Parameter]
+    public bool IsDescending { get; set; }
 }
