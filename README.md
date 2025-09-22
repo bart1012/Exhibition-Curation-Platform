@@ -26,7 +26,7 @@ To run the application locally you must:
 1. Clone the Repository: <br>
 `git clone https://github.com/bart1012/Exhibition-Curation-Platform.git; cd Exhibition-Curation-Platform;`
 2. Run the Projects: <br>
-The solution includes two main projects: ECP.UI.Server (the Blazor front-end) and ECP.API (the back-end API). You will need to run both simultaneously.
+The solution includes two main projects: ECP.UI.Server (the Blazor front-end) and ECP.API (the back-end API). Currently the front-end is configured to use the Azure-hosted API service but if you prefer to run both projects locally, you can change the target URL in ECP.UI.Server/Services/ArtworkService.cs. When doing so, you will need to run both projects simultaneously.
 
     - Open the solution in Visual Studio.
     - Right-click the solution in the Solution Explorer and select Set Startup Projects....
