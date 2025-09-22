@@ -16,7 +16,7 @@
         <div class="artwork-details-container">
 
         <MudGrid Class="artwork-grid h-100 w-auto ma-0 pa-0" Style="width: 100%; max-width: 100%;">
-            <MudItem xs="12" md="7" style=" border-right: none;" Class=" pa-0 artwork-image-panel">
+            <MudItem xs="12" md="7" style="border-right: none;" Class=" pa-0 artwork-image-panel">
                 <div class="image-container">
               
                     @if (!string.IsNullOrEmpty(_artwork.Images?.Web?.Url))
@@ -44,7 +44,7 @@
                     }
                 </div>
             </MudItem>
-            <MudItem xs="12" md="5" Class="artwork-details-panel pa-0 pl-5 pr-5">
+            <MudItem xs="12" md="5" Class="artwork-details-panel pa-0 pl-md-5 pr-md-5 pl-sm-0 pr-sm-0">
                 <div class="details-content">
                     <div class="artwork-header">
                         <div class="title-section">
@@ -498,7 +498,6 @@
 }
 
 .artwork-image-panel {
-    height: 100%;
     overflow: hidden;
     padding: 0 1rem 0 1rem;
     display: flex;
@@ -678,7 +677,12 @@
     text-transform: none;
 }
 
-
+@@media-query(max-height: 750px){
+        .artwork-details-panel {
+            padding-left: 0px !important;
+        }
+ 
+}
 
 </style>
 
